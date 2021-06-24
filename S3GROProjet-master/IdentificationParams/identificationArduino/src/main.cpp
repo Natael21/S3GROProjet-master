@@ -44,7 +44,16 @@ float Axyz[3];                      // tableau pour accelerometre
 float Gxyz[3];                      // tableau pour giroscope
 float Mxyz[3];                      // tableau pour magnetometre
 
+//ArduinoX AX_; // objet arduinoX 
+
 /*------------------------- Prototypes de fonctions -------------------------*/
+/*
+void ArduinoX::init();
+void ArduinoX::setMotorPWM(uint8_t id, float PWM);
+uint8_t MegaServo::attach(int pin);
+void MegaServo::detach() ;
+void MegaServo::write(int value);
+*/
 
 void timerCallback();
 void startPulse();
