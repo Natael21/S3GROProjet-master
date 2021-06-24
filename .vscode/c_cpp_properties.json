@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "D:\\Users\\Natael\\Documents\\Ecole\\Université\\S3\\Projet\\Code\\S3GROProjet-master\\S3GROProjet-master\\IdentificationParams\\identificationArduino\\myLibraries"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,9 +16,7 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
-            "compilerArgs": [
-                "D:\\Users\\Natael\\Documents\\Ecole\\Université\\S3\\Projet\\Code\\S3GROProjet-master\\S3GROProjet-master\\IdentificationParams\\identificationArduino\\myLibraries"
-            ]
+            "compilerArgs": []
         }
     ],
     "version": 4
