@@ -1,8 +1,8 @@
 /* 
  * GRO 302 - Conception d'un robot mobile
  * Code de démarrage
- * Auteurs: Jean-Samuel Lauzon     
- * date: 1 mai 2019
+ * Auteurs: Roundnet
+ * date: 24 juin 2021
 */
 
 /*------------------------------ Librairies ---------------------------------*/
