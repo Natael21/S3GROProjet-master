@@ -3,8 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "D:\\Users\\Natael\\Documents\\Ecole\\Université\\S3\\Projet\\Code\\S3GROProjet-master\\S3GROProjet-master\\IdentificationParams\\identificationArduino\\myLibraries"
+                "${workspaceFolder}**",
             ],
             "defines": [
                 "_DEBUG",
@@ -16,7 +15,8 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
-            "compilerArgs": []
+            "compilerArgs": [],
+            "compileCommands": "${workspaceFolder}/S3GROProjet-master/IdentificationParams/identification_Qt/compile_commands.json"
         }
     ],
     "version": 4
