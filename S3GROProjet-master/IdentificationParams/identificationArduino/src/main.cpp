@@ -14,7 +14,7 @@
 #define BAUD            115200      // Frequence de transmission serielle
 #define UPDATE_PERIODE  100         // Periode (ms) d'envoie d'etat general
 
-#define MAGPIN          32          // Port numerique pour electroaimant
+#define MAGPIN          32         // Port numerique pour electroaimant
 #define POTPIN          A5          // Port analogique pour le potentiometre
 
 #define PASPARTOUR      64          // Nombre de pas par tour du moteur
@@ -44,23 +44,16 @@ float Axyz[3];                      // tableau pour accelerometre
 float Gxyz[3];                      // tableau pour giroscope
 float Mxyz[3];                      // tableau pour magnetometre
 
-//ArduinoX AX_; // objet arduinoX 
+int time = 0;                       //timer pour la loop
 
 /*------------------------- Prototypes de fonctions -------------------------*/
-/*
-void ArduinoX::init();
-void ArduinoX::setMotorPWM(uint8_t id, float PWM);
-uint8_t MegaServo::attach(int pin);
-void MegaServo::detach() ;
-void MegaServo::write(int value);
-*/
-
 void timerCallback();
 void startPulse();
 void endPulse();
 void sendMsg(); 
 void readMsg();
 void serialEvent();
+void digitalWrite(uint8_t pin, uint8_t val);
 
 // Fonctions pour le PID
 double PIDmeasurement();
@@ -93,7 +86,10 @@ void setup() {
   pid_.setAtGoalFunc(PIDgoalReached);
   pid_.setEpsilon(0.001);
   pid_.setPeriod(200);
-}
+
+  //Defenition du IO pour l'ÉLECTRO-AIMANT
+  pinMode(MAGPIN, OUTPUT); 
+  }
 
 /* Boucle principale (infinie)*/
 void loop() {
@@ -111,7 +107,29 @@ void loop() {
   // mise a jour des chronometres
   timerSendMsg_.update();
   timerPulse_.update();
+
+
+  //TEST : Fait avancer le moteur 0 à une vitesse de 0.1 (??/??)
+  AX_.setMotorPWM(0,0.1);
+
+  //TEST : Allumer et éteindre l'électro-aimant
+  pinMode(MAGPIN, HIGH); // Activation electroAimant
+  if(time > 5000)
+  {
+      pinMode(MAGPIN, LOW); // Desactivation electroAimant
+      time = 0;
+  }
+  else
+  {
+    time += 1;
+      //delay(1000); //Délai de 1 secondes
+  }
+
+  //TEST : 
   
+
+
+
   // mise à jour du PID
   pid_.run();
 }

@@ -3,7 +3,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}**",
+                "D:/Users/Natael/Documents/Ecole/Université/S3/Projet/Code/S3GROProjet-master/S3GROProjet-master/IdentificationParams/Lib",
+                "D:/Users/Natael/Documents/Ecole/Université/S3/Projet/Code/S3GROProjet-master/S3GROProjet-master/IdentificationParams/identificationArduino/src",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/variants/mega",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/natae/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/natae/.platformio/packages/tool-unity",
+                ""
             ],
             "defines": [
                 "_DEBUG",

@@ -16,7 +16,7 @@ void SerialBluetooth::init(HardwareSerial& serialCon){
 void SerialBluetooth::init(SoftwareSerial& serialCon){
   stream_ptr = &serialCon;
   serialCon.begin(BAUD_RATE_BLUETOOTH);
-  while(!serialCon); // Attente d'ouverture du port serie
+  //while(!serialCon); // Attente d'ouverture du port serie
 }
 
 bool SerialBluetooth::read(String& msg){
