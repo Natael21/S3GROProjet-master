@@ -45,6 +45,7 @@ float Gxyz[3];                      // tableau pour giroscope
 float Mxyz[3];                      // tableau pour magnetometre
 
 int time = 0;                       //timer pour la loop
+int32_t compteur_encodeur = 0;      //Encodeur du moteur
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -89,6 +90,8 @@ void setup() {
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
+
+  pulsePWM_ = 0.5;
   }
 
 /* Boucle principale (infinie)*/
@@ -108,13 +111,20 @@ void loop() {
   timerSendMsg_.update();
   timerPulse_.update();
 
+  //----------------------------------SECTION MOTEUR-------------------------------------------//
 
-  //TEST : Fait avancer le moteur 0 à une vitesse de 0.1 (??/??)
-  AX_.setMotorPWM(0,0.1);
+  //Allume les moteur
+  //shouldPulse_ = false;
+
+  //Éteindre les moteurs
+  //shouldPulse_ = true;
+
+  //-------------------------------SECTION ÉLECTRO-AIMANT-------------------------------------//
 
   //TEST : Allumer et éteindre l'électro-aimant
+  /*
   pinMode(MAGPIN, HIGH); // Activation electroAimant
-  if(time > 5000)
+  if(time > 10000)
   {
       pinMode(MAGPIN, LOW); // Desactivation electroAimant
       time = 0;
@@ -122,16 +132,57 @@ void loop() {
   else
   {
     time += 1;
-      //delay(1000); //Délai de 1 secondes
+    //delay(1000); //Délai de 1 secondes
   }
-
-  //TEST : 
-  
+  */
 
 
+  //----------------------------------SECTION ENCODEUR------------------------------------------//
+
+  //compteur_encodeur = AX_. readEncoder(0);
+
+
+  //--------------------------SECTION CAPTEUR TENSION/COURANT----------------------------------//
+
+  //Voir section void sendMsg();
+
+
+  //------------------------------SECTION ENCODEUR OPTIQUE-------------------------------------//
+
+  //vexEncoder_.init(2,3); // initialisation de l'encodeur VEX
+  // attache de l'interruption pour encodeur vex
+  //attachInterrupt(vexEncoder_.getPinInt(),[]{vexEncoder_.isr();},FALLING);
+  //Voir section void sendMsg(); pour la fonction en dessous 
+  //doc["encVex"] = vexEncoder_.getCount();
+
+
+  //-----------------------------SECTION POTENTIOMÈTRE GROVE-----------------------------------//
+
+  //Voir section void sendMsg(); pour la fonction en dessous
+  //pour doc["potVex"] = analogRead(POTPIN);
+
+
+  //--------------------------SECTION CENTRALE INERTIELLE GROVE--------------------------------//
+
+  //Voir section void sendMsg();  pour pour les fonctions en dessous
+  //doc["accelZ"] = imu_.getAccelZ();
+  //doc["gyroX"] = imu_.getGyroX();
+
+
+  //-------------------------------------SECTION PID-------------------------------------------//
 
   // mise à jour du PID
   pid_.run();
+
+
+  //-------------------------------------SECTION TESTS------------------------------------------//
+  
+  //TEST #1 : Permet d'avoir en console la valeur de tous les capteurs.
+  //sendMsg();
+  //readMsg();
+
+  //TEST #2 : Fait avancer le moteur 0 à une vitesse de 0.1
+  AX_.setMotorPWM(0,1);
 }
 
 /*---------------------------Definition de fonctions ------------------------*/
@@ -235,6 +286,7 @@ void readMsg(){
 // Fonctions pour le PID
 double PIDmeasurement(){
   // To do
+  return 0;
 }
 void PIDcommand(double cmd){
   // To do
