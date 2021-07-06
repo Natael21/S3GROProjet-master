@@ -286,7 +286,7 @@ void readMsg(){
 // Fonctions pour le PID
 double PIDmeasurement(){
   // To do
-  return 0;
+  return 0.0;
 }
 void PIDcommand(double cmd){
   // To do
