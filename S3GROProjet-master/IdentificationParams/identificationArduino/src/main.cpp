@@ -14,7 +14,7 @@
 #define BAUD            115200      // Frequence de transmission serielle
 #define UPDATE_PERIODE  100         // Periode (ms) d'envoie d'etat general
 
-#define MAGPIN          32         // Port numerique pour electroaimant
+#define MAGPIN          32         // Port numerique pour electroaimant J-16
 #define POTPIN          A5          // Port analogique pour le potentiometre
 
 #define PASPARTOUR      64          // Nombre de pas par tour du moteur
@@ -38,7 +38,7 @@ SoftTimer timerSendMsg_;            // chronometre d'envoie de messages
 SoftTimer timerPulse_;              // chronometre pour la duree d'un pulse
 
 uint16_t pulseTime_ = 0;            // temps dun pulse en ms
-float pulsePWM_ = 0;                // Amplitude de la tension au moteur [-1,1]
+float pulsePWM_ = 0.1;                // Amplitude de la tension au moteur [-1,1]
 
 
 float Axyz[3];                      // tableau pour accelerometre
@@ -48,7 +48,8 @@ float Mxyz[3];                      // tableau pour magnetometre
 int time = 0;                       //timer pour la loop
 int32_t compteur_encodeur = 0;      //Encodeur du moteur
 
-int choix = -1;                      //sert pour le switch case
+int choix = 10;                      //sert pour le switch case
+double fonction = 0;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -88,8 +89,9 @@ void setup() {
   pid_x.setMeasurementFunc(PIDmeasurement);
   pid_x.setCommandFunc(PIDcommand);
   pid_x.setAtGoalFunc(PIDgoalReached);
-  pid_x.setEpsilon(0.001);
+  pid_x.setEpsilon(0.01);
   pid_x.setPeriod(200);
+  pid_x.enable();
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
@@ -98,6 +100,7 @@ void setup() {
 /* Boucle principale (infinie)*/
 void loop() {
 
+/*
   if(shouldRead_){
     readMsg();
   }
@@ -107,6 +110,7 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
+  */
 
   // mise a jour des chronometres
   timerSendMsg_.update();
@@ -140,8 +144,8 @@ void loop() {
 
   //----------------------------------SECTION ENCODEUR------------------------------------------//
 
-  compteur_encodeur = AX_.readEncoder(0);
-  Serial.println();
+  //compteur_encodeur = AX_.readEncoder(0);
+  //Serial.println();
 
 
   //--------------------------SECTION CAPTEUR TENSION/COURANT----------------------------------//
@@ -176,39 +180,65 @@ void loop() {
   
   switch(choix) 
   {
-    case -1:
+    case 10:
     pinMode(MAGPIN, HIGH);
+    delay(3000);
     choix = 0;
     break;
 
     case 0:
+    //Serial.println(pulsePWM_);
     pid_x.setGoal(0.7);
     pid_x.setGains(13,0,0);
     pid_x.run();
     AX_.setMotorPWM(0,pulsePWM_);//changer valeur vitesse avec MG
-    
-    break;
+      break;
     
     case 1:
-      //code
+    fonction = 0.8*sin(5.0*millis());
+    pid_x.setGoal(fonction);
+    pid_x.setGains(13,0,0);
+    pid_x.run();
+    Serial.println(fonction);
+    //AX_.setMotorPWM(0,pulsePWM_);//changer valeur vitesse avec MG
+    delay(200);
       break;
 
     case 2:
       //code
       break;
+
+    case 100:
+      //case vide
+      break;
   }
   // mise à jour du PID
-  pid_x.run();
+  //pid_x.run();
 
+
+  if(pid_x.isAtGoal())
+  { 
+     pinMode(MAGPIN, LOW);
+    choix = 100;
+    while(1)
+    {
+      AX_.setMotorPWM(0,0);
+    }
+  }
+  
 
   //-------------------------------------SECTION TESTS------------------------------------------//
   
   //TEST #1 : Permet d'avoir en console la valeur de tous les capteurs.
   //sendMsg();
   //readMsg();
-
+/*
   //TEST #2 : Fait avancer le moteur 0 à une vitesse de 0.1
-  AX_.setMotorPWM(0,1);
+  AX_.setMotorPWM(0,0.3);
+  delay(500);
+  AX_.setMotorPWM(0,-0.3);
+  delay(500);
+  */
 }
 
 /*---------------------------Definition de fonctions ------------------------*/
@@ -316,13 +346,18 @@ double PIDmeasurement(){
   double tour;
   pulse = AX_.readEncoder(0);
   tour = pulse/3200;
-  distance = tour * (60/1000) * 2 * PI;
+  distance = tour * 0.06 * 2 * PI;
 
   return distance;
 }
+
+
 void PIDcommand(double cmd){
-  pulsePWM_= cmd;
+  //Serial.println("commande");
+  pulsePWM_ = cmd;
 }
+
+
 void PIDgoalReached(){
   // To do
 }
