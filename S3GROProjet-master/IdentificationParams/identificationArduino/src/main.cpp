@@ -26,7 +26,8 @@ ArduinoX AX_;                       // objet arduinoX
 MegaServo servo_;                   // objet servomoteur
 VexQuadEncoder vexEncoder_;         // objet encodeur vex
 IMU9DOF imu_;                       // objet imu
-PID pid_;                           // objet PID
+PID pid_x;                           // objet PID x
+PID pid_q;                           // objet PID q
 
 volatile bool shouldSend_ = false;  // drapeau prêt à envoyer un message
 volatile bool shouldRead_ = false;  // drapeau prêt à lire un message
@@ -46,6 +47,8 @@ float Mxyz[3];                      // tableau pour magnetometre
 
 int time = 0;                       //timer pour la loop
 int32_t compteur_encodeur = 0;      //Encodeur du moteur
+
+int choix = -1;                      //sert pour le switch case
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -80,18 +83,16 @@ void setup() {
   timerPulse_.setCallback(endPulse);
   
   // Initialisation du PID
-  pid_.setGains(0.25,0.1 ,0);
+  pid_x.setGains(0.25,0.1 ,0);
   // Attache des fonctions de retour
-  pid_.setMeasurementFunc(PIDmeasurement);
-  pid_.setCommandFunc(PIDcommand);
-  pid_.setAtGoalFunc(PIDgoalReached);
-  pid_.setEpsilon(0.001);
-  pid_.setPeriod(200);
+  pid_x.setMeasurementFunc(PIDmeasurement);
+  pid_x.setCommandFunc(PIDcommand);
+  pid_x.setAtGoalFunc(PIDgoalReached);
+  pid_x.setEpsilon(0.001);
+  pid_x.setPeriod(200);
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
-
-  pulsePWM_ = 0.5;
   }
 
 /* Boucle principale (infinie)*/
@@ -139,7 +140,8 @@ void loop() {
 
   //----------------------------------SECTION ENCODEUR------------------------------------------//
 
-  //compteur_encodeur = AX_. readEncoder(0);
+  compteur_encodeur = AX_.readEncoder(0);
+  Serial.println();
 
 
   //--------------------------SECTION CAPTEUR TENSION/COURANT----------------------------------//
@@ -171,8 +173,32 @@ void loop() {
 
   //-------------------------------------SECTION PID-------------------------------------------//
 
+  
+  switch(choix) 
+  {
+    case -1:
+    pinMode(MAGPIN, HIGH);
+    choix = 0;
+    break;
+
+    case 0:
+    pid_x.setGoal(0.7);
+    pid_x.setGains(13,0,0);
+    pid_x.run();
+    AX_.setMotorPWM(0,pulsePWM_);//changer valeur vitesse avec MG
+    
+    break;
+    
+    case 1:
+      //code
+      break;
+
+    case 2:
+      //code
+      break;
+  }
   // mise à jour du PID
-  pid_.run();
+  pid_x.run();
 
 
   //-------------------------------------SECTION TESTS------------------------------------------//
@@ -218,7 +244,7 @@ void sendMsg(){
   doc["time"] = millis();
   doc["potVex"] = analogRead(POTPIN);
   doc["encVex"] = vexEncoder_.getCount();
-  doc["goal"] = pid_.getGoal();
+  doc["goal"] = pid_x.getGoal();
   doc["measurements"] = PIDmeasurement();
   doc["voltage"] = AX_.getVoltage();
   doc["current"] = AX_.getCurrent(); 
@@ -231,8 +257,8 @@ void sendMsg(){
   doc["gyroX"] = imu_.getGyroX();
   doc["gyroY"] = imu_.getGyroY();
   doc["gyroZ"] = imu_.getGyroZ();
-  doc["isGoal"] = pid_.isAtGoal();
-  doc["actualTime"] = pid_.getActualDt();
+  doc["isGoal"] = pid_x.isAtGoal();
+  doc["actualTime"] = pid_x.getActualDt();
 
   // Serialisation
   serializeJson(doc, Serial);
@@ -274,22 +300,28 @@ void readMsg(){
   }
   parse_msg = doc["setGoal"];
   if(!parse_msg.isNull()){
-    pid_.disable();
-    pid_.setGains(doc["setGoal"][0], doc["setGoal"][1], doc["setGoal"][2]);
-    pid_.setEpsilon(doc["setGoal"][3]);
-    pid_.setGoal(doc["setGoal"][4]);
-    pid_.enable();
+    pid_x.disable();
+    pid_x.setGains(doc["setGoal"][0], doc["setGoal"][1], doc["setGoal"][2]);
+    pid_x.setEpsilon(doc["setGoal"][3]);
+    pid_x.setGoal(doc["setGoal"][4]);
+    pid_x.enable();
   }
 }
 
 
 // Fonctions pour le PID
 double PIDmeasurement(){
-  // To do
-  return 0.0;
+  double pulse;
+  double distance;
+  double tour;
+  pulse = AX_.readEncoder(0);
+  tour = pulse/3200;
+  distance = tour * (60/1000) * 2 * PI;
+
+  return distance;
 }
 void PIDcommand(double cmd){
-  // To do
+  pulsePWM_= cmd;
 }
 void PIDgoalReached(){
   // To do
