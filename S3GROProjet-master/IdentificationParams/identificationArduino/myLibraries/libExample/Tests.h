@@ -60,6 +60,9 @@ bool goal_position_atteint = false;  //Permet de savoir si la positon est attein
 bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
 int goal_voulu_position = 0;         //Permet de dire la distance voulue
 int goal_voulu_angle = 0;            //Permet de dire l'angle voulue
+float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
+float deg = 0;
+bool rentree = false;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();

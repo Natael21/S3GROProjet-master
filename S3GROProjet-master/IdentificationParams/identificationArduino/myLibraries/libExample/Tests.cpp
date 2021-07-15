@@ -80,10 +80,22 @@ void Tests::Tests_unitaire(){
 
   //-----------------------------SECTION POTENTIOMÈTRE GROVE-----------------------------------//
   //retourne des valeurs de 0-1023
-  Serial.println(analogRead(POTPIN));
-  //etat initiale du pendule = 62-63
-  //à 90 degree (vers l'avant du robot) = 525
-  ////à 90 degree (vers l'arrière du robot) = 400
+  //117-1010
+  //Serial.println(analogRead(POTPIN));
+  /*
+  if(rentree == false)
+  {
+      Potentio_zero = analogRead(POTPIN);
+      rentree = true;
+  }
+
+  deg = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
+  */
+  //Serial.println(deg);
+
+  //etat initiale du pendule = 
+  //à 90 degree (vers l'avant du robot) = 
+  ////à 90 degree (vers l'arrière du robot) = 
 
 
   //--------------------------SECTION CENTRALE INERTIELLE GROVE--------------------------------//

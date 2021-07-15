@@ -49,12 +49,14 @@ float Mxyz[3];                      // tableau pour magnetometre
 int time = 0;                       //timer pour la loop
 int32_t compteur_encodeur = 0;      //Encodeur du moteur
 
-int choix = 10;                      //sert pour le switch case
+int choix = 0;                      //sert pour le switch case
 double fonction = 0;                 //fonction de tests dans la loop
 bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
 int goal_voulu_position = 0;         //Permet de dire la distance voulue
 int goal_voulu_angle = 0;            //Permet de dire l'angle voulue
+float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
+float deg = 0;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -116,17 +118,23 @@ void setup() {
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
-}
 
+
+  Potentio_zero = analogRead(POTPIN);
+
+  goal_voulu_position = 0.4;
+}
+/*
 void loop() {
   tests.Tests_unitaire();
 }
+*/
 
-/*
-/* Boucle principale (infinie)
+
+// Boucle principale (infinie) 
 void loop() {
 
-
+/*
   if(shouldRead_){
     readMsg();
   }
@@ -136,6 +144,7 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
+  */
 
   // mise a jour des chronometres
   timerSendMsg_.update();
@@ -143,36 +152,58 @@ void loop() {
 
   switch(choix) 
   {
-    case 10:
-    pinMode(MAGPIN, HIGH);
-    delay(3000);
-    choix = 0;
+    case 0: // init de l'électroaimant
+      pinMode(MAGPIN, HIGH);
+      delay(2000);
+     choix = 10;
     break;
 
-    case 0:
+    case 1: //squence 1 aller
+      //code ici
+      fonction = 0.8*sin(5.0*millis());
+      AX_.setMotorPWM(0,fonction);
+      Serial.println(fonction);
+    break;
+
+    case 2: //séquence 2 aller
+      //code ici
+    break;
+
+    case 3: //séquence 3 aller
+      //code ici
+    break;
+
+    case 4: //séquence 4 aller
+      //code ici
+    break;
+
+    case 10: // test du PID de position
     //Serial.println(pulsePWM_);
-    pid_x.setGoal(0.7);
+    pid_x.setGoal(goal_voulu_position);
     pid_x.setGains(13,0,0);
     pid_x.run();
-    AX_.setMotorPWM(0,pulsePWM_);//changer valeur vitesse avec MG
+    AX_.setMotorPWM(0,pulsePWM_);
       break;
     
-    case 1:
+    case 11: // Tests 2 du PID de position
       //fonction = 0.8*sin(5.0*millis());
       pid_x.setGoal(goal_voulu_position);
       pid_x.setGains(13,0,0);
       pid_x.run();
       //Serial.println(fonction);
       AX_.setMotorPWM(0,pulsePWM_);
+      //Serial.println("allo");
       //delay(200);
+      /*
       if(goal_position_atteint)
       { 
        pinMode(MAGPIN, LOW);
        choix = 100;
       }
+      */
     break;
 
-    case 2:
+    case 12:
       //code
       pid_q.setGoal(goal_voulu_angle);
       pid_q.setGains(13,0,0);
@@ -182,14 +213,12 @@ void loop() {
       //delay(200);
     break;
 
-    case 100:
-      //case des moteurs à 0. Donc, arret du moteur
+    case 100: //mets des moteurs à 0. Donc, arret du moteur et de l'électroaimant
       AX_.setMotorPWM(0,0);
       pinMode(MAGPIN, LOW);
     break;
   }//Fin du switch case
 }
-*/
 
 /*---------------------------Definition de fonctions ------------------------*/
 
@@ -301,7 +330,6 @@ double PIDmeasurement(){
   return distance;
 }
 
-
 void PIDcommand(double cmd){
   pulsePWM_ = cmd;
 }
@@ -316,11 +344,9 @@ void PIDgoalReached(){
 // Fonctions pour le PID d'angle
 double PIDmeasurement_angle(){
   
-  double angle = 0;
+  deg = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
 
-  //angle = analogRead(POTPIN);
-
-  return angle;
+  return deg;
 }
 
 
