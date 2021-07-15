@@ -56,8 +56,10 @@ bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule es
 double goal_voulu_position_aller = 0;//Permet de dire la distance voulue pour l'aller
 double goal_voulu_position_retour = 0;//Permet de dire la distance voulue pour le retour
 double goal_voulu_angle = 0;         //Permet de dire l'angle voulue
+double distance_oscillation = 0;     //Permet savoir l'endroit d'oscillation
 float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
 float deg = 0;                       //Permet de savoir l'agle actuelle du pendule
+
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -164,7 +166,7 @@ void loop() {
     break;
 
     case 1: //squence 1 aller (oscillation du pendule)
-      fonction = 0.8*sin(5.0*millis());
+      fonction = 0.3*sin(5.0*millis())+distance_oscillation;
       pid_q.setGains(5,0,0);
       pid_q.setGoal(goal_voulu_angle);
       pid_q.run();
@@ -190,11 +192,10 @@ void loop() {
     break;
 
     case 3: //séquence 3 aller (arret du pendule vers 0 degree)
-      fonction = 0.8*sin(5.0*millis());
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
       pid_q.run();
-      AX_.setMotorPWM(0,fonction);
+      AX_.setMotorPWM(0,pulsePWM_angle);
       if(goal_angle_atteint)
       {
         choix = 4;
@@ -206,21 +207,7 @@ void loop() {
       AX_.setMotorPWM(0,0);
       pinMode(MAGPIN, LOW);
       delay(750);
-      choix = 5;
-    break;
-
-    case 5: //séquence 5 aller (oscille assez pour passer l'obstacle pour le retour)
-      fonction = 0.8*sin(5.0*millis());
-      pid_q.setGains(5,0,0);
-      pid_q.setGoal(-goal_voulu_angle);
-      pid_q.run();
-      AX_.setMotorPWM(0,fonction);
-      //Serial.println(fonction);
-      if(goal_angle_atteint)
-      {
-        choix = 6;
-        goal_angle_atteint = false;
-      }
+      choix = 6;
     break;
 
     case 6: //séquence 6 aller (passer par dessus l'obstacle pour le retour)
@@ -236,11 +223,10 @@ void loop() {
     break;
 
     case 7: //séquence 7 aller (arret du pendule au dessus du sapin = 0 degree)
-      fonction = 0.8*sin(5.0*millis());
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
       pid_q.run();
-      AX_.setMotorPWM(0,fonction);
+      AX_.setMotorPWM(0,pulsePWM_angle);
       //Serial.println(fonction);
       if(goal_angle_atteint)
       {
