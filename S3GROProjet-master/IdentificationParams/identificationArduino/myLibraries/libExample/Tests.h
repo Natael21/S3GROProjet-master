@@ -51,18 +51,19 @@ float Axyz[3];                      // tableau pour accelerometre
 float Gxyz[3];                      // tableau pour giroscope
 float Mxyz[3];                      // tableau pour magnetometre
 
-int time = 0;                       //timer pour la loop
+int time = 0;                       //Timer pour la loop
 int32_t compteur_encodeur = 0;      //Encodeur du moteur
 
-int choix = 10;                      //sert pour le switch case
-double fonction = 0;                 //fonction de tests dans la loop
+int choix = 10;                      //Srt pour le switch case
+double fonction = 0;                 //Fonction de tests dans la loop
 bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
 int goal_voulu_position = 0;         //Permet de dire la distance voulue
 int goal_voulu_angle = 0;            //Permet de dire l'angle voulue
 float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
-float deg = 0;
-bool rentree = false;
+float deg = 0;                       //Permet de savoir l'anlge du pendule
+bool rentree = false;                //Permet de calculer Potentio_zero une seule fois
+float distance = 0;                  //Permet de savoir la distance en temps réelle du robot
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();

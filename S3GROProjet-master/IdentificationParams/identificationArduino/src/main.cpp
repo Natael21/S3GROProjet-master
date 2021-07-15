@@ -53,8 +53,8 @@ int choix = 0;                      //sert pour le switch case
 double fonction = 0;                 //fonction de tests dans la loop
 bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
-int goal_voulu_position = 0;         //Permet de dire la distance voulue
-int goal_voulu_angle = 0;            //Permet de dire l'angle voulue
+double goal_voulu_position = 0;         //Permet de dire la distance voulue
+double goal_voulu_angle = 0;            //Permet de dire l'angle voulue
 float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
 float deg = 0;
 
@@ -122,19 +122,21 @@ void setup() {
 
   Potentio_zero = analogRead(POTPIN);
 
-  goal_voulu_position = 0.4;
+  goal_voulu_position = 0.7;
 }
-/*
+
+
 void loop() {
-  tests.Tests_unitaire();
+  //tests.Tests_unitaire();
+  //Serial.println(imu_.getTemp());
+  //delay(750);
 }
-*/
 
 
+/*
 // Boucle principale (infinie) 
 void loop() {
 
-/*
   if(shouldRead_){
     readMsg();
   }
@@ -144,7 +146,7 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
-  */
+  
 
   // mise a jour des chronometres
   timerSendMsg_.update();
@@ -155,7 +157,7 @@ void loop() {
     case 0: // init de l'électroaimant
       pinMode(MAGPIN, HIGH);
       delay(2000);
-     choix = 10;
+     choix = 11;
     break;
 
     case 1: //squence 1 aller
@@ -180,9 +182,10 @@ void loop() {
     case 10: // test du PID de position
     //Serial.println(pulsePWM_);
     pid_x.setGoal(goal_voulu_position);
-    pid_x.setGains(13,0,0);
+    pid_x.setGains(5,0,0);
     pid_x.run();
     AX_.setMotorPWM(0,pulsePWM_);
+    //Serial.println("sortit");
       break;
     
     case 11: // Tests 2 du PID de position
@@ -191,16 +194,12 @@ void loop() {
       pid_x.setGains(13,0,0);
       pid_x.run();
       //Serial.println(fonction);
-      AX_.setMotorPWM(0,pulsePWM_);
-      //Serial.println("allo");
-      //delay(200);
-      /*
+      AX_.setMotorPWM(0,pulsePWM_);      
       if(goal_position_atteint)
       { 
-       pinMode(MAGPIN, LOW);
        choix = 100;
       }
-      */
+      
     break;
 
     case 12:
@@ -220,6 +219,7 @@ void loop() {
   }//Fin du switch case
 }
 
+*/
 /*---------------------------Definition de fonctions ------------------------*/
 
 void serialEvent(){shouldRead_ = true;}
@@ -266,6 +266,7 @@ void sendMsg(){
   doc["gyroX"] = imu_.getGyroX();
   doc["gyroY"] = imu_.getGyroY();
   doc["gyroZ"] = imu_.getGyroZ();
+  doc["temp"] = imu_.getTemp();
   doc["isGoal"] = pid_x.isAtGoal();
   doc["actualTime"] = pid_x.getActualDt();
 
@@ -326,6 +327,7 @@ double PIDmeasurement(){
   pulse = AX_.readEncoder(0);
   tour = pulse/3200;
   distance = tour * 0.06 * 2 * PI;
+  Serial.println(distance);
 
   return distance;
 }

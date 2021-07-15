@@ -104,9 +104,11 @@ void Tests::Tests_unitaire(){
   //doc["accelZ"] = imu_.getAccelZ();
   //doc["gyroX"] = imu_.getGyroX();
 
-
+  //Serial.println(((imu_.getAccelY()*((millis()/1000.0)*(millis()/1000.0)))/2.0));
+  //distance = distance + ((imu_.getAccelY()*((millis()/1000.0)*(millis()/1000.0)))/2.0);
+  //Serial.println(distance);
   //-------------------------------------SECTION PID-------------------------------------------//
-  pid_x.run();
+  //pid_x.run();
 }
 
 // Private Functions
