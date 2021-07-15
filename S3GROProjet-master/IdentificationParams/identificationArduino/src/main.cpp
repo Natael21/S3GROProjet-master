@@ -38,25 +38,26 @@ volatile bool isInPulse_ = false;   // drapeau pour effectuer un pulse
 SoftTimer timerSendMsg_;            // chronometre d'envoie de messages
 SoftTimer timerPulse_;              // chronometre pour la duree d'un pulse
 
-uint16_t pulseTime_ = 0;            // temps dun pulse en ms
-float pulsePWM_ = 0.1;              // Amplitude de la tension au moteur pour la position[-1,1]
-float pulsePWM_angle = 0.1;         //Amplitude de la tension au moteur pour l'angle [-1,1]
+uint16_t pulseTime_ = 0;             // temps dun pulse en ms
+float pulsePWM_ = 0.1;               // Amplitude de la tension au moteur pour la position[-1,1]
+float pulsePWM_angle = 0.1;          //Amplitude de la tension au moteur pour l'angle [-1,1]
 
-float Axyz[3];                      // tableau pour accelerometre
-float Gxyz[3];                      // tableau pour giroscope
-float Mxyz[3];                      // tableau pour magnetometre
+float Axyz[3];                       // tableau pour accelerometre
+float Gxyz[3];                       // tableau pour giroscope
+float Mxyz[3];                       // tableau pour magnetometre
 
-int time = 0;                       //timer pour la loop
-int32_t compteur_encodeur = 0;      //Encodeur du moteur
+int time = 0;                        //timer pour la loop
+int32_t compteur_encodeur = 0;       //Encodeur du moteur
 
-int choix = 0;                      //sert pour le switch case
+int choix = 0;                       //sert pour le switch case
 double fonction = 0;                 //fonction de tests dans la loop
 bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
-double goal_voulu_position = 0;         //Permet de dire la distance voulue
-double goal_voulu_angle = 0;            //Permet de dire l'angle voulue
+double goal_voulu_position_aller = 0;//Permet de dire la distance voulue pour l'aller
+double goal_voulu_position_retour = 0;//Permet de dire la distance voulue pour le retour
+double goal_voulu_angle = 0;         //Permet de dire l'angle voulue
 float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
-float deg = 0;
+float deg = 0;                       //Permet de savoir l'agle actuelle du pendule
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -121,19 +122,18 @@ void setup() {
 
 
   Potentio_zero = analogRead(POTPIN);
-
-  goal_voulu_position = 0.7;
 }
 
-
+/*
 void loop() {
   //tests.Tests_unitaire();
   //Serial.println(imu_.getTemp());
   //delay(750);
 }
+*/
 
 
-/*
+
 // Boucle principale (infinie) 
 void loop() {
 
@@ -154,43 +154,113 @@ void loop() {
 
   switch(choix) 
   {
-    case 0: // init de l'électroaimant
+    case 0: // initialisation des variables
       pinMode(MAGPIN, HIGH);
       delay(2000);
-     choix = 11;
+      goal_voulu_position_aller = 0.7;
+      goal_voulu_position_retour = -0.7;
+      goal_voulu_angle = -80;
+      choix = 11;
     break;
 
-    case 1: //squence 1 aller
-      //code ici
+    case 1: //squence 1 aller (oscillation du pendule)
       fonction = 0.8*sin(5.0*millis());
+      pid_q.setGains(5,0,0);
+      pid_q.setGoal(goal_voulu_angle);
+      pid_q.run();
       AX_.setMotorPWM(0,fonction);
-      Serial.println(fonction);
+      //Serial.println(fonction);
+      if(goal_angle_atteint)
+      {
+        choix = 2;
+        goal_angle_atteint = false;
+      }
     break;
 
-    case 2: //séquence 2 aller
-      //code ici
+    case 2: //séquence 2 aller (passer par dessus l'obstacle)
+      pid_x.setGoal(goal_voulu_position_aller);
+      pid_x.setGains(5,0,0);
+      pid_x.run();
+      AX_.setMotorPWM(0,pulsePWM_);
+      if(goal_position_atteint)
+      {
+        choix = 3;
+        goal_position_atteint = false;
+      }
     break;
 
-    case 3: //séquence 3 aller
-      //code ici
+    case 3: //séquence 3 aller (arret du pendule vers 0 degree)
+      fonction = 0.8*sin(5.0*millis());
+      pid_q.setGains(5,0,0);
+      pid_q.setGoal(0);
+      pid_q.run();
+      AX_.setMotorPWM(0,fonction);
+      if(goal_angle_atteint)
+      {
+        choix = 4;
+        goal_angle_atteint = false;
+      }
     break;
 
-    case 4: //séquence 4 aller
-      //code ici
+    case 4: //séquence 4 aller (lache le pendule dans le panier)
+      AX_.setMotorPWM(0,0);
+      pinMode(MAGPIN, LOW);
+      delay(750);
+      choix = 5;
     break;
 
-    case 10: // test du PID de position
+    case 5: //séquence 5 aller (oscille assez pour passer l'obstacle pour le retour)
+      fonction = 0.8*sin(5.0*millis());
+      pid_q.setGains(5,0,0);
+      pid_q.setGoal(-goal_voulu_angle);
+      pid_q.run();
+      AX_.setMotorPWM(0,fonction);
+      //Serial.println(fonction);
+      if(goal_angle_atteint)
+      {
+        choix = 6;
+        goal_angle_atteint = false;
+      }
+    break;
+
+    case 6: //séquence 6 aller (passer par dessus l'obstacle pour le retour)
+      pid_x.setGoal(goal_voulu_position_retour);
+      pid_x.setGains(5,0,0);
+      pid_x.run();
+      AX_.setMotorPWM(0,pulsePWM_);
+      if(goal_position_atteint)
+      {
+        choix = 7;
+        goal_position_atteint = false;
+      }
+    break;
+
+    case 7: //séquence 7 aller (arret du pendule au dessus du sapin = 0 degree)
+      fonction = 0.8*sin(5.0*millis());
+      pid_q.setGains(5,0,0);
+      pid_q.setGoal(0);
+      pid_q.run();
+      AX_.setMotorPWM(0,fonction);
+      //Serial.println(fonction);
+      if(goal_angle_atteint)
+      {
+        choix = 1;
+        goal_angle_atteint = false;
+      }
+    break;
+
+    case 10: // Test du PID de position
     //Serial.println(pulsePWM_);
-    pid_x.setGoal(goal_voulu_position);
+    pid_x.setGoal(goal_voulu_position_aller);
     pid_x.setGains(5,0,0);
     pid_x.run();
     AX_.setMotorPWM(0,pulsePWM_);
     //Serial.println("sortit");
       break;
     
-    case 11: // Tests 2 du PID de position
+    case 11: // Test 2 du PID de position
       //fonction = 0.8*sin(5.0*millis());
-      pid_x.setGoal(goal_voulu_position);
+      pid_x.setGoal(goal_voulu_position_aller);
       pid_x.setGains(13,0,0);
       pid_x.run();
       //Serial.println(fonction);
@@ -202,7 +272,7 @@ void loop() {
       
     break;
 
-    case 12:
+    case 12: // Test du PID du pendule
       //code
       pid_q.setGoal(goal_voulu_angle);
       pid_q.setGains(13,0,0);
@@ -219,7 +289,6 @@ void loop() {
   }//Fin du switch case
 }
 
-*/
 /*---------------------------Definition de fonctions ------------------------*/
 
 void serialEvent(){shouldRead_ = true;}
