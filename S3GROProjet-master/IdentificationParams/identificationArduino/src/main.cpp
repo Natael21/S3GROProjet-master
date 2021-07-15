@@ -8,7 +8,7 @@
 /*------------------------------ Librairies ---------------------------------*/
 #include <LibS3GRO.h>
 #include <ArduinoJson.h>
-#include <libExample.h> // Vos propres librairies
+#include <Tests.h> // Vos propres librairies
 /*------------------------------ Constantes ---------------------------------*/
 
 #define BAUD            115200      // Frequence de transmission serielle
@@ -38,8 +38,8 @@ SoftTimer timerSendMsg_;            // chronometre d'envoie de messages
 SoftTimer timerPulse_;              // chronometre pour la duree d'un pulse
 
 uint16_t pulseTime_ = 0;            // temps dun pulse en ms
-float pulsePWM_ = 0.1;                // Amplitude de la tension au moteur [-1,1]
-
+float pulsePWM_ = 0.1;              // Amplitude de la tension au moteur pour la position[-1,1]
+float pulsePWM_angle = 0.1;         //Amplitude de la tension au moteur pour l'angle [-1,1]
 
 float Axyz[3];                      // tableau pour accelerometre
 float Gxyz[3];                      // tableau pour giroscope
@@ -49,7 +49,11 @@ int time = 0;                       //timer pour la loop
 int32_t compteur_encodeur = 0;      //Encodeur du moteur
 
 int choix = 10;                      //sert pour le switch case
-double fonction = 0;
+double fonction = 0;                 //fonction de tests dans la loop
+bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
+bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
+int goal_voulu_position = 0;         //Permet de dire la distance voulue
+int goal_voulu_angle = 0;            //Permet de dire l'angle voulue
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -60,10 +64,15 @@ void readMsg();
 void serialEvent();
 void digitalWrite(uint8_t pin, uint8_t val);
 
-// Fonctions pour le PID
+// Fonctions pour le PID de position
 double PIDmeasurement();
 void PIDcommand(double cmd);
 void PIDgoalReached();
+
+// Fonctions pour le PID de l'angle
+double PIDmeasurement_angle();
+void PIDcommand_angle(double cmd);
+void PIDgoalReached_angle();
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
@@ -83,7 +92,7 @@ void setup() {
   // Chronometre duration pulse
   timerPulse_.setCallback(endPulse);
   
-  // Initialisation du PID
+  // Initialisation du PID de position
   pid_x.setGains(0.25,0.1 ,0);
   // Attache des fonctions de retour
   pid_x.setMeasurementFunc(PIDmeasurement);
@@ -93,14 +102,25 @@ void setup() {
   pid_x.setPeriod(200);
   pid_x.enable();
 
+    // Initialisation du PID d'angle
+  pid_q.setGains(0.25,0.1 ,0);
+  // Attache des fonctions de retour
+  pid_q.setMeasurementFunc(PIDmeasurement_angle);
+  pid_q.setCommandFunc(PIDcommand_angle);
+  pid_q.setAtGoalFunc(PIDgoalReached_angle);
+  pid_q.setEpsilon(0.01);
+  pid_q.setPeriod(200);
+  pid_q.enable();
+
+
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
-  }
+}
 
 /* Boucle principale (infinie)*/
 void loop() {
 
-/*
+
   if(shouldRead_){
     readMsg();
   }
@@ -110,7 +130,6 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
-  */
 
   // mise a jour des chronometres
   timerSendMsg_.update();
@@ -195,50 +214,37 @@ void loop() {
       break;
     
     case 1:
-    fonction = 0.8*sin(5.0*millis());
+    //fonction = 0.8*sin(5.0*millis());
+    pid_x.setGoal(goal_voulu_position);
+    pid_x.setGains(13,0,0);
+    pid_x.run();
+    Serial.println(fonction);
+    AX_.setMotorPWM(0,pulsePWM_);
+    //delay(200);
+    if(goal_position_atteint)
+    { 
+      pinMode(MAGPIN, LOW);
+      choix = 100;
+    }
+    break;
+
+    case 2:
+      //code
     pid_x.setGoal(fonction);
     pid_x.setGains(13,0,0);
     pid_x.run();
     Serial.println(fonction);
-    //AX_.setMotorPWM(0,pulsePWM_);//changer valeur vitesse avec MG
+    AX_.setMotorPWM(0,pulsePWM_angle);
     delay(200);
-      break;
+      //pid_q.setGoal(1);
 
-    case 2:
-      //code
       break;
 
     case 100:
       //case vide
+      AX_.setMotorPWM(0,0);
       break;
   }
-  // mise à jour du PID
-  //pid_x.run();
-
-
-  if(pid_x.isAtGoal())
-  { 
-     pinMode(MAGPIN, LOW);
-    choix = 100;
-    while(1)
-    {
-      AX_.setMotorPWM(0,0);
-    }
-  }
-  
-
-  //-------------------------------------SECTION TESTS------------------------------------------//
-  
-  //TEST #1 : Permet d'avoir en console la valeur de tous les capteurs.
-  //sendMsg();
-  //readMsg();
-/*
-  //TEST #2 : Fait avancer le moteur 0 à une vitesse de 0.1
-  AX_.setMotorPWM(0,0.3);
-  delay(500);
-  AX_.setMotorPWM(0,-0.3);
-  delay(500);
-  */
 }
 
 /*---------------------------Definition de fonctions ------------------------*/
@@ -339,7 +345,7 @@ void readMsg(){
 }
 
 
-// Fonctions pour le PID
+// Fonctions pour le PID de position
 double PIDmeasurement(){
   double pulse;
   double distance;
@@ -353,11 +359,32 @@ double PIDmeasurement(){
 
 
 void PIDcommand(double cmd){
-  //Serial.println("commande");
   pulsePWM_ = cmd;
 }
 
-
 void PIDgoalReached(){
-  // To do
+  goal_position_atteint = true;
+}
+
+
+
+/////////////////////////////////////////////////////////
+// Fonctions pour le PID d'angle
+double PIDmeasurement_angle(){
+  
+  double angle = 0;
+
+
+  
+  return angle;
+}
+
+
+void PIDcommand_angle(double cmd_angle){
+  pulsePWM_angle = cmd_angle;
+}
+
+
+void PIDgoalReached_angle(){
+  goal_angle_atteint = true;
 }
