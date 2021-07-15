@@ -4,19 +4,19 @@ Exemple de librairie pouvant etre ajoute au projet
 #include <Tests.h>
 
 // Class constructor
-MyClass::MyClass(){
+Tests::Tests(){
     
 }
 
 // Class desstructor
-MyClass::~MyClass(){
+Tests::~Tests(){
     
 }
 
 // Public Functions
-void MyClass::Tests_unitaire(){
+void Tests::Tests_unitaire(){
 
-
+  /*
   if(shouldRead_){
     readMsg();
   }
@@ -26,6 +26,7 @@ void MyClass::Tests_unitaire(){
   if(shouldPulse_){
     startPulse();
   }
+  */
 
   // mise a jour des chronometres
   timerSendMsg_.update();
@@ -78,9 +79,11 @@ void MyClass::Tests_unitaire(){
 
 
   //-----------------------------SECTION POTENTIOMÈTRE GROVE-----------------------------------//
-
-  //Voir section void sendMsg(); pour la fonction en dessous
-  //pour doc["potVex"] = analogRead(POTPIN);
+  //retourne des valeurs de 0-1023
+  Serial.println(analogRead(POTPIN));
+  //etat initiale du pendule = 62-63
+  //à 90 degree (vers l'avant du robot) = 525
+  ////à 90 degree (vers l'arrière du robot) = 400
 
 
   //--------------------------SECTION CENTRALE INERTIELLE GROVE--------------------------------//
@@ -95,11 +98,11 @@ void MyClass::Tests_unitaire(){
 }
 
 // Private Functions
-void MyClass::myPrivateFunction(){
+void Tests::myPrivateFunction(){
 
 }
 
 // Protected Functions
-void MyClass::myProtectedFunction(){
+void Tests::myProtectedFunction(){
 
 }

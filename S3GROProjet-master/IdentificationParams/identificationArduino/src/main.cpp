@@ -28,6 +28,7 @@ VexQuadEncoder vexEncoder_;         // objet encodeur vex
 IMU9DOF imu_;                       // objet imu
 PID pid_x;                           // objet PID x
 PID pid_q;                           // objet PID q
+Tests tests;
 
 volatile bool shouldSend_ = false;  // drapeau prêt à envoyer un message
 volatile bool shouldRead_ = false;  // drapeau prêt à lire un message
@@ -117,7 +118,12 @@ void setup() {
   pinMode(MAGPIN, OUTPUT); 
 }
 
-/* Boucle principale (infinie)*/
+void loop() {
+  tests.Tests_unitaire();
+}
+
+/*
+/* Boucle principale (infinie)
 void loop() {
 
 
@@ -135,68 +141,6 @@ void loop() {
   timerSendMsg_.update();
   timerPulse_.update();
 
-  //----------------------------------SECTION MOTEUR-------------------------------------------//
-
-  //Allume les moteur
-  //shouldPulse_ = false;
-
-  //Éteindre les moteurs
-  //shouldPulse_ = true;
-
-  //-------------------------------SECTION ÉLECTRO-AIMANT-------------------------------------//
-
-  //TEST : Allumer et éteindre l'électro-aimant
-  /*
-  pinMode(MAGPIN, HIGH); // Activation electroAimant
-  if(time > 10000)
-  {
-      pinMode(MAGPIN, LOW); // Desactivation electroAimant
-      time = 0;
-  }
-  else
-  {
-    time += 1;
-    //delay(1000); //Délai de 1 secondes
-  }
-  */
-
-
-  //----------------------------------SECTION ENCODEUR------------------------------------------//
-
-  //compteur_encodeur = AX_.readEncoder(0);
-  //Serial.println();
-
-
-  //--------------------------SECTION CAPTEUR TENSION/COURANT----------------------------------//
-
-  //Voir section void sendMsg();
-
-
-  //------------------------------SECTION ENCODEUR OPTIQUE-------------------------------------//
-
-  //vexEncoder_.init(2,3); // initialisation de l'encodeur VEX
-  // attache de l'interruption pour encodeur vex
-  //attachInterrupt(vexEncoder_.getPinInt(),[]{vexEncoder_.isr();},FALLING);
-  //Voir section void sendMsg(); pour la fonction en dessous 
-  //doc["encVex"] = vexEncoder_.getCount();
-
-
-  //-----------------------------SECTION POTENTIOMÈTRE GROVE-----------------------------------//
-
-  //Voir section void sendMsg(); pour la fonction en dessous
-  //pour doc["potVex"] = analogRead(POTPIN);
-
-
-  //--------------------------SECTION CENTRALE INERTIELLE GROVE--------------------------------//
-
-  //Voir section void sendMsg();  pour pour les fonctions en dessous
-  //doc["accelZ"] = imu_.getAccelZ();
-  //doc["gyroX"] = imu_.getGyroX();
-
-
-  //-------------------------------------SECTION PID-------------------------------------------//
-
-  
   switch(choix) 
   {
     case 10:
@@ -214,38 +158,38 @@ void loop() {
       break;
     
     case 1:
-    //fonction = 0.8*sin(5.0*millis());
-    pid_x.setGoal(goal_voulu_position);
-    pid_x.setGains(13,0,0);
-    pid_x.run();
-    Serial.println(fonction);
-    AX_.setMotorPWM(0,pulsePWM_);
-    //delay(200);
-    if(goal_position_atteint)
-    { 
-      pinMode(MAGPIN, LOW);
-      choix = 100;
-    }
+      //fonction = 0.8*sin(5.0*millis());
+      pid_x.setGoal(goal_voulu_position);
+      pid_x.setGains(13,0,0);
+      pid_x.run();
+      //Serial.println(fonction);
+      AX_.setMotorPWM(0,pulsePWM_);
+      //delay(200);
+      if(goal_position_atteint)
+      { 
+       pinMode(MAGPIN, LOW);
+       choix = 100;
+      }
     break;
 
     case 2:
       //code
-    pid_x.setGoal(fonction);
-    pid_x.setGains(13,0,0);
-    pid_x.run();
-    Serial.println(fonction);
-    AX_.setMotorPWM(0,pulsePWM_angle);
-    delay(200);
-      //pid_q.setGoal(1);
-
-      break;
+      pid_q.setGoal(goal_voulu_angle);
+      pid_q.setGains(13,0,0);
+      pid_q.run();
+      //Serial.println(30);
+      //AX_.setMotorPWM(0,pulsePWM_angle);
+      //delay(200);
+    break;
 
     case 100:
-      //case vide
+      //case des moteurs à 0. Donc, arret du moteur
       AX_.setMotorPWM(0,0);
-      break;
-  }
+      pinMode(MAGPIN, LOW);
+    break;
+  }//Fin du switch case
 }
+*/
 
 /*---------------------------Definition de fonctions ------------------------*/
 
@@ -374,8 +318,8 @@ double PIDmeasurement_angle(){
   
   double angle = 0;
 
+  //angle = analogRead(POTPIN);
 
-  
   return angle;
 }
 

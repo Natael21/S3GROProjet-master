@@ -1,12 +1,11 @@
 /*
-Projet S1 2019
-Exemple de librairie pouvant etre ajoute au projet
-@author Jean-Samuel Lauzon
-@version 1.0 22/05/2019
+Projet S3 2021
+@author Natael Laroche-Latulippe
+@version 1.0 15/07/2021
 */
 
-#ifndef LibExample_H_
-#define LibExample_H_
+#ifndef TESTS_H_
+#define TESTS_H_
 
 #include <LibS3GRO.h>
 #include <ArduinoJson.h>
@@ -20,11 +19,11 @@ Exemple de librairie pouvant etre ajoute au projet
 #define PASPARTOUR      64          // Nombre de pas par tour du moteur
 #define RAPPORTVITESSE  50          // Rapport de vitesse du moteur
 
-class MyClass
+class Tests
 {
     public:
-    MyClass();
-    ~MyClass();
+    Tests();
+    ~Tests();
     void Tests_unitaire();
 
 /*---------------------------- variables globales ---------------------------*/
