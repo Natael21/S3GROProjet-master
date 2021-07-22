@@ -11,20 +11,26 @@
 #include <Tests.h> // Vos propres librairies
 /*------------------------------ Constantes ---------------------------------*/
 
-#define BAUD            115200      // Frequence de transmission serielle
-#define UPDATE_PERIODE  100         // Periode (ms) d'envoie d'etat general
+#define BAUD              115200      // Frequence de transmission serielle
+#define UPDATE_PERIODE    100         // Periode (ms) d'envoie d'etat general
 
-#define MAGPIN          32          // Port numerique pour electroaimant J-16
-#define POTPIN          A5          // Port analogique pour le potentiometre
+#define MAGPIN            32          // Port numerique pour electroaimant J-16
+#define POTPIN            A5          // Port analogique pour le potentiometre
 
-#define PASPARTOUR      64          // Nombre de pas par tour du moteur
-#define RAPPORTVITESSE  50          // Rapport de vitesse du moteur
-#define RAYON_ROUE   0.06        // Diamètres des roues
-#define MOTOR_ID        1
-#define GEAR_RATIO      2
-#define FACTEUR_MAGIQUE 1.1
-#define DISTANCE_OBSTACLE 0.6
+#define PASPARTOUR        64          // Nombre de pas par tour du moteur
+#define RAPPORTVITESSE    50          // Rapport de vitesse du moteur
+#define RAYON_ROUE        0.06        // Diamètres des roues
+#define MOTOR_ID          1
+#define GEAR_RATIO        2
+#define FACTEUR_MAGIQUE   1.1
 #define DISTANCE_AVANT_OBSTACLE 0.095
+#define AVANCE_INITIAL    1
+#define OSCILLATION_DEBUT 2
+#define ARRET_OSCILLATION 3
+#define AVANCE_ALLER      4
+#define LACHE_SAPIN       5
+#define AVANCE_RETOUR     6
+#define PREND_SAPIN       7
 
 /*---------------------------- variables globales ---------------------------*/
 
@@ -55,25 +61,27 @@ float Mxyz[3];                       // tableau pour magnetometre
 int time = 0;                        //timer pour la loop
 int32_t compteur_encodeur = 0;       //Encodeur du moteur
 
-int choix = 0;                  //sert pour le switch case
-//int choix = 10000;                  //sert pour le switch case
-double fonction = 0;                 //fonction de tests dans la loop
-bool goal_position_atteint = false;  //Permet de savoir si la positon est atteinte
-bool goal_angle_atteint = false;     //Permet de savoir si l'anlge du pendule est atteinte
-double goal_voulu_position_aller = 0;//Permet de dire la distance voulue pour l'aller
-double goal_voulu_position_retour = 0;//Permet de dire la distance voulue pour le retour
-double goal_voulu_angle = 0;         //Permet de dire l'angle voulue
-double distance_oscillation = 0;     //Permet savoir l'endroit d'oscillation
-float Potentio_zero = 0;             //permet de savoir la valeur initiale du pendule
-float deg = 0;                       //Permet de savoir l'agle actuelle du pendule
-float cur_pos = 0;
-float cur_vel = 0;
-float cur_angle = 0;
-double distance_ins;
-double distance_old = 0.0;
-double temps_ins;
-double temps_old = 0.0;
-double goal_voulu_position_aller_cas2 = 0;
+int choix =                             0;      //sert pour le switch case
+//int choix =                           10000;  //sert pour le switch case
+double fonction =                       0;      //fonction de tests dans la loop
+bool goal_position_atteint =            false;  //Permet de savoir si la positon est atteinte
+bool goal_angle_atteint =               false;  //Permet de savoir si l'anlge du pendule est atteinte
+double goal_voulu_position_aller =      0;      //Permet de dire la distance voulue pour l'aller
+double goal_voulu_position_retour =     0;      //Permet de dire la distance voulue pour le retour
+double goal_voulu_angle =               0;      //Permet de dire l'angle voulue
+double distance_oscillation =           0;      //Permet savoir l'endroit d'oscillation
+double distance_obtacle =               0;      //Permet de savoir la position de l'obstacle
+double distance_depot =                 0;      //Permet de savoir la position du dépot du sapin
+float Potentio_zero =                   0;      //permet de savoir la valeur initiale du pendule
+float deg =                             0;      //Permet de savoir l'agle actuelle du pendule
+float cur_pos =                         0;      //Permet de savoir la position en temps réelle du pendule
+float cur_vel =                         0;      //Permet de savoir la vitesse en temps réelle du pendule
+float cur_angle =                       0;      //Permet de savoir l'angle en temps réelle du pendule
+double distance_ins =                   0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
+double distance_old =                   0.0;    //Permet de savoir la distance précédente pour le calcul de la vitesse
+double temps_ins =                      0;      //Permet de savoir le temps instantanné du véhicule pour calculer la vitesse
+double temps_old =                      0.0;    //Permet de savoir le temps précédente pour le calcul de la vitesse
+
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -194,7 +202,7 @@ void loop() {
       pinMode(MAGPIN, HIGH);
       delay(3000);
       goal_voulu_position_aller = 0.5;
-      goal_voulu_position_aller_cas2 = 0.75;
+      distance_obtacle = 0.75;
       goal_voulu_position_retour = 0;
       goal_voulu_angle = 60;
       distance_oscillation = 0;
@@ -245,7 +253,7 @@ void loop() {
     break;
 
     case 4 :
-      pid_x.setGoal(goal_voulu_position_aller_cas2);
+      pid_x.setGoal(distance_obtacle);
       pid_x.setGains(1.5, 0.25, 0.2);
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
