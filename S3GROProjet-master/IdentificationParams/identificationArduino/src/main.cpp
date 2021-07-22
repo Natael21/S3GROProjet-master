@@ -23,6 +23,8 @@
 #define MOTOR_ID        1
 #define GEAR_RATIO      2
 #define FACTEUR_MAGIQUE 1.1
+#define DISTANCE_OBSTACLE 0.6
+#define DISTANCE_AVANT_OBSTACLE 0.095
 
 /*---------------------------- variables globales ---------------------------*/
 
@@ -167,7 +169,7 @@ void loop() {
 // Boucle principale (infinie) 
 void loop() {
 
-
+/*
   if(shouldRead_){
     readMsg();
   }
@@ -177,107 +179,116 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
-  
+  */
   
 
 
   // Mise à jour des chronometres
-  timerSendMsg_.update();
-  timerPulse_.update();
+  //timerSendMsg_.update();
+  //timerPulse_.update();
 
   switch(choix) 
   {
     case 0: // initialisation des variables
       pinMode(MAGPIN, HIGH);
       delay(3000);
-      goal_voulu_position_aller = 0.4;
-      goal_voulu_position_aller_cas2 = 0.3;
-      goal_voulu_position_retour = -0.7;
-      goal_voulu_angle = -60;
+      goal_voulu_position_aller = 0.5;
+      goal_voulu_position_aller_cas2 = 0.75;
+      goal_voulu_position_retour = 0;
+      goal_voulu_angle = 60;
       distance_oscillation = 0;
       goal_position_atteint = false;
       goal_angle_atteint = false;
       choix = 1;
     break;
 
-    case 1: //squence 1 aller (oscillation du pendule)
+    case 1:
+      pid_x.setGoal(DISTANCE_OBSTACLE-DISTANCE_AVANT_OBSTACLE);
+      pid_x.setGains(1.5, 0.25, 0.2);
+      pid_x.run();
+      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+
+     if(goal_position_atteint)
+      {
+        choix = 2;
+        goal_position_atteint = false;
+        pid_x.enable();
+      }
+    break;
+
+    case 2: //squence 1 aller (oscillation du pendule)
       fonction = 0.9*sin(5.0*(millis()/1000.0))+distance_oscillation;
-      //fonction = 0.8*sin(5.0*(millis()/1000.0))+0.5;
       pid_q.setGoal(goal_voulu_angle);
       pid_q.run();
       AX_.setMotorPWM(MOTOR_ID,fonction);
-      //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
-      //Serial.print("sin = ");
-      //Serial.println(fonction);
 
       if(goal_angle_atteint)
       {
-        choix = 2;
+        choix = 3;
         goal_angle_atteint = false;
-        pid_x.setGoal(goal_voulu_position_aller);
-        pid_x.setGains(13,0,0);
-        Serial.println("cas 1 finis");
+        pid_q.enable();
       }
     break;
 
-    case 2: //séquence 2 aller (passer par dessus l'obstacle)
-      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+    case 3: //séquence 2 aller (passer par dessus l'obstacle)
+      pid_x.setGoal(goal_voulu_position_aller);
+      pid_x.setGains(13,0,0);
       pid_x.run();
+      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
       if(goal_position_atteint)
       {
-        choix = 15;
+        choix = 4;
         goal_position_atteint = false;
-        pid_x.setGoal(goal_voulu_position_aller_cas2);
-        pid_x.setGains(1.5, 0.25, 0.2);
-        Serial.println("cas 2 finis");
+        pid_x.enable();
       }
     break;
 
-    case 15 :
-      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+    case 4 :
+      pid_x.setGoal(goal_voulu_position_aller_cas2);
+      pid_x.setGains(1.5, 0.25, 0.2);
       pid_x.run();
-      //Serial.println("case 2 entree");
+      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
       if(goal_position_atteint)
       {
         choix = 100;
         goal_position_atteint = false;
-        Serial.println("cas 15 finis");
+        pid_x.enable();
       }
 
       break;
 
-    case 3: //séquence 3 aller (arret du pendule vers 0 degree)
+    case 5: //séquence 3 aller (arret du pendule vers 0 degree)
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
       pid_q.run();
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
       if(goal_angle_atteint)
       {
-        choix = 4;
+        choix = 6;
         goal_angle_atteint = false;
       }
     break;
 
-    case 4: //séquence 4 aller (lache le pendule dans le panier)
+    case 6: //séquence 4 aller (lache le pendule dans le panier)
       AX_.setMotorPWM(MOTOR_ID,0);
       pinMode(MAGPIN, LOW);
       delay(750);
-      choix = 6;
+      choix = 7;
     break;
 
-    case 5: //séquence 5 aller (passer par dessus l'obstacle pour le retour)
+    case 7: //séquence 5 aller (passer par dessus l'obstacle pour le retour)
       pid_x.setGoal(goal_voulu_position_retour);
       pid_x.setGains(5,0,0);
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
       if(goal_position_atteint)
       {
-        choix = 6;
+        choix = 8;
         goal_position_atteint = false;
       }
     break;
 
-    case 6: //séquence 6 aller (arret du pendule au dessus du sapin = 0 degree)
+    case 8: //séquence 6 aller (arret du pendule au dessus du sapin = 0 degree)
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
       pid_q.run();
@@ -482,6 +493,9 @@ double PIDmeasurement(){
   distance = (tour * RAYON_ROUE * 2.0 * PI ) / FACTEUR_MAGIQUE;
 
   cur_pos = distance;
+
+  Serial.print("distance : ");
+  Serial.println(distance);
 
   return distance;
 }
