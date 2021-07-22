@@ -15,6 +15,12 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     chart_.legend()->hide();
     chart_.addSeries(&series_);
 
+    ui->Stop->setStyleSheet("QPushButton { background-color: red; }\n"
+                          "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
+
+    ui->StartButton->setStyleSheet("QPushButton { background-color: green; }\n"
+                          "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
+
     // Fonctions de connections events/slots
     connectTimers(updateRate);
     connectButtons();
@@ -60,6 +66,7 @@ void MainWindow::receiveFromSerial(QString msg){
 
             // Affichage des messages Json
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
+            //ui->Etat->setText(jsonObj["Etat"].toString());
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -101,6 +108,8 @@ void MainWindow::connectButtons(){
     connect(ui->pulseButton, SIGNAL(clicked()), this, SLOT(sendPulseStart()));
     connect(ui->checkBox, SIGNAL(stateChanged(int)), this, SLOT(manageRecording(int)));
     connect(ui->pushButton_Params, SIGNAL(clicked()), this, SLOT(sendPID()));
+    connect(ui->StartButton, SIGNAL(clicked()), this, SLOT(sendButton()));
+    connect(ui->Stop, SIGNAL(clicked()), this, SLOT(Stopsend()));
 }
 
 void MainWindow::connectSpinBoxes(){
@@ -166,6 +175,30 @@ void MainWindow::sendPID(){
     QString strJson(doc.toJson(QJsonDocument::Compact));
     sendMessage(strJson);
 }
+
+void MainWindow::sendButton(){
+    QJsonObject jsonObject
+    {
+        {"Start", 0}
+    };
+
+    QJsonDocument doc(jsonObject);
+    QString strJson(doc.toJson(QJsonDocument::Compact));
+    sendMessage(strJson);
+}
+
+void MainWindow::Stopsend()
+{
+    QJsonObject jsonObject
+    {
+        {"Stop", 100}
+    };
+
+    QJsonDocument doc(jsonObject);
+    QString strJson(doc.toJson(QJsonDocument::Compact));
+    sendMessage(strJson);
+}
+
 void MainWindow::sendPulseSetting(){
     // Fonction SLOT pour envoyer les paramettres de pulse
     double PWM_val = ui->PWMBox->value();
