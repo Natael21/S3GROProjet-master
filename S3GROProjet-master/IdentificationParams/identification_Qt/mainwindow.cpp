@@ -4,6 +4,8 @@
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)
 {
+    setWindowTitle("ROUNDNET");
+
     // Constructeur de la classe
     // Initialisation du UI
     ui = new Ui::MainWindow;
@@ -15,6 +17,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     chart_.legend()->hide();
     chart_.addSeries(&series_);
 
+    //Permet de mettre de la couleur sur les boutons
     ui->Stop->setStyleSheet("QPushButton { background-color: red; }\n"
                           "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
 
@@ -27,6 +30,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectSpinBoxes();
     connectTextInputs();
     connectComboBox();
+    addFormes();
 
     // Recensement des ports
     portCensus();
@@ -68,6 +72,10 @@ void MainWindow::receiveFromSerial(QString msg){
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
 
+            positionVoiture = jsonObj["cur_pos"].toDouble();
+            positionObstacle = jsonObj["position_obstacle"].toDouble();
+            positionDepot = jsonObj["position_depot"].toDouble();
+
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
                 double time = jsonObj["time"].toDouble();
@@ -108,8 +116,29 @@ void MainWindow::connectButtons(){
     connect(ui->pulseButton, SIGNAL(clicked()), this, SLOT(sendPulseStart()));
     connect(ui->checkBox, SIGNAL(stateChanged(int)), this, SLOT(manageRecording(int)));
     connect(ui->pushButton_Params, SIGNAL(clicked()), this, SLOT(sendPID()));
-    connect(ui->StartButton, SIGNAL(clicked()), this, SLOT(sendButton()));
-    connect(ui->Stop, SIGNAL(clicked()), this, SLOT(Stopsend()));
+    connect(ui->StartButton, SIGNAL(clicked()), this, SLOT(sendStart()));
+    connect(ui->Stop, SIGNAL(clicked()), this, SLOT(sendStop()));
+    connect(ui->envoiDistance, SIGNAL(clicked()), this, SLOT(sendPosition()));
+}
+
+void MainWindow::sendPosition()
+{
+    distance_obstacle = ui->distanceObstacle->text().toDouble();
+    distance_depot = ui->distanceDepot->text().toDouble();
+
+    QJsonArray array = { QString::number(distance_obstacle, 'f', 0),
+                         QString::number(distance_depot, 'f', 0)
+                       };
+
+    QJsonObject jsonObject
+    {
+        {"Distance", array}
+    };
+    QJsonDocument doc(jsonObject);
+    QString strJson(doc.toJson(QJsonDocument::Compact));
+    sendMessage(strJson);
+
+    distance_envoyer = true;
 }
 
 void MainWindow::connectSpinBoxes(){
@@ -147,11 +176,46 @@ void MainWindow::startSerialCom(QString portName){
     connectSerialPortRead();
 }
 
+void MainWindow::addFormes()
+{
+    //Mettre la scene vide
+    scene.clear();
+
+    //qleft : positif (-> droite); negatif (<- gauche)
+    //qtop : positif (bas); negatif(haut)
+
+    //Rail qui donne le point initiale des autres formes
+    QColor colorBlack = Qt::black;
+    //QBrush brush1 = Qt::SolidPattern;
+    //brush1.setColor(color1);
+    scene.addRect(QRectF(0, 0, 700, 7), colorBlack);
+
+    //Voiture
+    QColor colorRed = Qt::red;
+    QBrush brushRed = Qt::SolidPattern;
+    brushRed.setColor(colorRed);
+    QBrush brushBlack = Qt::SolidPattern;
+    brushBlack.setColor(colorBlack);
+    scene.addRect(QRectF(positionVoiture+5, -37, 30, 30), colorRed, brushRed);
+    scene.addEllipse(QRectF(positionVoiture, -12, 12, 12), colorBlack, brushBlack);
+    scene.addEllipse(QRectF(positionVoiture+30, -12, 12, 12), colorBlack, brushBlack);
+
+    //Obstacle
+    scene.addRect(QRectF(positionObstacle+350, 50, 10, 40), colorBlack, brushBlack);
+
+    //Panier
+    scene.addRect(QRectF(positionDepot+500, 50, 10, 40), colorBlack, brushBlack);
+
+    //ui->Graphique->setBackgroundBrush(QImage(":../rien"));
+    ui->Graphique->setScene(&scene);
+}
+
 void MainWindow::changeJsonKeyValue(){
     // Fonction SLOT pour changer la valeur de la cle Json
     series_.clear();
     JsonKey_ = ui->JsonKey->text();
 }
+
 void MainWindow::sendPID(){
     // Fonction SLOT pour envoyer les paramettres de pulse
     double goal = ui->lineEdit_DesVal->text().toDouble();
@@ -176,18 +240,25 @@ void MainWindow::sendPID(){
     sendMessage(strJson);
 }
 
-void MainWindow::sendButton(){
-    QJsonObject jsonObject
+void MainWindow::sendStart(){
+    if(distance_envoyer)
     {
-        {"Start", 0}
-    };
+        QJsonObject jsonObject
+        {
+             {"Start", 0}
+        };
 
-    QJsonDocument doc(jsonObject);
-    QString strJson(doc.toJson(QJsonDocument::Compact));
-    sendMessage(strJson);
+        QJsonDocument doc(jsonObject);
+        QString strJson(doc.toJson(QJsonDocument::Compact));
+        sendMessage(strJson);
+    }
+    else
+    {
+        //Pop-up-----------------------------------------------------------------------------------------
+    }
 }
 
-void MainWindow::Stopsend()
+void MainWindow::sendStop()
 {
     QJsonObject jsonObject
     {

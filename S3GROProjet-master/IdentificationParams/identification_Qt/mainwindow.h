@@ -13,6 +13,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts>
+#include <QGraphicsView>
 
 // Propres librairies
 #include "csvwriter.h"
@@ -48,9 +49,11 @@ private slots:
     void manageRecording(int);
     void changeJsonKeyValue();
     void startSerialCom(QString);
+    void addFormes();
     void sendPID();
-    void sendButton();
-    void Stopsend();
+    void sendStart();
+    void sendStop();
+    void sendPosition();
 
 private:
     void connectTimers(int updateRate);
@@ -73,7 +76,14 @@ private:
     QString JsonKey_;
     QLineSeries series_;
     QChart chart_;
-
+    QGraphicsScene scene;
+    double distance_obstacle = 0;
+    double distance_depot = 0;
+    double decalageVoiture = 0;
+    double positionVoiture = decalageVoiture;
+    double positionObstacle = 0;
+    double positionDepot = 0
+    bool distance_envoyer = false;
 
 protected:
     Ui::MainWindow *ui;

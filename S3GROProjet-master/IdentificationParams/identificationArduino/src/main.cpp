@@ -362,6 +362,8 @@ void sendMsg(){
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
   doc["actualTime"] = pid_x.getActualDt();
+  doc["position_obstacle"] = position_obstacle;
+  doc["position_depot"] = position_depot;
 
   //doc["potVex"] = analogRead(POTPIN);
   //doc["encVex"] = vexEncoder_.getCount();
@@ -433,9 +435,6 @@ void readMsg(){
   }
   //------------------------------------------------------------------------------------------------------------------------
 
-
-  //À METTRE DANS UNE NOUVELLLE FENETRE ET METTRE LES INFORMATIONS SI DESSOUS ET UN GRAPHIQUE COMME SOUS SIMULINK--------------------------------
-
   parse_msg = doc["Start"];
   if(!parse_msg.isNull())
   {
@@ -450,18 +449,16 @@ void readMsg(){
     choix = ARRET_TOTAL;
   }
 
-
-  //Informations à aller chercher dans le QT (pas encore fait)
   parse_msg = doc["position_obstacle"];
   if(!parse_msg.isNull())
   {
-    position_obstacle = doc["position_obstacle"];
+    position_obstacle = (doc["Distance"][0]);
   }
 
   parse_msg = doc["position_depot"];
   if(!parse_msg.isNull())
   {
-    position_depot = doc["position_depot"];
+    position_depot = (doc["Distance"][1]);
   }  
   //--------------------------------------------------------------------------------------------------------------
 }
