@@ -4,8 +4,6 @@
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)
 {
-    setWindowTitle("ROUNDNET");
-
     // Constructeur de la classe
     // Initialisation du UI
     ui = new Ui::MainWindow;
@@ -38,6 +36,8 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
 
     // initialisation du timer
     updateTimer_.start();
+
+
 
 }
 
@@ -245,25 +245,33 @@ void MainWindow::addFormes()
 
     QColor colorRed = Qt::red;
     QColor colorBlack = Qt::black;
-    QColor colorBlue = Qt::blue;
+    QColor colorBlue = Qt::darkGray;
+    QColor colorGreen = Qt::green;
 
     QBrush brushRed = Qt::SolidPattern;
     QBrush brushBlack = Qt::SolidPattern;
     QBrush brushBlue = Qt::SolidPattern;
+    QBrush brushGreen = Qt::SolidPattern;
 
     brushRed.setColor(colorRed);
     brushBlack.setColor(colorBlack);
     brushBlue.setColor(colorBlue);
+    brushGreen.setColor(colorGreen);
 
     //Rail qui donne le point initiale des autres formes
     scene.addRect(QRectF(0, 0, 700, 7), colorBlack);
 
     //Voiture
-    scene.addRect(QRectF(positionVoiture+5, -37, largeurRobot, hauteurRobot), colorRed, brushRed);
+    QRectF rectVoiture1 = QRectF(positionVoiture+5, -17, largeurRobot, hauteurRobot);
+    QRectF rectVoiture2 = QRectF(positionVoiture+5, -30, largeurRobot/2, hauteurRobot+10);
+    scene.addRect(rectVoiture1, colorRed, brushRed);
+    scene.addRect(rectVoiture2, colorRed, brushRed);
 
     //Roue voiture
-    scene.addEllipse(QRectF(positionVoiture, -12, diametreRoue, diametreRoue), colorBlack, brushBlack);
-    scene.addEllipse(QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue), colorBlack, brushBlack);
+    QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
+    QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
+    scene.addEllipse(ellipseRoue1, colorBlack, brushBlack);
+    scene.addEllipse(ellipseRoue2, colorBlack, brushBlack);
 
     //Pendule
     //addLine(x1,y1,x2,y2) y2 = longeur pendule
@@ -272,23 +280,69 @@ void MainWindow::addFormes()
     double y1 = -10;
     double y2 = longeurPendule;
 
-    scene.addLine(x1, y1, x2+x1, y2, colorBlue);
+    QLine pendule = QLine(x1, y1, x2+x1, y2);
+    scene.addLine(pendule, colorBlue);
 
     //Sapin
     if(!sapinLacher)
     {
-        scene.addRect(QRectF(x2+(x1-5), y2, 10, 10), colorBlack, brushBlack);
+        QRectF sapin = QRectF(x2+(x1-5), y2, 10, 10);
+        scene.addRect(sapin, colorGreen, brushGreen);
+    }
+    else
+    {
+        sapin++;
+    }
+
+    if(sapin == 1)
+    {
+        QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
+        scene.addRect(sapin1, colorGreen, brushGreen);
+        qDebug() << "sapin == 1";
+    }
+    else if (sapin == 2)
+    {
+        QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
+        QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
+        scene.addRect(sapin1, colorGreen, brushGreen);
+        scene.addRect(sapin2, colorBlack, brushGreen);
+    }
+    else if (sapin == 3)
+    {
+        QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
+        QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
+        QRectF sapin3 = QRectF(positionDepot+23, 63, 10, 10);
+        scene.addRect(sapin1, colorGreen, brushGreen);
+        scene.addRect(sapin2, colorBlack, brushGreen);
+        scene.addRect(sapin3, colorBlue, brushGreen);
+    }
+    else if (sapin == 4)
+    {
+        QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
+        QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
+        QRectF sapin3 = QRectF(positionDepot+23, 63, 10, 10);
+        QRectF sapin4 = QRectF(positionDepot+8, 63, 10, 10);
+        scene.addRect(sapin1, colorGreen, brushGreen);
+        scene.addRect(sapin2, colorBlack, brushGreen);
+        scene.addRect(sapin3, colorBlue, brushGreen);
+        scene.addRect(sapin4, colorRed, brushGreen);
+
     }
 
     //Obstacle
-    scene.addRect(QRectF(positionObstacle+350, 50, 10, 40), colorBlack, brushBlack);
+    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
+    scene.addRect(obstacle, colorBlack, brushBlack);
 
     //Panier
-    scene.addRect(QRectF(positionDepot+500, 65, 5, 20), colorBlue, brushBlue);
-    scene.addRect(QRectF(positionDepot+500, 85, 40, 5), colorBlue, brushBlue);
-    scene.addRect(QRectF(positionDepot+535, 65, 5, 20), colorBlue, brushBlue);
+    QRectF panierGauche = QRectF(positionDepot, 65, 5, 20);
+    QRectF panierMillieu = QRectF(positionDepot, 85, 40, 5);
+    QRectF panierDroite = QRectF(positionDepot+35, 65, 5, 20);
+    scene.addRect(panierGauche, colorBlue, brushBlue);
+    scene.addRect(panierMillieu, colorBlue, brushBlue);
+    scene.addRect(panierDroite, colorBlue, brushBlue);
 
     //Ajout des forme dans le graphique
+    scene.setBackgroundBrush(Qt::white);
     ui->Graphique->setScene(&scene);
 }
 

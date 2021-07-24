@@ -83,21 +83,23 @@ private:
     QMovie *movie = new QMovie("../identification_Qt/image/WeDidIt.gif");
     QLabel *label;
 
+    int sapin =                  4;
+
     double distance_obstacle =   0;
     double distance_depot =      0;
-    double positionVoiture =     75;
-    double positionObstacle =    0;
+    double positionVoiture =     0;
+    double positionObstacle =    350;
     double longeurPendule =      40;
-    double positionDepot =       0;
-    double anglePendule =        -30;
+    double positionDepot =       500;
+    double anglePendule =        0;
     double largeurRobot =        50;
-    double hauteurRobot =        30;
+    double hauteurRobot =        10;
     double diametreRoue =        12;
     double afficher     =        0;
 
-    bool casZero     = false;
-    bool sapinLacher = false;
-    bool distance_envoyer = false;
+    bool casZero     =           false;
+    bool sapinLacher =           false;
+    bool distance_envoyer =      false;
 
 protected:
     Ui::MainWindow *ui;
