@@ -261,6 +261,7 @@ void loop() {
     break;
 
     case ARRET_OSCILLATION: //Cas pour arreter le pendule vers 0 degree au dessus du panier
+      //On fait un sinus qui tend vers 0 ???---------------------------------------------------------------
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
       pid_q.run();
@@ -308,17 +309,10 @@ void loop() {
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
-      pid_q.setGains(5,0,0);
-      pid_q.setGoal(0);
-      pid_q.run();
-      AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
-
-      if(goal_angle_atteint)
-      {
         choix = START;
         goal_angle_atteint = false;
         prendre_sapin = false;
-      }
+        pinMode(MAGPIN, HIGH);
 
     break;
 
