@@ -70,7 +70,8 @@ int choix =                             ATTENTE;  //sert pour le switch case
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
 bool prendre_sapin =                    false;    //Permet de savoir si à la fin de l'arrêt de l'oscillation, il faut prendre ou laisser le sapin
-bool sapinLacher =                      false;
+bool sapinLacher =                      false;    //Permet de savoir si le sapin à été laché
+bool casZero =                          false;    //Permet de savoir si le cas START est actif
 
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
@@ -190,6 +191,7 @@ void loop() {
     break;
 
     case START: //Cas pour l'initialisation des variables
+      casZero = true;
       goal_voulu_angle = 60;
       goal_position_atteint = false;
       goal_angle_atteint = false;
@@ -203,6 +205,7 @@ void loop() {
     break;
 
     case AVANCE_INITIAL: //Cas pour aller  la position initiale avant d'osciller
+      casZero = false;
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
@@ -369,6 +372,7 @@ void sendMsg(){
   doc["position_obstacle"] = position_obstacle;
   doc["position_depot"] = position_depot;
   doc["sapin_lacher"] = sapinLacher;
+  doc["casZero"] = casZero;
 
   //doc["potVex"] = analogRead(POTPIN);
   //doc["encVex"] = vexEncoder_.getCount();

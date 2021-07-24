@@ -14,6 +14,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts>
 #include <QGraphicsView>
+#include <QPixmap>
 
 // Propres librairies
 #include "csvwriter.h"
@@ -55,6 +56,7 @@ private slots:
     void sendStop();
     void sendPosition();
     void showPopUp();
+    void showGIF();
 
 private:
     void connectTimers(int updateRate);
@@ -78,20 +80,22 @@ private:
     QLineSeries series_;
     QChart chart_;
     QGraphicsScene scene;
-    QMovie *movie = new QMovie("../identification_Qt/image/ajax-loader.gif");
+    QMovie *movie = new QMovie("../identification_Qt/image/WeDidIt.gif");
     QLabel *label;
 
-    double distance_obstacle = 0;
-    double distance_depot = 0;
-    double positionVoiture = 75;
-    double positionObstacle = 0;
-    double longeurPendule = 40;
-    double positionDepot = 0;
-    double anglePendule = -30;
-    double largeurRobot = 50;
-    double hauteurRobot = 30;
-    double diametreRoue = 12;
+    double distance_obstacle =   0;
+    double distance_depot =      0;
+    double positionVoiture =     75;
+    double positionObstacle =    0;
+    double longeurPendule =      40;
+    double positionDepot =       0;
+    double anglePendule =        -30;
+    double largeurRobot =        50;
+    double hauteurRobot =        30;
+    double diametreRoue =        12;
+    double afficher     =        0;
 
+    bool casZero     = false;
     bool sapinLacher = false;
     bool distance_envoyer = false;
 

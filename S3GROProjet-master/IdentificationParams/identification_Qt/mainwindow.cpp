@@ -31,25 +31,13 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     addFormes();
+    //showGIF();
 
     // Recensement des ports
     portCensus();
 
     // initialisation du timer
     updateTimer_.start();
-
-    if (!movie->isValid())
-        {
-         qDebug() << "Something went wrong :(";
-        }
-
-    // Play GIF
-    label = new QLabel(this);
-    label->setGeometry(350,0,500,500);
-    //label->resize(QSize(500,500));
-    label->setMovie(movie);
-    movie->setScaledSize(QSize(50,50));
-    movie->start();
 
 }
 
@@ -67,6 +55,37 @@ void MainWindow::showPopUp()
     QMessageBox msg;
     msg.setText("Tu dois initialiser la position de l'obstacle et du panier dans la deuxième page");
     msg.exec();
+}
+
+void MainWindow::showGIF()
+{
+    QMessageBox msg;
+        //msg.setText("This closes in 10 seconds");
+
+        int cnt = 10;
+
+        QTimer cntDown;
+        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&cnt, &cntDown]()->void{
+                             if(--cnt < 0){
+                                 cntDown.stop();
+                                 msg.close();
+                             } else {
+                                 msg.setWindowTitle("AMAZING");
+                                 msg.setStandardButtons(0);
+                             }
+                         });
+
+            // create Label
+            msg.setIconPixmap(QPixmap("../identification_Qt/image/WeDidIt.gif"));
+            QLabel *icon_label = msg.findChild<QLabel *>("qt_msgboxex_icon_label");
+            icon_label->setFixedWidth(1000);
+            icon_label->setFixedHeight(600);
+            icon_label->setMovie(movie);
+            movie->setScaledSize(QSize(1000, 600));
+            movie->start();
+
+            cntDown.start(300);
+            msg.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -97,7 +116,8 @@ void MainWindow::receiveFromSerial(QString msg){
             positionObstacle = jsonObj["position_obstacle"].toDouble();
             positionDepot = jsonObj["position_depot"].toDouble();
             anglePendule = jsonObj["cur_angle"].toDouble();
-            sapinLacher = jsonObj["sapin_lacher"].toDouble();
+            sapinLacher = jsonObj["sapin_lacher"].toBool();
+            casZero     = jsonObj["casZero"].toBool();
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -121,6 +141,20 @@ void MainWindow::receiveFromSerial(QString msg){
         // Reinitialisation du message tampon
         msgBuffer_ = "";
     }
+
+    //Section servant de loop----------------------------------------
+    if(casZero)
+    {
+        afficher = 0;
+    }
+
+    if(sapinLacher && afficher != 1)
+    {
+       showGIF();
+       afficher = 1;
+    }
+
+    addFormes();
 }
 
 void MainWindow::connectTimers(int updateRate){
@@ -146,8 +180,6 @@ void MainWindow::connectButtons(){
 
 void MainWindow::sendPosition()
 {
-    label->hide();
-
     distance_obstacle = ui->distanceObstacle->text().toDouble();
     distance_depot = ui->distanceDepot->text().toDouble();
 
@@ -159,6 +191,7 @@ void MainWindow::sendPosition()
     {
         {"Distance", array}
     };
+
     QJsonDocument doc(jsonObject);
     QString strJson(doc.toJson(QJsonDocument::Compact));
     sendMessage(strJson);
