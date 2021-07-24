@@ -70,7 +70,7 @@ int choix =                             ATTENTE;  //sert pour le switch case
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
 bool prendre_sapin =                    false;    //Permet de savoir si à la fin de l'arrêt de l'oscillation, il faut prendre ou laisser le sapin
-
+bool sapinLacher =                      false;
 
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
@@ -195,6 +195,8 @@ void loop() {
       goal_angle_atteint = false;
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
       pinMode(MAGPIN, HIGH);
+
+      sapinLacher = false;
       
       choix = AVANCE_INITIAL;
     
@@ -277,6 +279,8 @@ void loop() {
     break;
 
     case LACHE_SAPIN: //Cas pour lacher le pendule dans le panier
+      sapinLacher = true;
+
       AX_.setMotorPWM(MOTOR_ID,0);
       pinMode(MAGPIN, LOW);
       delay(500);
@@ -364,6 +368,7 @@ void sendMsg(){
   doc["actualTime"] = pid_x.getActualDt();
   doc["position_obstacle"] = position_obstacle;
   doc["position_depot"] = position_depot;
+  doc["sapin_lacher"] = sapinLacher;
 
   //doc["potVex"] = analogRead(POTPIN);
   //doc["encVex"] = vexEncoder_.getCount();

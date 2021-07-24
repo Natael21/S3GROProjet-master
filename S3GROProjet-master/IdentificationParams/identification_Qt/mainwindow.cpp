@@ -37,6 +37,20 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
 
     // initialisation du timer
     updateTimer_.start();
+
+    if (!movie->isValid())
+        {
+         qDebug() << "Something went wrong :(";
+        }
+
+    // Play GIF
+    label = new QLabel(this);
+    label->setGeometry(350,0,500,500);
+    //label->resize(QSize(500,500));
+    label->setMovie(movie);
+    movie->setScaledSize(QSize(50,50));
+    movie->start();
+
 }
 
 MainWindow::~MainWindow(){
@@ -46,6 +60,13 @@ MainWindow::~MainWindow(){
       delete serialCom_;
     }
     delete ui;
+}
+
+void MainWindow::showPopUp()
+{
+    QMessageBox msg;
+    msg.setText("Tu dois initialiser la position de l'obstacle et du panier dans la deuxième page");
+    msg.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -75,6 +96,8 @@ void MainWindow::receiveFromSerial(QString msg){
             positionVoiture = jsonObj["cur_pos"].toDouble();
             positionObstacle = jsonObj["position_obstacle"].toDouble();
             positionDepot = jsonObj["position_depot"].toDouble();
+            anglePendule = jsonObj["cur_angle"].toDouble();
+            sapinLacher = jsonObj["sapin_lacher"].toDouble();
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -123,6 +146,8 @@ void MainWindow::connectButtons(){
 
 void MainWindow::sendPosition()
 {
+    label->hide();
+
     distance_obstacle = ui->distanceObstacle->text().toDouble();
     distance_depot = ui->distanceDepot->text().toDouble();
 
@@ -178,35 +203,59 @@ void MainWindow::startSerialCom(QString portName){
 
 void MainWindow::addFormes()
 {
+    //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
     scene.clear();
 
     //qleft : positif (-> droite); negatif (<- gauche)
     //qtop : positif (bas); negatif(haut)
 
-    //Rail qui donne le point initiale des autres formes
+    QColor colorRed = Qt::red;
     QColor colorBlack = Qt::black;
-    //QBrush brush1 = Qt::SolidPattern;
-    //brush1.setColor(color1);
+    QColor colorBlue = Qt::blue;
+
+    QBrush brushRed = Qt::SolidPattern;
+    QBrush brushBlack = Qt::SolidPattern;
+    QBrush brushBlue = Qt::SolidPattern;
+
+    brushRed.setColor(colorRed);
+    brushBlack.setColor(colorBlack);
+    brushBlue.setColor(colorBlue);
+
+    //Rail qui donne le point initiale des autres formes
     scene.addRect(QRectF(0, 0, 700, 7), colorBlack);
 
     //Voiture
-    QColor colorRed = Qt::red;
-    QBrush brushRed = Qt::SolidPattern;
-    brushRed.setColor(colorRed);
-    QBrush brushBlack = Qt::SolidPattern;
-    brushBlack.setColor(colorBlack);
-    scene.addRect(QRectF(positionVoiture+5, -37, 30, 30), colorRed, brushRed);
-    scene.addEllipse(QRectF(positionVoiture, -12, 12, 12), colorBlack, brushBlack);
-    scene.addEllipse(QRectF(positionVoiture+30, -12, 12, 12), colorBlack, brushBlack);
+    scene.addRect(QRectF(positionVoiture+5, -37, largeurRobot, hauteurRobot), colorRed, brushRed);
+
+    //Roue voiture
+    scene.addEllipse(QRectF(positionVoiture, -12, diametreRoue, diametreRoue), colorBlack, brushBlack);
+    scene.addEllipse(QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue), colorBlack, brushBlack);
+
+    //Pendule
+    //addLine(x1,y1,x2,y2) y2 = longeur pendule
+    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
+    double x1 =(largeurRobot/2)+(diametreRoue/2)+positionVoiture;
+    double y1 = -10;
+    double y2 = longeurPendule;
+
+    scene.addLine(x1, y1, x2+x1, y2, colorBlue);
+
+    //Sapin
+    if(!sapinLacher)
+    {
+        scene.addRect(QRectF(x2+(x1-5), y2, 10, 10), colorBlack, brushBlack);
+    }
 
     //Obstacle
     scene.addRect(QRectF(positionObstacle+350, 50, 10, 40), colorBlack, brushBlack);
 
     //Panier
-    scene.addRect(QRectF(positionDepot+500, 50, 10, 40), colorBlack, brushBlack);
+    scene.addRect(QRectF(positionDepot+500, 65, 5, 20), colorBlue, brushBlue);
+    scene.addRect(QRectF(positionDepot+500, 85, 40, 5), colorBlue, brushBlue);
+    scene.addRect(QRectF(positionDepot+535, 65, 5, 20), colorBlue, brushBlue);
 
-    //ui->Graphique->setBackgroundBrush(QImage(":../rien"));
+    //Ajout des forme dans le graphique
     ui->Graphique->setScene(&scene);
 }
 
@@ -254,7 +303,7 @@ void MainWindow::sendStart(){
     }
     else
     {
-        //Pop-up-----------------------------------------------------------------------------------------
+        showPopUp();
     }
 }
 

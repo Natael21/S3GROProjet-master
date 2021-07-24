@@ -21,11 +21,11 @@
     <item row="17" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Page 1</string>
        </attribute>
        <widget class="QLineEdit" name="JsonKey">
         <property name="geometry">
@@ -245,7 +245,7 @@
         <property name="geometry">
          <rect>
           <x>490</x>
-          <y>210</y>
+          <y>220</y>
           <width>221</width>
           <height>28</height>
          </rect>
@@ -537,7 +537,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Page 2</string>
        </attribute>
        <widget class="QGraphicsView" name="Graphique">
         <property name="enabled">

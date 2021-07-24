@@ -54,6 +54,7 @@ private slots:
     void sendStart();
     void sendStop();
     void sendPosition();
+    void showPopUp();
 
 private:
     void connectTimers(int updateRate);
@@ -77,12 +78,21 @@ private:
     QLineSeries series_;
     QChart chart_;
     QGraphicsScene scene;
+    QMovie *movie = new QMovie("../identification_Qt/image/ajax-loader.gif");
+    QLabel *label;
+
     double distance_obstacle = 0;
     double distance_depot = 0;
-    double decalageVoiture = 0;
-    double positionVoiture = decalageVoiture;
+    double positionVoiture = 75;
     double positionObstacle = 0;
-    double positionDepot = 0
+    double longeurPendule = 40;
+    double positionDepot = 0;
+    double anglePendule = -30;
+    double largeurRobot = 50;
+    double hauteurRobot = 30;
+    double diametreRoue = 12;
+
+    bool sapinLacher = false;
     bool distance_envoyer = false;
 
 protected:
