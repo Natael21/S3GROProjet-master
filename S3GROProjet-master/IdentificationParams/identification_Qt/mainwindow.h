@@ -15,6 +15,8 @@
 #include <QtCharts>
 #include <QGraphicsView>
 #include <QPixmap>
+#include <QObject>
+#include <QSound>
 
 // Propres librairies
 #include "csvwriter.h"
@@ -83,7 +85,7 @@ private:
     QMovie *movie = new QMovie("../identification_Qt/image/WeDidIt.gif");
     QLabel *label;
 
-    int sapin =                  4;
+    int sapin =                  0;
 
     double distance_obstacle =   0;
     double distance_depot =      0;

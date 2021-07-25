@@ -37,8 +37,6 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     // initialisation du timer
     updateTimer_.start();
 
-
-
 }
 
 MainWindow::~MainWindow(){
@@ -59,6 +57,9 @@ void MainWindow::showPopUp()
 
 void MainWindow::showGIF()
 {
+    QSound ohYeah("../identification_Qt/sound/WeDidIt.wav");
+    ohYeah.play();
+
     QMessageBox msg;
         //msg.setText("This closes in 10 seconds");
 
