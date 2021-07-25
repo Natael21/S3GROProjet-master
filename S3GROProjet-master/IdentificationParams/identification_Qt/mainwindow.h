@@ -15,7 +15,7 @@
 #include <QtCharts>
 #include <QGraphicsView>
 #include <QPixmap>
-
+#include <QGraphicsPixmapItem>
 // Propres librairies
 #include "csvwriter.h"
 #include "serialprotocol.h"
@@ -79,16 +79,20 @@ private:
     QString JsonKey_;
     QLineSeries series_;
     QChart chart_;
+
+public:// pour avoir positionVoiture dans la classe car
+
     QGraphicsScene scene;
     QMovie *movie = new QMovie("../identification_Qt/image/WeDidIt.gif");
+    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/sky.png"));
     QLabel *label;
 
     int sapin =                  4;
 
     double distance_obstacle =   0;
     double distance_depot =      0;
-    double positionVoiture =     0;
-    double positionObstacle =    350;
+    double positionVoiture =     0;//peut peut etre enlever et garder dans la classe
+    double positionObstacle =    350;//same
     double longeurPendule =      40;
     double positionDepot =       500;
     double anglePendule =        0;

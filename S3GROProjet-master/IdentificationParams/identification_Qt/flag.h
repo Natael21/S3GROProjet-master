@@ -2,16 +2,28 @@
 #define FLAG_H
 
 #include <QObject>
+#include<QGraphicsItemGroup>
+#include<QGraphicsPixmapItem>
+#include<QPropertyAnimation>
 
-class flag : public QObject
+class FlagItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
+    Q_PROPERTY(qreal x READ x WRITE setX)
+    qreal x();
+
 public:
-    explicit flag(QObject *parent = nullptr);
+    explicit FlagItem();
+    ~FlagItem();
+    void setX(qreal x);
 
 signals:
 
 public slots:
+private:
+    double positionDepot = 500;
+    qreal m_x;
+    QGraphicsPixmapItem * flag;
 };
 
 #endif // FLAG_H

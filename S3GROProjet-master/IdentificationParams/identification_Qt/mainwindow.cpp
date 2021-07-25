@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "car.h"
+#include "pipe.h"
+#include "flag.h"
 
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)
@@ -8,6 +11,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     // Initialisation du UI
     ui = new Ui::MainWindow;
     ui->setupUi(this);
+
 
     // Initialisation du graphique
     ui->graph->setChart(&chart_);
@@ -71,7 +75,7 @@ void MainWindow::showGIF()
                                  msg.close();
                              } else {
                                  msg.setWindowTitle("AMAZING");
-                                 msg.setStandardButtons(0);
+                                 msg.setStandardButtons(nullptr);
                              }
                          });
 
@@ -239,6 +243,8 @@ void MainWindow::addFormes()
     //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
     scene.clear();
+   // scene.setSceneRect(15,190,700,300);
+    scene.addItem(pixItem);
 
     //qleft : positif (-> droite); negatif (<- gauche)
     //qtop : positif (bas); negatif(haut)
@@ -259,29 +265,32 @@ void MainWindow::addFormes()
     brushGreen.setColor(colorGreen);
 
     //Rail qui donne le point initiale des autres formes
-    scene.addRect(QRectF(0, 0, 700, 7), colorBlack);
+    scene.addRect(QRectF(5,350, 720, 7), colorBlack);
 
     //Voiture
-    QRectF rectVoiture1 = QRectF(positionVoiture+5, -17, largeurRobot, hauteurRobot);
-    QRectF rectVoiture2 = QRectF(positionVoiture+5, -30, largeurRobot/2, hauteurRobot+10);
-    scene.addRect(rectVoiture1, colorRed, brushRed);
-    scene.addRect(rectVoiture2, colorRed, brushRed);
+    //QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
+    //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
+   // scene.addRect(rectVoiture1, colorRed, brushRed);
+    //scene.addRect(rectVoiture2, colorRed, brushRed);
+    CarItem * camion = new CarItem();
+
+    scene.addItem(camion);
 
     //Roue voiture
-    QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
-    QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
-    scene.addEllipse(ellipseRoue1, colorBlack, brushBlack);
-    scene.addEllipse(ellipseRoue2, colorBlack, brushBlack);
+    //QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
+   // QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
+   // scene.addEllipse(ellipseRoue1, colorBlack, brushBlack);
+   // scene.addEllipse(ellipseRoue2, colorBlack, brushBlack);
 
     //Pendule
     //addLine(x1,y1,x2,y2) y2 = longeur pendule
-    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-    double x1 =(largeurRobot/2)+(diametreRoue/2)+positionVoiture;
-    double y1 = -10;
-    double y2 = longeurPendule;
+    double x2 = 10+(tan(anglePendule*(3.1416/180)))*longeurPendule;
+    double x1 = 80+positionVoiture;
+    double y1 = 345;
+    double y2 = 350+longeurPendule;
 
     QLine pendule = QLine(x1, y1, x2+x1, y2);
-    scene.addLine(pendule, colorBlue);
+    scene.addLine(pendule, colorRed);
 
     //Sapin
     if(!sapinLacher)
@@ -318,10 +327,10 @@ void MainWindow::addFormes()
     }
     else if (sapin == 4)
     {
-        QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
-        QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
-        QRectF sapin3 = QRectF(positionDepot+23, 63, 10, 10);
-        QRectF sapin4 = QRectF(positionDepot+8, 63, 10, 10);
+        QRectF sapin1 = QRectF(positionDepot+23, 435, 10, 10);
+        QRectF sapin2 = QRectF(positionDepot+8, 435, 10, 10);
+        QRectF sapin3 = QRectF(positionDepot+23, 425, 10, 10);
+        QRectF sapin4 = QRectF(positionDepot+8, 425, 10, 10);
         scene.addRect(sapin1, colorGreen, brushGreen);
         scene.addRect(sapin2, colorBlack, brushGreen);
         scene.addRect(sapin3, colorBlue, brushGreen);
@@ -330,19 +339,27 @@ void MainWindow::addFormes()
     }
 
     //Obstacle
-    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
-    scene.addRect(obstacle, colorBlack, brushBlack);
+    //QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
+    //scene.addRect(obstacle, colorBlack, brushBlack);
+
+    PipeItem * pipe = new PipeItem();
+
+    scene.addItem(pipe);
 
     //Panier
-    QRectF panierGauche = QRectF(positionDepot, 65, 5, 20);
-    QRectF panierMillieu = QRectF(positionDepot, 85, 40, 5);
-    QRectF panierDroite = QRectF(positionDepot+35, 65, 5, 20);
+    QRectF panierGauche = QRectF(positionDepot, 425, 5, 20);
+    QRectF panierMillieu = QRectF(positionDepot, 445, 40, 5);
+    QRectF panierDroite = QRectF(positionDepot+35, 425, 5, 20);
     scene.addRect(panierGauche, colorBlue, brushBlue);
     scene.addRect(panierMillieu, colorBlue, brushBlue);
     scene.addRect(panierDroite, colorBlue, brushBlue);
 
+    FlagItem * flag = new FlagItem();
+
+    scene.addItem(flag);
+
     //Ajout des forme dans le graphique
-    scene.setBackgroundBrush(Qt::white);
+    //scene.setBackgroundBrush(Qt::white);
     ui->Graphique->setScene(&scene);
 }
 

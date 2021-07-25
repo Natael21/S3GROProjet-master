@@ -1,6 +1,23 @@
 #include "flag.h"
 
-flag::flag(QObject *parent) : QObject(parent)
+FlagItem::FlagItem():
+   flag(new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/flag.png")))
+{
+   flag->setPos(positionDepot-5,373);
+   addToGroup(flag);
+}
+
+FlagItem::~FlagItem()
 {
 
 }
+
+qreal FlagItem::x() {
+       return positionDepot;
+}
+
+void FlagItem::setX(qreal x)
+{
+    m_x = x;
+}
+
