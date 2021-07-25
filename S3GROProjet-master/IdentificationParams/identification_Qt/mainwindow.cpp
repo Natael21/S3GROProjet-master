@@ -12,6 +12,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     ui = new Ui::MainWindow;
     ui->setupUi(this);
 
+
     // Initialisation du graphique
     ui->graph->setChart(&chart_);
     chart_.setTitle("Donnees brutes");
