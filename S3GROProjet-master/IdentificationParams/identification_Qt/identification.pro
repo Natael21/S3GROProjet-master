@@ -29,17 +29,17 @@ SOURCES += \
         mainwindow.cpp \
         serialprotocol.cpp \
         csvwriter.cpp \
-    car.cpp \
-    pipe.cpp \
-    flag.cpp
+        car.cpp \
+        pipe.cpp \
+        flag.cpp
 
 HEADERS += \
         mainwindow.h \
         serialprotocol.h \
         csvwriter.h \
-    car.h \
-    pipe.h \
-    flag.h
+        car.h \
+        pipe.h \
+        flag.h
 
 FORMS += \
         mainwindow.ui
