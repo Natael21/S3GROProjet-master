@@ -15,7 +15,10 @@
 #include <QtCharts>
 #include <QGraphicsView>
 #include <QPixmap>
+#include <QObject>
+#include <QSound>
 #include <QGraphicsPixmapItem>
+
 // Propres librairies
 #include "csvwriter.h"
 #include "serialprotocol.h"
@@ -87,7 +90,7 @@ public:// pour avoir positionVoiture dans la classe car
     QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/sky.png"));
     QLabel *label;
 
-    int sapin =                  4;
+    int sapin =                  0;
 
     double distance_obstacle =   0;
     double distance_depot =      0;
