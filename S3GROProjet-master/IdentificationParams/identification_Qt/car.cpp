@@ -8,7 +8,8 @@ CarItem::CarItem():
    vehicule->setPos(-10,245);
    addToGroup(vehicule);
     xAnimation = new QPropertyAnimation(this,"x",this);
-    xAnimation->setStartValue(0);
+    xAnimation->setStartValue(-10);//a changer
+    xAnimation->setEndValue(225);//a changer
     xAnimation->setDuration(1000);
     xAnimation->start();
 }

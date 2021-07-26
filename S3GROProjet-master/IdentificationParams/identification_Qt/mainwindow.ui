@@ -18,10 +18,10 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="17" column="0">
+    <item row="4" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -547,8 +547,8 @@
          <rect>
           <x>0</x>
           <y>190</y>
-          <width>831</width>
-          <height>381</height>
+          <width>641</width>
+          <height>411</height>
          </rect>
         </property>
        </widget>
@@ -581,7 +581,7 @@
        <widget class="QLabel" name="label_28">
         <property name="geometry">
          <rect>
-          <x>230</x>
+          <x>90</x>
           <y>130</y>
           <width>371</width>
           <height>61</height>

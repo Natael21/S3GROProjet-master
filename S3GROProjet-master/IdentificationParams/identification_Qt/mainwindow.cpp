@@ -244,7 +244,7 @@ void MainWindow::addFormes()
     //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
     scene.clear();
-   scene.setSceneRect(15,190,700,300);
+    scene.setSceneRect(225,190,200,200);
     scene.addItem(pixItem);
 
     //qleft : positif (-> droite); negatif (<- gauche)
