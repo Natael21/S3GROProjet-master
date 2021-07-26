@@ -61,7 +61,7 @@ void MainWindow::showPopUp()
 
 void MainWindow::showGIF()
 {
-    QSound ohYeah("../identification_Qt/sound/WeDidIt.wav");
+    QSound ohYeah(".:/sound/WeDidIt.wav");
     ohYeah.play();
 
     QMessageBox msg;
