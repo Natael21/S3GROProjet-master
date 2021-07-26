@@ -33,7 +33,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     addFormes();
-    //showGIF();
+    showGIF();
 
     // Recensement des ports
     portCensus();
@@ -61,7 +61,7 @@ void MainWindow::showPopUp()
 
 void MainWindow::showGIF()
 {
-    QSound ohYeah(".:/sound/WeDidIt.wav");
+    QSound ohYeah(":/sound/WeDidIt.wav");
     ohYeah.play();
 
     QMessageBox msg;

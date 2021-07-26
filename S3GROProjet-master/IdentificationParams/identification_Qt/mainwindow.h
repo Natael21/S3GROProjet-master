@@ -18,6 +18,7 @@
 #include <QObject>
 #include <QSound>
 #include <QGraphicsPixmapItem>
+#include <QPropertyAnimation>
 
 // Propres librairies
 #include "csvwriter.h"
