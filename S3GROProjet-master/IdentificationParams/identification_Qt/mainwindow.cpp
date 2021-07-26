@@ -81,7 +81,7 @@ void MainWindow::showGIF()
                          });
 
             // create Label
-            msg.setIconPixmap(QPixmap("../identification_Qt/image/WeDidIt.gif"));
+            msg.setIconPixmap(QPixmap(":/image/WeDidIt.gif"));
             QLabel *icon_label = msg.findChild<QLabel *>("qt_msgboxex_icon_label");
             icon_label->setFixedWidth(1000);
             icon_label->setFixedHeight(600);
@@ -244,7 +244,7 @@ void MainWindow::addFormes()
     //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
     scene.clear();
-   // scene.setSceneRect(15,190,700,300);
+   scene.setSceneRect(15,190,700,300);
     scene.addItem(pixItem);
 
     //qleft : positif (-> droite); negatif (<- gauche)

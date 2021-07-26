@@ -86,8 +86,8 @@ private:
 public:// pour avoir positionVoiture dans la classe car
 
     QGraphicsScene scene;
-    QMovie *movie = new QMovie("../identification_Qt/image/WeDidIt.gif");
-    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/sky.png"));
+    QMovie *movie = new QMovie(":/image/WeDidIt.gif");
+    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
     QLabel *label;
 
     int sapin =                  0;

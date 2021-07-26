@@ -1,7 +1,7 @@
 #include "pipe.h"
 
 PipeItem::PipeItem() :
-    pipe(new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/pipe.png")))
+    pipe(new QGraphicsPixmapItem(QPixmap(":/image/pipe.png")))
 {
     pipe->setPos(positionObstacle,395);
     addToGroup(pipe);

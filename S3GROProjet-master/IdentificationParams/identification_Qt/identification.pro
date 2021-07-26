@@ -45,3 +45,6 @@ FORMS += \
         mainwindow.ui
 
 DISTFILES +=
+
+RESOURCES += \
+    Images.qrc

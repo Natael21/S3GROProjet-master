@@ -1,7 +1,7 @@
 #include "flag.h"
 
 FlagItem::FlagItem():
-   flag(new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/flag.png")))
+    flag(new QGraphicsPixmapItem(QPixmap(":/image/flag.png")))
 {
    flag->setPos(positionDepot-5,373);
    addToGroup(flag);

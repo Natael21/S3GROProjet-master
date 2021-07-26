@@ -2,7 +2,8 @@
 
 
 CarItem::CarItem():
-   vehicule(new QGraphicsPixmapItem(QPixmap("../identification_Qt/image/car.png")))
+  vehicule(new QGraphicsPixmapItem(QPixmap(":/image/car.png")))
+
 {
    vehicule->setPos(-10,245);
    addToGroup(vehicule);
