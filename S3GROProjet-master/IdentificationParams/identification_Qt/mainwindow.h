@@ -96,7 +96,7 @@ public:// pour avoir positionVoiture dans la classe car
     double distance_obstacle =   0;
     double distance_depot =      0;
     double positionVoiture =     0;//peut peut etre enlever et garder dans la classe
-    double positionObstacle =    350;//same
+    double positionObstacle =    350;//same 350,-18 a 620
     double longeurPendule =      40;
     double positionDepot =       500;
     double anglePendule =        0;

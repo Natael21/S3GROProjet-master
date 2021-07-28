@@ -1,5 +1,6 @@
-#ifndef CAR_H
-#define CAR_H
+#ifndef SAPIN_H
+#define SAPIN_H
+
 
 #include <QObject>
 #include<QGraphicsItemGroup>
@@ -8,28 +9,32 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-class CarItem :public QObject, public QGraphicsItemGroup
+class SapinItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
     Q_PROPERTY(qreal x READ x WRITE setX)
     qreal x();
 
 public:
-    explicit CarItem(double position);
-    ~CarItem();
+    explicit SapinItem();
+    ~SapinItem();
     void receiveFromSerial(QString);
     void onMessageReceived(QString);
-    void setX(qreal x);
+    void setQ(qreal Q);
 
 signals:
 
 public slots:
 private:
-    double positionVehicule;
+    double anglePendule =        0;
+    double longeurPendule =      40;
     qreal m_x;
     QGraphicsPixmapItem * vehicule;
     QPropertyAnimation * xAnimation;
+    QString msgReceived_{""};
+    QString msgBuffer_{""};
 
 };
 
-#endif // CAR_H
+
+#endif // SAPIN_H

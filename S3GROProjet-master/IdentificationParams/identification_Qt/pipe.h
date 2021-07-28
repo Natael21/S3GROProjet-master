@@ -15,7 +15,7 @@ class PipeItem :public QObject, public QGraphicsItemGroup
     qreal x();
 
 public:
-    explicit PipeItem();
+    explicit PipeItem(double position);
     ~PipeItem();
     void receiveFromSerial(QString);
     void onMessageReceived(QString);
@@ -25,11 +25,9 @@ signals:
 
 public slots:
 private:
-    double positionObstacle =    350;
+    double positionObstacle;
     qreal m_x;
     QGraphicsPixmapItem * pipe;
-    QString msgReceived_{""};
-    QString msgBuffer_{""};
 };
 
 #endif // PIPE_H

@@ -33,7 +33,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     addFormes();
-    showGIF();
+    //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
     portCensus();
@@ -186,10 +186,13 @@ void MainWindow::connectButtons(){
 void MainWindow::sendPosition()
 {
     distance_obstacle = ui->distanceObstacle->text().toDouble();
+    positionObstacle = ui->distanceObstacle->text().toDouble();
+    positionObstacle = positionObstacle*3.01; // conversion cm en pixel
     distance_depot = ui->distanceDepot->text().toDouble();
 
-    QJsonArray array = { QString::number(distance_obstacle, 'f', 0),
-                         QString::number(distance_depot, 'f', 0)
+    QJsonArray array = { QString::number(-distance_obstacle, 'f', 0),//??
+                         QString::number(positionObstacle, 'f', 0),//?? negatif
+                         QString::number(-distance_depot, 'f', 0)
                        };
 
     QJsonObject jsonObject
@@ -265,17 +268,18 @@ void MainWindow::addFormes()
     brushBlue.setColor(colorBlue);
     brushGreen.setColor(colorGreen);
 
-    //Rail qui donne le point initiale des autres formes
-    scene.addRect(QRectF(5,350, 720, 7), colorBlack);
-
     //Voiture
     //QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
     //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
    // scene.addRect(rectVoiture1, colorRed, brushRed);
     //scene.addRect(rectVoiture2, colorRed, brushRed);
-    CarItem * camion = new CarItem();
+    CarItem * camion = new CarItem(positionVoiture);
 
     scene.addItem(camion);
+
+    //Rail qui donne le point initiale des autres formes
+    QRectF rail = QRectF(5,350, 650, 7);
+    scene.addRect(rail, colorBlue, brushBlue);
 
     //Roue voiture
     //QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
@@ -285,13 +289,13 @@ void MainWindow::addFormes()
 
     //Pendule
     //addLine(x1,y1,x2,y2) y2 = longeur pendule
-    double x2 = 10+(tan(anglePendule*(3.1416/180)))*longeurPendule;
-    double x1 = 80+positionVoiture;
-    double y1 = 345;
+    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
+    double x1 = 40+positionVoiture;
+    double y1 = 346;
     double y2 = 350+longeurPendule;
 
     QLine pendule = QLine(x1, y1, x2+x1, y2);
-    scene.addLine(pendule, colorRed);
+    scene.addLine(pendule, colorBlack);
 
     //Sapin
     if(!sapinLacher)
@@ -343,7 +347,7 @@ void MainWindow::addFormes()
     //QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
     //scene.addRect(obstacle, colorBlack, brushBlack);
 
-    PipeItem * pipe = new PipeItem();
+    PipeItem * pipe = new PipeItem(positionObstacle);
 
     scene.addItem(pipe);
 
@@ -355,7 +359,7 @@ void MainWindow::addFormes()
     scene.addRect(panierMillieu, colorBlue, brushBlue);
     scene.addRect(panierDroite, colorBlue, brushBlue);
 
-    FlagItem * flag = new FlagItem();
+    FlagItem * flag = new FlagItem(positionDepot);
 
     scene.addItem(flag);
 

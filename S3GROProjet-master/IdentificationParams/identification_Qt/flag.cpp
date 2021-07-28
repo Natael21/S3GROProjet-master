@@ -1,9 +1,10 @@
 #include "flag.h"
 
-FlagItem::FlagItem():
+FlagItem::FlagItem(double position):
     flag(new QGraphicsPixmapItem(QPixmap(":/image/flag.png")))
 {
-   flag->setPos(positionDepot-5,373);
+   flag->setPos(position-5,373);
+   positionDepot = position;
    addToGroup(flag);
 }
 

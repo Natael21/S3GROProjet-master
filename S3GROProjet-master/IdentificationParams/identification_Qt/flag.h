@@ -13,7 +13,7 @@ class FlagItem :public QObject, public QGraphicsItemGroup
     qreal x();
 
 public:
-    explicit FlagItem();
+    explicit FlagItem(double position);
     ~FlagItem();
     void setX(qreal x);
 
@@ -21,7 +21,7 @@ signals:
 
 public slots:
 private:
-    double positionDepot = 500;
+    double positionDepot;
     qreal m_x;
     QGraphicsPixmapItem * flag;
 };
