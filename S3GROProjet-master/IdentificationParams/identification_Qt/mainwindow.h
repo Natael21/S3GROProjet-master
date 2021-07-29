@@ -23,6 +23,7 @@
 // Propres librairies
 #include "csvwriter.h"
 #include "serialprotocol.h"
+#include "scene.h"
 
 // Classe definissant l'application
 namespace Ui {
@@ -54,13 +55,13 @@ private slots:
     void manageRecording(int);
     void changeJsonKeyValue();
     void startSerialCom(QString);
-    void addFormes();
     void sendPID();
     void sendStart();
     void sendStop();
     void sendPosition();
     void showPopUp();
     void showGIF();
+    void setUpMarioTimer(double lastposvoiture,double positionVoiture);// ??
 
 private:
     void connectTimers(int updateRate);
@@ -71,6 +72,7 @@ private:
     void stopRecording();
     void connectTextInputs();
     void connectComboBox();
+    void addFormes();
     void portCensus();
 
     bool record = false;
@@ -83,20 +85,18 @@ private:
     QString JsonKey_;
     QLineSeries series_;
     QChart chart_;
-
-public:// pour avoir positionVoiture dans la classe car
-
-    QGraphicsScene scene;
+    QGraphicsScene *scene;    //Création Scene
     QMovie *movie = new QMovie(":/image/WeDidIt.gif");
-    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
     QLabel *label;
+    QTimer *marioTimer;
 
     int sapin =                  0;
 
     double distance_obstacle =   0;
     double distance_depot =      0;
-    double positionVoiture =     0;//peut peut etre enlever et garder dans la classe
-    double positionObstacle =    350;//same 350,-18 a 620
+    double lastposvoiture =      0;
+    double positionVoiture =     300;//peut peut etre enlever et garder dans la classe
+    double positionObstacle =    0;//same 350,-18 a 620
     double longeurPendule =      40;
     double positionDepot =       500;
     double anglePendule =        0;

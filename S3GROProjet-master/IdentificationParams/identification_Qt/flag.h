@@ -9,20 +9,13 @@
 class FlagItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal x READ x WRITE setX)
-    qreal x();
 
 public:
     explicit FlagItem(double position);
     ~FlagItem();
-    void setX(qreal x);
 
-signals:
-
-public slots:
 private:
     double positionDepot;
-    qreal m_x;
     QGraphicsPixmapItem * flag;
 };
 

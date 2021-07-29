@@ -11,22 +11,13 @@
 class PipeItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal x READ x WRITE setX)
-    qreal x();
 
 public:
     explicit PipeItem(double position);
     ~PipeItem();
-    void receiveFromSerial(QString);
-    void onMessageReceived(QString);
-    void setX(qreal x);
 
-signals:
-
-public slots:
 private:
     double positionObstacle;
-    qreal m_x;
     QGraphicsPixmapItem * pipe;
 };
 

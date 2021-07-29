@@ -4,6 +4,7 @@
 #include <QObject>
 #include<QGraphicsItemGroup>
 #include<QGraphicsPixmapItem>
+#include<QGraphicsScene>
 #include<QPropertyAnimation>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -12,20 +13,19 @@ class CarItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
     Q_PROPERTY(qreal x READ x WRITE setX)
-    qreal x();
 
 public:
-    explicit CarItem(double position);
+    explicit CarItem(double currentpos, double newpos);
     ~CarItem();
-    void receiveFromSerial(QString);
-    void onMessageReceived(QString);
-    void setX(qreal x);
+    qreal x();
 
 signals:
 
 public slots:
+     void setX(qreal x);
 private:
-    double positionVehicule;
+    double startpositionVehicule;
+    double newpositionVehicule;
     qreal m_x;
     QGraphicsPixmapItem * vehicule;
     QPropertyAnimation * xAnimation;

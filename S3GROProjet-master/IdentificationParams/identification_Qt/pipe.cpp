@@ -13,11 +13,3 @@ PipeItem::~PipeItem()
 {
 
 }
-qreal PipeItem::x() {
-       return positionObstacle;
-}
-
-void PipeItem::setX(qreal x)
-{
-    positionObstacle = x;
-}

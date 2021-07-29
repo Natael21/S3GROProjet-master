@@ -25,6 +25,14 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
 
     ui->StartButton->setStyleSheet("QPushButton { background-color: green; }\n"
                           "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
+    // Création scène
+    scene = new QGraphicsScene(this);
+    scene->setSceneRect(225,190,200,200);
+
+    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
+    scene->addItem(pixItem);
+
+    ui->Graphique->setScene(scene);
 
     // Fonctions de connections events/slots
     connectTimers(updateRate);
@@ -33,6 +41,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     addFormes();
+    setUpMarioTimer(lastposvoiture,positionVoiture);
     //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
@@ -116,6 +125,8 @@ void MainWindow::receiveFromSerial(QString msg){
             // Affichage des messages Json
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
+
+            lastposvoiture = positionVoiture;//prendre valeur avant de changer
 
             positionVoiture = jsonObj["cur_pos"].toDouble();
             positionObstacle = jsonObj["position_obstacle"].toDouble();
@@ -246,9 +257,7 @@ void MainWindow::addFormes()
 {
     //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
-    scene.clear();
-    scene.setSceneRect(225,190,200,200);
-    scene.addItem(pixItem);
+    //scene.clear();
 
     //qleft : positif (-> droite); negatif (<- gauche)
     //qtop : positif (bas); negatif(haut)
@@ -273,13 +282,13 @@ void MainWindow::addFormes()
     //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
    // scene.addRect(rectVoiture1, colorRed, brushRed);
     //scene.addRect(rectVoiture2, colorRed, brushRed);
-    CarItem * camion = new CarItem(positionVoiture);
+    CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
 
-    scene.addItem(camion);
+    scene->addItem(camion);
 
     //Rail qui donne le point initiale des autres formes
     QRectF rail = QRectF(5,350, 650, 7);
-    scene.addRect(rail, colorBlue, brushBlue);
+    scene->addRect(rail, colorBlue, brushBlue);
 
     //Roue voiture
     //QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
@@ -290,18 +299,18 @@ void MainWindow::addFormes()
     //Pendule
     //addLine(x1,y1,x2,y2) y2 = longeur pendule
     double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-    double x1 = 40+positionVoiture;
+    double x1 = 40+lastposvoiture;
     double y1 = 346;
     double y2 = 350+longeurPendule;
 
     QLine pendule = QLine(x1, y1, x2+x1, y2);
-    scene.addLine(pendule, colorBlack);
+    scene->addLine(pendule, colorBlack);
 
     //Sapin
     if(!sapinLacher)
     {
         QRectF sapin = QRectF(x2+(x1-5), y2, 10, 10);
-        scene.addRect(sapin, colorGreen, brushGreen);
+        scene->addRect(sapin, colorGreen, brushGreen);
     }
     else
     {
@@ -311,24 +320,24 @@ void MainWindow::addFormes()
     if(sapin == 1)
     {
         QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
-        scene.addRect(sapin1, colorGreen, brushGreen);
+        scene->addRect(sapin1, colorGreen, brushGreen);
         qDebug() << "sapin == 1";
     }
     else if (sapin == 2)
     {
         QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
         QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
-        scene.addRect(sapin1, colorGreen, brushGreen);
-        scene.addRect(sapin2, colorBlack, brushGreen);
+        scene->addRect(sapin1, colorGreen, brushGreen);
+        scene->addRect(sapin2, colorBlack, brushGreen);
     }
     else if (sapin == 3)
     {
         QRectF sapin1 = QRectF(positionDepot+23, 75, 10, 10);
         QRectF sapin2 = QRectF(positionDepot+8, 75, 10, 10);
         QRectF sapin3 = QRectF(positionDepot+23, 63, 10, 10);
-        scene.addRect(sapin1, colorGreen, brushGreen);
-        scene.addRect(sapin2, colorBlack, brushGreen);
-        scene.addRect(sapin3, colorBlue, brushGreen);
+        scene->addRect(sapin1, colorGreen, brushGreen);
+        scene->addRect(sapin2, colorBlack, brushGreen);
+        scene->addRect(sapin3, colorBlue, brushGreen);
     }
     else if (sapin == 4)
     {
@@ -336,10 +345,10 @@ void MainWindow::addFormes()
         QRectF sapin2 = QRectF(positionDepot+8, 435, 10, 10);
         QRectF sapin3 = QRectF(positionDepot+23, 425, 10, 10);
         QRectF sapin4 = QRectF(positionDepot+8, 425, 10, 10);
-        scene.addRect(sapin1, colorGreen, brushGreen);
-        scene.addRect(sapin2, colorBlack, brushGreen);
-        scene.addRect(sapin3, colorBlue, brushGreen);
-        scene.addRect(sapin4, colorRed, brushGreen);
+        scene->addRect(sapin1, colorGreen, brushGreen);
+        scene->addRect(sapin2, colorBlack, brushGreen);
+        scene->addRect(sapin3, colorBlue, brushGreen);
+        scene->addRect(sapin4, colorRed, brushGreen);
 
     }
 
@@ -349,23 +358,37 @@ void MainWindow::addFormes()
 
     PipeItem * pipe = new PipeItem(positionObstacle);
 
-    scene.addItem(pipe);
+    scene->addItem(pipe);
 
     //Panier
     QRectF panierGauche = QRectF(positionDepot, 425, 5, 20);
     QRectF panierMillieu = QRectF(positionDepot, 445, 40, 5);
     QRectF panierDroite = QRectF(positionDepot+35, 425, 5, 20);
-    scene.addRect(panierGauche, colorBlue, brushBlue);
-    scene.addRect(panierMillieu, colorBlue, brushBlue);
-    scene.addRect(panierDroite, colorBlue, brushBlue);
+    scene->addRect(panierGauche, colorBlue, brushBlue);
+    scene->addRect(panierMillieu, colorBlue, brushBlue);
+    scene->addRect(panierDroite, colorBlue, brushBlue);
 
     FlagItem * flag = new FlagItem(positionDepot);
 
-    scene.addItem(flag);
+    scene->addItem(flag);
 
     //Ajout des forme dans le graphique
     //scene.setBackgroundBrush(Qt::white);
-    ui->Graphique->setScene(&scene);
+   // ui->Graphique->setScene(&scene);
+}
+
+void MainWindow::setUpMarioTimer(double lastposvoiture,double positionVoiture)
+{
+
+    marioTimer = new QTimer(this);
+    connect(marioTimer,&QTimer::timeout,[=](){
+
+    CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
+
+        scene->addItem(camion);
+    });
+
+    marioTimer->start(1050);
 }
 
 void MainWindow::changeJsonKeyValue(){
@@ -397,6 +420,7 @@ void MainWindow::sendPID(){
     QString strJson(doc.toJson(QJsonDocument::Compact));
     sendMessage(strJson);
 }
+
 
 void MainWindow::sendStart(){
     if(distance_envoyer)

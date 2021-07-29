@@ -13,12 +13,3 @@ FlagItem::~FlagItem()
 
 }
 
-qreal FlagItem::x() {
-       return positionDepot;
-}
-
-void FlagItem::setX(qreal x)
-{
-    m_x = x;
-}
-
