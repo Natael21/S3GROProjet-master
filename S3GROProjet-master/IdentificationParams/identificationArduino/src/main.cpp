@@ -72,6 +72,7 @@ bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge 
 bool prendre_sapin =                    false;    //Permet de savoir si à la fin de l'arrêt de l'oscillation, il faut prendre ou laisser le sapin
 bool sapinLacher =                      false;    //Permet de savoir si le sapin à été laché
 bool casZero =                          false;    //Permet de savoir si le cas START est actif
+bool oscillation_finis =                false;
 
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
@@ -139,18 +140,18 @@ void setup() {
   pid_x.setCommandFunc(PIDcommand);
   pid_x.setAtGoalFunc(PIDgoalReached);
   pid_x.setEpsilon(0.01);
-  pid_x.setPeriod(200);
-  pid_x.enable();
+  pid_x.setPeriod(100);
+  //pid_x.enable();
 
-    // Initialisation du PID d'angle
+  // Initialisation du PID d'angle
   pid_q.setGains(5, 0 ,0);
   // Attache des fonctions de retour
   pid_q.setMeasurementFunc(PIDmeasurement_angle);
   pid_q.setCommandFunc(PIDcommand_angle);
   pid_q.setAtGoalFunc(PIDgoalReached_angle);
   pid_q.setEpsilon(5);
-  pid_q.setPeriod(200);
-  pid_q.enable();
+  pid_q.setPeriod(100);
+  //pid_q.enable();
 
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
@@ -163,7 +164,7 @@ void setup() {
 
 // Boucle principale (infinie) 
 void loop() {
-
+/*
   if(shouldRead_){
     readMsg();
   }
@@ -173,14 +174,11 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
+  */
 
   // Mise à jour des chronometres
   timerSendMsg_.update();
   timerPulse_.update();
-
-  //Active les pid pour une utilisation future
-  pid_x.enable();
-  pid_q.enable();
 
 
   switch(choix) 
@@ -188,6 +186,9 @@ void loop() {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
       pinMode(MAGPIN, HIGH);
       AX_.setMotorPWM(MOTOR_ID, 0);
+      //delay(3000);
+      //choix = START;
+
     break;
 
     case START: //Cas pour l'initialisation des variables
@@ -201,6 +202,8 @@ void loop() {
       sapinLacher = false;
       
       choix = AVANCE_INITIAL;
+      AX_.setMotorPWM(MOTOR_ID, 0.1);
+      pid_x.enable();
     
     break;
 
@@ -209,25 +212,53 @@ void loop() {
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+      //Serial.println("case = pid_x.getGoal()");
+      //Serial.println(pid_x.getGoal());
+
 
      if(goal_position_atteint)
       {
-        choix = OSCILLATION_DEBUT;
+        choix = ARRET_TOTAL;
         goal_position_atteint = false;
+        pid_x.setGoal(position_depot);
+        pid_q.enable();
+        pid_x.enable();
       }
 
     break;
 
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
+      if(!oscillation_finis)
+      {
       fonction = 0.9*sin(5.0*(millis()/1000.0));
       pid_q.setGoal(goal_voulu_angle);
       pid_q.run();
       AX_.setMotorPWM(MOTOR_ID,fonction);
+      }
 
       if(goal_angle_atteint)
       {
-        choix = PASSE_OBSTACLE;
-        goal_angle_atteint = false;
+        oscillation_finis = true;
+        pid_x.setGains(PID_KP_RAPIDE,0,0);
+      
+        pid_x.run();
+        AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+
+        if(goal_position_atteint)
+        {
+          oscillation_finis = false;
+          goal_angle_atteint = false;
+          choix = AVANCE_ALLER;
+          goal_position_atteint = false;
+          //pid_x.enable();
+        }
+
+        /*
+          choix = PASSE_OBSTACLE;
+          goal_angle_atteint = false;
+          pid_q.disable();
+          pid_x.enable();
+          */
       }
 
     break;
@@ -235,6 +266,7 @@ void loop() {
     case PASSE_OBSTACLE: //Cas pour passer par dessus l'obstacle
       pid_x.setGoal(position_obstacle);
       pid_x.setGains(PID_KP_RAPIDE,0,0);
+      
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
@@ -242,6 +274,7 @@ void loop() {
       {
         choix = AVANCE_ALLER;
         goal_position_atteint = false;
+        pid_x.enable();
       }
 
     break;
@@ -249,6 +282,7 @@ void loop() {
     case AVANCE_ALLER : //Cas pour se rendre au dessus du panier à sapin
       pid_x.setGoal(position_depot);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
+      
       pid_x.run();
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
@@ -256,6 +290,7 @@ void loop() {
       {
         choix = ARRET_TOTAL;
         goal_position_atteint = false;
+        pid_q.enable();
       }
 
     break;
@@ -269,6 +304,8 @@ void loop() {
 
       if(goal_angle_atteint)
       {
+        choix = ARRET_TOTAL;
+        /*
         if(prendre_sapin == true)
         {
           choix = PREND_SAPIN;
@@ -277,7 +314,9 @@ void loop() {
         {
           choix = LACHE_SAPIN;
         }
+        */
         goal_angle_atteint = false;
+        
       }
 
     break;
@@ -515,6 +554,15 @@ void PIDgoalReached(){
 
 
 /////////////////////////////////////////////////////////
+
+void PIDAngle()
+{
+  if(PIDmeasurement_angle > 0)
+  {
+
+  }
+}
+
 // Fonctions pour le PID d'angle
 double PIDmeasurement_angle(){
   
@@ -531,6 +579,8 @@ double PIDmeasurement_angle(){
 
 void PIDcommand_angle(double cmd_angle){
   pulsePWM_angle = cmd_angle;
+  Serial.println("cmd_angle");
+  Serial.println(cmd_angle);
 }
 
 
