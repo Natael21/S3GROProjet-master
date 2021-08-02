@@ -28,6 +28,7 @@
 #define PID_KI_LENT                     0.25
 #define PID_KD_LENT                     0.2
 #define PID_KP_RAPIDE                   13
+#define COMPTEUR                        4
 
 //Différent cas pour la séquence du projet du sapin
 #define START                           0
@@ -94,7 +95,7 @@ float angle_pendule =                   0.0;      //Permet de savoir l'agle actu
 float cur_pos =                         0.0;      //Permet de savoir la position en temps réelle du pendule
 float cur_vel =                         0.0;      //Permet de savoir la vitesse en temps réelle du pendule
 float cur_angle =                       0.0;      //Permet de savoir l'angle en temps réelle du pendule
-
+int i = 0;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -202,6 +203,7 @@ void loop() {
       goal_angle_atteint = false;
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
       pinMode(MAGPIN, HIGH);
+      i = 0;
 
       sapinLacher = false;
       
@@ -330,10 +332,19 @@ void loop() {
 
       //Serial.println(angle_pendule);
 
-      if(goal_angle_atteint)
+      if(goal_position_atteint)
       {
-        Serial.println(" Sim_est_trash");
-        choix = ARRET_TOTAL;
+        i++;
+      }
+      else
+      {
+        i = 0;
+      }
+
+      if(i == COMPTEUR)
+      {
+        Serial.println(" allo");
+        choix = LACHE_SAPIN;
         pid_x.enable();
         /*
         if(prendre_sapin == true)
@@ -359,22 +370,22 @@ void loop() {
       delay(500);
 
       choix = AVANCE_RETOUR;
+      pid_x.enable();
 
     break;
 
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
-      pid_x.run();
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
-
       if(goal_position_atteint)
       {
-        choix = ARRET_OSCILLATION;
         goal_position_atteint = false;
         prendre_sapin = true;
         pid_x.enable();
+        choix = ARRET_OSCILLATION;
       }
+      
 
     break;
 
@@ -382,6 +393,7 @@ void loop() {
         choix = START;
         goal_angle_atteint = false;
         prendre_sapin = false;
+        AX_.resetEncoder(MOTOR_ID);
         pid_x.enable();
         pid_q.enable();
         pinMode(MAGPIN, HIGH);
