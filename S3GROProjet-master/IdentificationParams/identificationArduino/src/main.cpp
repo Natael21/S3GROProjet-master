@@ -332,7 +332,7 @@ void loop() {
 
       if(goal_angle_atteint)
       {
-        Serial.println(" Sim_est_trash");
+        Serial.println(" allo");
         choix = ARRET_TOTAL;
         pid_x.enable();
         /*
@@ -382,6 +382,7 @@ void loop() {
         choix = START;
         goal_angle_atteint = false;
         prendre_sapin = false;
+        AX_.resetEncoder(MOTOR_ID);
         pid_x.enable();
         pid_q.enable();
         pinMode(MAGPIN, HIGH);
