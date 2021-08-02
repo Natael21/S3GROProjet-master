@@ -12,15 +12,15 @@
 class PenduleItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal q READ q WRITE setQ)
-    Q_PROPERTY(qreal x READ x WRITE setX)
+    Q_PROPERTY(qreal q READ getQ WRITE setQ)
+    Q_PROPERTY(qreal x READ getX WRITE setX)
 
 
 public:
-    explicit PenduleItem(double currentangle, double newangle,double currentpos, double newpos);
+    explicit PenduleItem(double angle,double currentpos);
     ~PenduleItem();
-    qreal q();
-    qreal x();
+    qreal getQ();
+    qreal getX();
 
 signals:
 
@@ -29,15 +29,11 @@ public slots:
     void setX(qreal x);
 
 private:
-    double startanglePendule;
-    double newanglePendule;
-    double startpositionPendule;
-    double newpositionPendule;
     qreal m_q;
     qreal m_x;
     QGraphicsPixmapItem * pendule;
-    QPropertyAnimation * xAnimation;
-    QPropertyAnimation * qAnimation;
+//    QPropertyAnimation * xAnimation;
+//    QPropertyAnimation * qAnimation;
 
 };
 

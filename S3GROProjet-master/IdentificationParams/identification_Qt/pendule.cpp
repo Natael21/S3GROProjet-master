@@ -7,43 +7,41 @@
 //double y1 = 346;
 //double y2 = 350+longeurPendule;
 
-PenduleItem::PenduleItem(double currentangle, double newangle,double currentpos, double newpos):
+PenduleItem::PenduleItem(double angle,double currentpos):
   pendule(new QGraphicsPixmapItem(QPixmap(":/image/pendule.png")))
 
 {
-    startanglePendule = currentangle;
-    startpositionPendule = currentpos;
-    //qDebug()<<"startpositionPendule"<< startpositionPendule;
-    //qDebug()<<"newpositionPendule"<< newpositionPendule;
-    pendule->setPos(currentpos-5,344);
+    pendule->setPos(currentpos+5,360);
+    pendule->setRotation(angle);
+
     addToGroup(pendule);
-    xAnimation = new QPropertyAnimation(this,"x",this);
-    xAnimation->setStartValue(currentpos);//a changer
-    xAnimation->setEndValue(newpos);//a changer
-    xAnimation->setEasingCurve(QEasingCurve::Linear);
-    xAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
+//    xAnimation = new QPropertyAnimation(this,"x",this);
+//    xAnimation->setStartValue(currentpos);//a changer
+//    xAnimation->setEndValue(newpos);//a changer
+//    xAnimation->setEasingCurve(QEasingCurve::Linear);
+//    xAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
 
-   connect(xAnimation,&QPropertyAnimation::finished,[=](){
-        qDebug()<<"Animation position Pendule Fini";
-        scene()->removeItem(this);
-        delete this;
-    });
+//   connect(xAnimation,&QPropertyAnimation::finished,[=](){
+//        qDebug()<<"Animation position Pendule Fini";
+//        scene()->removeItem(this);
+//        delete this;
+//    });
 
-    xAnimation->start();
+ //   xAnimation->start();
 
-    qAnimation = new QPropertyAnimation(this,"q",this);
-    qAnimation->setStartValue(startanglePendule);//a changer
-    qAnimation->setEndValue(newangle);//a changer
-    qAnimation->setEasingCurve(QEasingCurve::InQuad);
-    qAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
+//    qAnimation = new QPropertyAnimation(this,"q",this);
+//    qAnimation->setStartValue(startanglePendule);//a changer
+//    qAnimation->setEndValue(newangle);//a changer
+//    qAnimation->setEasingCurve(QEasingCurve::InQuad);
+//    qAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
 
-    connect(qAnimation,&QPropertyAnimation::finished,[=](){
-         qDebug()<<"Animation angle Pendule Fini";
-         scene()->removeItem(this);
-         delete this;
-     });
+//    connect(qAnimation,&QPropertyAnimation::finished,[=](){
+//         qDebug()<<"Animation angle Pendule Fini";
+//         scene()->removeItem(this);
+//         delete this;
+//     });
 
-     qAnimation->start();
+//     qAnimation->start();
 }
 
 PenduleItem::~PenduleItem()//tester si efface
@@ -51,11 +49,11 @@ PenduleItem::~PenduleItem()//tester si efface
     qDebug()<< "Pendule est mort";
 
 }
-qreal PenduleItem::q() {
+qreal PenduleItem::getQ() {
     return m_q;
 }
 
-qreal PenduleItem::x()
+qreal PenduleItem::getX()
 {
     return m_x;
 }
@@ -69,13 +67,13 @@ void PenduleItem::setQ(qreal q)
     QTransform t;
     t.translate(c.x(), c.y());
     t.rotate(q);
-    t.translate(-c.x(),-c.y());
+    t.translate(-c.x(),-c.y());//maybe not?
     setTransform(t);
 }
 
 void PenduleItem::setX(qreal x)
 {
-    //qDebug() << "Pendule position:"<< x;
-    moveBy(x-m_x,0);
+    qDebug() << "Pendule position:"<< x;
+    moveBy(x,0);
     m_x = x;
 }

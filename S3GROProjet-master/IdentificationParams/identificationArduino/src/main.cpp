@@ -78,8 +78,8 @@ bool oscillation_finis =                false;
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
 double position_depart =                0.0;      //Permet de savoir la position initial du robot
-double position_obstacle =              0.4;      //Permet de savoir la position de l'obstacle
-double position_depot =                 0.7;      //Permet de savoir la position du dépot du sapin
+double position_obstacle =              0.0;      //Permet de savoir la position de l'obstacle
+double position_depot =                 0.0;      //Permet de savoir la position du dépot du sapin
 double distance_ins =                   0.0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
 double distance_old =                   0.0;      //Permet de savoir la distance précédente pour le calcul de la vitesse
 double temps_ins =                      0.0;      //Permet de savoir le temps instantanné du véhicule pour calculer la vitesse
@@ -160,12 +160,15 @@ void setup() {
 
   //Initialise l'état initiale du pendule comme étant 0 degree
   Potentio_zero = analogRead(POTPIN);
+
+  readMsg();
+  sendMsg();
 }
 
 
 // Boucle principale (infinie) 
 void loop() {
-/*
+
   if(shouldRead_){
     readMsg();
   }
@@ -175,7 +178,7 @@ void loop() {
   if(shouldPulse_){
     startPulse();
   }
-  */
+  
 
   
 
@@ -187,16 +190,16 @@ void loop() {
   switch(choix) 
   {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
-    Serial.println("Case 1");
+    //Serial.println("Case 1");
       pinMode(MAGPIN, HIGH);
       AX_.setMotorPWM(MOTOR_ID, 0);
-      delay(3000);
-      choix = START;
+      //delay(3000);
+      //choix = START;
 
     break;
 
     case START: //Cas pour l'initialisation des variables
-    Serial.println("Case 2");
+    //Serial.println("Case 2");
       casZero = true;
       goal_voulu_angle = 60;
       goal_position_atteint = false;
@@ -214,7 +217,7 @@ void loop() {
     break;
 
     case AVANCE_INITIAL: //Cas pour aller  la position initiale avant d'osciller
-    Serial.println("Case 3");
+    //Serial.println("Case 3");
       casZero = false;
       
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
@@ -239,7 +242,7 @@ void loop() {
     break;
 
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
-    Serial.println("Case 4");
+    //Serial.println("Case 4");
       if(!oscillation_finis)
       {
       fonction = 0.9*sin(5.0*(millis()/1000.0));
@@ -291,7 +294,7 @@ void loop() {
     */
 
     case AVANCE_ALLER : //Cas pour se rendre au dessus du panier à sapin
-    Serial.println("Case 5");
+    //Serial.println("Case 5");
     
         // Serial.println("pos depot");
         // Serial.println(position_depot);
@@ -343,7 +346,7 @@ void loop() {
 
       if(i == COMPTEUR)
       {
-        Serial.println(" allo");
+        //Serial.println(" allo");
         choix = LACHE_SAPIN;
         pid_x.enable();
         /*
@@ -369,7 +372,7 @@ void loop() {
       pinMode(MAGPIN, LOW);
       delay(500);
 
-      choix = AVANCE_RETOUR;
+      choix = ARRET_TOTAL;
       pid_x.enable();
 
     break;
@@ -455,8 +458,8 @@ void sendMsg(){
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
   doc["actualTime"] = pid_x.getActualDt();
-  doc["position_obstacle"] = position_obstacle;
-  doc["position_depot"] = position_depot;
+  //doc["position_obstacle"] = position_obstacle;
+  //doc["position_depot"] = position_depot;
   doc["sapin_lacher"] = sapinLacher;
   doc["casZero"] = casZero;
 
@@ -539,8 +542,8 @@ void readMsg(){
   parse_msg = doc["Stop"];
   if(!parse_msg.isNull())
   {
-    pinMode(MAGPIN, LOW);
-    AX_.setMotorPWM(MOTOR_ID, 0);
+    //pinMode(MAGPIN, LOW);
+    //AX_.setMotorPWM(MOTOR_ID, 0);
     choix = ARRET_TOTAL;
   }
 

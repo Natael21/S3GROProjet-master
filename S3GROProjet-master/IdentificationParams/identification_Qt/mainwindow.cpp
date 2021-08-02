@@ -1,9 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "car.h"
-#include "pipe.h"
-#include "flag.h"
-#include "pendule.h"
+
 
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)
@@ -20,37 +17,62 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     chart_.legend()->hide();
     chart_.addSeries(&series_);
 
-    //Permet de mettre de la couleur sur les boutons
-    ui->Stop->setStyleSheet("QPushButton { background-color: red; }\n"
-                          "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
-
-    ui->StartButton->setStyleSheet("QPushButton { background-color: green; }\n"
-                          "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
-    // Création scène
-    scene = new QGraphicsScene(this);
-    scene->setSceneRect(225,190,200,200);
-
-    QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
-    scene->addItem(pixItem);
-
-
-    ui->Graphique->setScene(scene);// Max a &scene
-
     // Fonctions de connections events/slots
     connectTimers(updateRate);
     connectButtons();
     connectSpinBoxes();
     connectTextInputs();
     connectComboBox();
-    addFormes();
-    setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate);
+    //addFormes();
+    //setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate);
     //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
     portCensus();
 
+
     // initialisation du timer
     updateTimer_.start();
+
+        // Création scène
+        scene = new QGraphicsScene(this);
+        scene->setSceneRect(225,190,200,200);
+
+        ui->Graphique->setScene(scene);
+
+        //Couleurs
+
+        brushRed.setColor(colorRed);
+        brushBlack.setColor(colorBlack);
+        brushBlue.setColor(colorBlue);
+        brushGreen.setColor(colorGreen);
+
+        //Création background
+        pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
+
+        //Creation objets avec image
+        camion = new CarItem(positionVoiture);
+        pipe = new PipeItem(positionObstacle);
+        flag = new FlagItem(positionDepot);
+        pendule = new PenduleItem(anglePendule,positionVoiture);
+
+        //Creation objets sans images
+        rail = QRectF(5,350, 650, 7);
+        panierGauche = QRectF(positionDepot, 425, 5, 20);
+        panierMillieu = QRectF(positionDepot, 445, 40, 5);
+        panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+
+        //Faire apparaître objets dans la scène au début
+        scene->addItem(pixItem);
+        scene->addItem(pendule);
+        scene->addItem(camion);
+        scene->addItem(pipe);
+        scene->addItem(flag);
+        scene->addRect(rail, colorBlue, brushBlue);
+        scene->addRect(panierGauche, colorBlue, brushBlue);
+        scene->addRect(panierMillieu, colorBlue, brushBlue);
+        scene->addRect(panierDroite, colorBlue, brushBlue);
+
 
 }
 
@@ -128,16 +150,18 @@ void MainWindow::receiveFromSerial(QString msg){
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
 
-            lastposvoiture = positionVoiture;//prendre valeur avant de changer
+            camion->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());// marche peut etre
+            pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
+            pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
-            positionVoiture = jsonObj["cur_pos"].toDouble();
-            positionObstacle = jsonObj["position_obstacle"].toDouble();
-            positionDepot = jsonObj["position_depot"].toDouble();
-            anglePendule = jsonObj["cur_angle"].toDouble()-45;
+            positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();//nécessaire?
+            anglePendule = jsonObj["cur_angle"].toDouble()-45;//necessaire?
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
 
-            //this->setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate); //peut etre une solution?
+            //positionObstacle = covertisseurMagique*jsonObj["position_obstacle"].toDouble();
+            //positionDepot = covertisseurMagique*jsonObj["position_depot"].toDouble();
+            this->addFormes();
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -170,11 +194,9 @@ void MainWindow::receiveFromSerial(QString msg){
 
     if(sapinLacher && afficher != 1)
     {
-       showGIF();
+       this->showGIF();
        afficher = 1;
     }
-
-    //addFormes();
 }
 
 void MainWindow::connectTimers(int updateRate){
@@ -196,18 +218,24 @@ void MainWindow::connectButtons(){
     connect(ui->StartButton, SIGNAL(clicked()), this, SLOT(sendStart()));
     connect(ui->Stop, SIGNAL(clicked()), this, SLOT(sendStop()));
     connect(ui->envoiDistance, SIGNAL(clicked()), this, SLOT(sendPosition()));
+
+    //Permet de mettre de la couleur sur les boutons
+    ui->Stop->setStyleSheet("QPushButton { background-color: red; }\n"
+                          "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
+
+    ui->StartButton->setStyleSheet("QPushButton { background-color: green; }\n"
+                          "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
 }
 
 void MainWindow::sendPosition()
 {
-    distance_obstacle = ui->distanceObstacle->text().toDouble();
-    positionObstacle = ui->distanceObstacle->text().toDouble();
-    positionObstacle = positionObstacle*3.01; // conversion cm en pixel
-    distance_depot = ui->distanceDepot->text().toDouble();
+    distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+    positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+    positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
 
-    QJsonArray array = { QString::number(-distance_obstacle, 'f', 0),//??
-                         QString::number(positionObstacle, 'f', 0),//?? negatif
-                         QString::number(-distance_depot, 'f', 0)
+    QJsonArray array = { QString::number(-distance_obstacle, 'f', 2),//??
+                         QString::number(-positionObstacle, 'f', 2),//?? negatif
+                         QString::number(-positionDepot, 'f', 2)
                        };
 
     QJsonObject jsonObject
@@ -220,6 +248,7 @@ void MainWindow::sendPosition()
     sendMessage(strJson);
 
     distance_envoyer = true;
+    this->addFormes();
 }
 
 void MainWindow::connectSpinBoxes(){
@@ -253,6 +282,7 @@ void MainWindow::startSerialCom(QString portName){
     if(serialCom_!=nullptr){
         delete serialCom_;
     }
+    qDebug() << "allo";
     serialCom_ = new SerialProtocol(portName, BAUD_RATE);
     connectSerialPortRead();
 }
@@ -261,54 +291,39 @@ void MainWindow::addFormes()
 {
     //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
-    //scene.clear();
+    scene->clear();
 
-    //qleft : positif (-> droite); negatif (<- gauche)
-    //qtop : positif (bas); negatif(haut)
+    scene->addItem(pixItem);
 
-    QColor colorRed = Qt::red;
-    QColor colorBlack = Qt::black;
-    QColor colorBlue = Qt::darkGray;
-    QColor colorGreen = Qt::green;
-
-    QBrush brushRed = Qt::SolidPattern;
-    QBrush brushBlack = Qt::SolidPattern;
-    QBrush brushBlue = Qt::SolidPattern;
-    QBrush brushGreen = Qt::SolidPattern;
-
-    brushRed.setColor(colorRed);
-    brushBlack.setColor(colorBlack);
-    brushBlue.setColor(colorBlue);
-    brushGreen.setColor(colorGreen);
+    scene->addItem(pendule);
 
     //Voiture
     //QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
     //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
-   // scene.addRect(rectVoiture1, colorRed, brushRed);
-    //scene.addRect(rectVoiture2, colorRed, brushRed);
-    //CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
+    //scene->addRect(rectVoiture1, colorRed, brushRed);
+    //scene->addRect(rectVoiture2, colorRed, brushRed);
+    //CarItem * camion = new CarItem(positionVoiture);
 
-    //scene->addItem(camion);
+    scene->addItem(camion);
 
     //Rail qui donne le point initiale des autres formes
-    QRectF rail = QRectF(5,350, 650, 7);
+
     scene->addRect(rail, colorBlue, brushBlue);
 
     //Roue voiture
     //QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
-   // QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
-   // scene.addEllipse(ellipseRoue1, colorBlack, brushBlack);
-   // scene.addEllipse(ellipseRoue2, colorBlack, brushBlack);
+    //QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
+    //scene->addEllipse(ellipseRoue1, colorBlack, brushBlack);
+    //scene->addEllipse(ellipseRoue2, colorBlack, brushBlack);
 
     //Pendule
-    //addLine(x1,y1,x2,y2) y2 = longeur pendule
     double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-    double x1 = 40+lastposvoiture;
+    double x1 = 40+positionVoiture;
     double y1 = 346;
     double y2 = 350+longeurPendule;
 
-    //QLine pendule = QLine(x1, y1, x2+x1, y2);
-    //scene->addLine(pendule, colorBlack);
+   // QLine pendule = QLine(x1, y1, x2+x1, y2);
+   // scene->addLine(pendule, colorBlack);
 
     //Sapin
     if(!sapinLacher)
@@ -345,7 +360,7 @@ void MainWindow::addFormes()
     }
     else if (sapin == 4)
     {
-        QRectF sapin1 = QRectF(positionDepot+23, 435, 10, 10);
+        QRectF sapin1 = QRectF(positionDepot+23, 435, 10, 10);//435?
         QRectF sapin2 = QRectF(positionDepot+8, 435, 10, 10);
         QRectF sapin3 = QRectF(positionDepot+23, 425, 10, 10);
         QRectF sapin4 = QRectF(positionDepot+8, 425, 10, 10);
@@ -360,43 +375,25 @@ void MainWindow::addFormes()
     //QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
     //scene.addRect(obstacle, colorBlack, brushBlack);
 
-    PipeItem * pipe = new PipeItem(positionObstacle);
+    pipe = new PipeItem(positionObstacle);// a changer pour ne pas recréer d'objet
 
     scene->addItem(pipe);
 
+
     //Panier
-    QRectF panierGauche = QRectF(positionDepot, 425, 5, 20);
-    QRectF panierMillieu = QRectF(positionDepot, 445, 40, 5);
-    QRectF panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+    panierGauche = QRectF(positionDepot, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+
     scene->addRect(panierGauche, colorBlue, brushBlue);
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
-    FlagItem * flag = new FlagItem(positionDepot);
-
+    flag = new FlagItem(positionDepot);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
-    //Ajout des forme dans le graphique
-    //scene.setBackgroundBrush(Qt::white);
-   // ui->Graphique->setScene(&scene);
 }
 
-void MainWindow::setUpMarioTimer(double lastanglePendule,double anglePendule,double lastposvoiture,double positionVoiture,int updateRate)
-{
-
-    marioTimer = new QTimer(this);
-    connect(marioTimer,&QTimer::timeout,[=](){
-
-    CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
-    PenduleItem * pendule = new PenduleItem(lastanglePendule,anglePendule,lastposvoiture,positionVoiture);
-
-    scene->addItem(pendule);
-    scene->addItem(camion);
-    });
-
-    marioTimer->start(updateRate);
-
-}
 
 
 void MainWindow::changeJsonKeyValue(){
@@ -435,7 +432,7 @@ void MainWindow::sendStart(){
     {
         QJsonObject jsonObject
         {
-             {"Start", 0}
+             {"Start", 1}
         };
 
         QJsonDocument doc(jsonObject);

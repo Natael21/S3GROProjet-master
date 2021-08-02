@@ -23,7 +23,11 @@
 // Propres librairies
 #include "csvwriter.h"
 #include "serialprotocol.h"
-#include "scene.h"
+
+#include "car.h"
+#include "pipe.h"
+#include "flag.h"
+#include "pendule.h"
 
 // Classe definissant l'application
 namespace Ui {
@@ -60,7 +64,6 @@ private slots:
     void sendStop();
     void sendPosition();
 
-   // void setUpMarioTimer(double lastposvoiture,double positionVoiture);// ??
 
 private:
     void connectTimers(int updateRate);
@@ -73,7 +76,6 @@ private:
     void connectComboBox();
     void addFormes();
     void portCensus();
-    void setUpMarioTimer(double lastanglePendule,double anglePendule,double lastposvoiture,double positionVoiture,int updateRate);
     void showPopUp();
     void showGIF();
 
@@ -90,24 +92,46 @@ private:
     QGraphicsScene *scene;    //Création Scene
     QMovie *movie = new QMovie(":/image/WeDidIt.gif");
     QLabel *label;
-    QTimer *marioTimer;
 
+    QColor colorRed = Qt::red;
+    QColor colorBlack = Qt::black;
+    QColor colorBlue = Qt::darkGray;
+    QColor colorGreen = Qt::green;
+
+    QBrush brushRed = Qt::SolidPattern;
+    QBrush brushBlack = Qt::SolidPattern;
+    QBrush brushBlue = Qt::SolidPattern;
+    QBrush brushGreen = Qt::SolidPattern;
+
+    QGraphicsPixmapItem * pixItem;
+
+    QRectF rail;
+    QRectF panierGauche;
+    QRectF panierMillieu;
+    QRectF panierDroite;
+
+
+    CarItem * camion;
+    PipeItem * pipe;
+    FlagItem * flag;
+    PenduleItem * pendule;
 
     int sapin =                  0;
 
-    double distance_obstacle =   0;
-    double distance_depot =      0;
-    double lastposvoiture =      0;
-    double positionVoiture =     602;//peut peut etre enlever et garder dans la classe
+    double distance_obstacle =   100;
+    //double distance_depot =      500;
+   // double lastposvoiture =      0;
+    double positionVoiture =     0;//peut peut etre enlever et garder dans la classe max = 602
     double positionObstacle =    0;//same 350,-18 a 620
     double longeurPendule =      40;
     double positionDepot =       500;
-    double lastanglePendule =    0;
-    double anglePendule =        20;
+    //double lastanglePendule =    0;
+    double anglePendule =        -45;
     double largeurRobot =        50;
     double hauteurRobot =        10;
     double diametreRoue =        12;
     double afficher     =        0;
+    double covertisseurMagique = (602/2);
 
     bool casZero     =           false;
     bool sapinLacher =           false;
