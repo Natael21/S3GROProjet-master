@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+        pendule.cpp \
         serialprotocol.cpp \
         csvwriter.cpp \
         car.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+        pendule.h \
         serialprotocol.h \
         csvwriter.h \
         car.h \

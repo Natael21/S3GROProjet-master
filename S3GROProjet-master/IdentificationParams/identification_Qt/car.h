@@ -6,8 +6,6 @@
 #include<QGraphicsPixmapItem>
 #include<QGraphicsScene>
 #include<QPropertyAnimation>
-#include <QJsonObject>
-#include <QJsonDocument>
 
 class CarItem :public QObject, public QGraphicsItemGroup
 {

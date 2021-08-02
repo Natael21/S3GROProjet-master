@@ -59,9 +59,8 @@ private slots:
     void sendStart();
     void sendStop();
     void sendPosition();
-    void showPopUp();
-    void showGIF();
-    void setUpMarioTimer(double lastposvoiture,double positionVoiture);// ??
+
+   // void setUpMarioTimer(double lastposvoiture,double positionVoiture);// ??
 
 private:
     void connectTimers(int updateRate);
@@ -74,6 +73,9 @@ private:
     void connectComboBox();
     void addFormes();
     void portCensus();
+    void setUpMarioTimer(double lastanglePendule,double anglePendule,double lastposvoiture,double positionVoiture,int updateRate);
+    void showPopUp();
+    void showGIF();
 
     bool record = false;
     CsvWriter* writer_;
@@ -90,16 +92,18 @@ private:
     QLabel *label;
     QTimer *marioTimer;
 
+
     int sapin =                  0;
 
     double distance_obstacle =   0;
     double distance_depot =      0;
     double lastposvoiture =      0;
-    double positionVoiture =     300;//peut peut etre enlever et garder dans la classe
+    double positionVoiture =     602;//peut peut etre enlever et garder dans la classe
     double positionObstacle =    0;//same 350,-18 a 620
     double longeurPendule =      40;
     double positionDepot =       500;
-    double anglePendule =        0;
+    double lastanglePendule =    0;
+    double anglePendule =        20;
     double largeurRobot =        50;
     double hauteurRobot =        10;
     double diametreRoue =        12;

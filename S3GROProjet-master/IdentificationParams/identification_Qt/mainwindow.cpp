@@ -3,6 +3,7 @@
 #include "car.h"
 #include "pipe.h"
 #include "flag.h"
+#include "pendule.h"
 
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)
@@ -32,7 +33,8 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     QGraphicsPixmapItem * pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
     scene->addItem(pixItem);
 
-    ui->Graphique->setScene(scene);
+
+    ui->Graphique->setScene(scene);// Max a &scene
 
     // Fonctions de connections events/slots
     connectTimers(updateRate);
@@ -41,7 +43,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     addFormes();
-    setUpMarioTimer(lastposvoiture,positionVoiture);
+    setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate);
     //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
@@ -131,9 +133,11 @@ void MainWindow::receiveFromSerial(QString msg){
             positionVoiture = jsonObj["cur_pos"].toDouble();
             positionObstacle = jsonObj["position_obstacle"].toDouble();
             positionDepot = jsonObj["position_depot"].toDouble();
-            anglePendule = jsonObj["cur_angle"].toDouble();
+            anglePendule = jsonObj["cur_angle"].toDouble()-45;
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
+
+            //this->setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate); //peut etre une solution?
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -170,7 +174,7 @@ void MainWindow::receiveFromSerial(QString msg){
        afficher = 1;
     }
 
-    addFormes();
+    //addFormes();
 }
 
 void MainWindow::connectTimers(int updateRate){
@@ -282,9 +286,9 @@ void MainWindow::addFormes()
     //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
    // scene.addRect(rectVoiture1, colorRed, brushRed);
     //scene.addRect(rectVoiture2, colorRed, brushRed);
-    CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
+    //CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
 
-    scene->addItem(camion);
+    //scene->addItem(camion);
 
     //Rail qui donne le point initiale des autres formes
     QRectF rail = QRectF(5,350, 650, 7);
@@ -303,8 +307,8 @@ void MainWindow::addFormes()
     double y1 = 346;
     double y2 = 350+longeurPendule;
 
-    QLine pendule = QLine(x1, y1, x2+x1, y2);
-    scene->addLine(pendule, colorBlack);
+    //QLine pendule = QLine(x1, y1, x2+x1, y2);
+    //scene->addLine(pendule, colorBlack);
 
     //Sapin
     if(!sapinLacher)
@@ -377,19 +381,23 @@ void MainWindow::addFormes()
    // ui->Graphique->setScene(&scene);
 }
 
-void MainWindow::setUpMarioTimer(double lastposvoiture,double positionVoiture)
+void MainWindow::setUpMarioTimer(double lastanglePendule,double anglePendule,double lastposvoiture,double positionVoiture,int updateRate)
 {
 
     marioTimer = new QTimer(this);
     connect(marioTimer,&QTimer::timeout,[=](){
 
     CarItem * camion = new CarItem(lastposvoiture,positionVoiture);
+    PenduleItem * pendule = new PenduleItem(lastanglePendule,anglePendule,lastposvoiture,positionVoiture);
 
-        scene->addItem(camion);
+    scene->addItem(pendule);
+    scene->addItem(camion);
     });
 
-    marioTimer->start(1050);
+    marioTimer->start(updateRate);
+
 }
+
 
 void MainWindow::changeJsonKeyValue(){
     // Fonction SLOT pour changer la valeur de la cle Json

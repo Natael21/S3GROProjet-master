@@ -6,5 +6,6 @@
         <file>image/sky.png</file>
         <file>image/WeDidIt.gif</file>
         <file>image/sapin.png</file>
+        <file>image/pendule.png</file>
     </qresource>
 </RCC>
