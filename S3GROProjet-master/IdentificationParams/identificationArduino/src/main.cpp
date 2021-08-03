@@ -66,7 +66,7 @@ uint16_t pulseTime_ =                   0;        // temps dun pulse en ms
 int time =                              0;        //timer pour la loop
 int32_t compteur_encodeur =             0;        //Encodeur du moteur
 
-int choix =                             ATTENTE;  //sert pour le switch case
+int choix =                             START;  //sert pour le switch case
 
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte

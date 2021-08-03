@@ -10,7 +10,7 @@
 class CarItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal x READ getX WRITE setX)
+    //Q_PROPERTY(qreal x READ getX WRITE setX)
 
 public:
     explicit CarItem(double currentpos);

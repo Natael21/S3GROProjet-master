@@ -150,9 +150,9 @@ void MainWindow::receiveFromSerial(QString msg){
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
 
-            camion->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());// marche peut etre
-            pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
-            pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
+            //camion->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());// marche peut etre
+           // pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
+            //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();//nécessaire?
             anglePendule = jsonObj["cur_angle"].toDouble()-45;//necessaire?
