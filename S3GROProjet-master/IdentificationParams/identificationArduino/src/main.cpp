@@ -372,7 +372,7 @@ void loop() {
       pinMode(MAGPIN, LOW);
       delay(500);
 
-      choix = ARRET_TOTAL;
+      choix = AVANCE_RETOUR;
       pid_x.enable();
 
     break;
@@ -393,10 +393,10 @@ void loop() {
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
-        choix = START;
+        choix = ARRET_TOTAL;
         goal_angle_atteint = false;
         prendre_sapin = false;
-        AX_.resetEncoder(MOTOR_ID);
+        // AX_.resetEncoder(MOTOR_ID);
         pid_x.enable();
         pid_q.enable();
         pinMode(MAGPIN, HIGH);
