@@ -335,12 +335,12 @@ void loop() {
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
 
       //Serial.println(angle_pendule);
-      pid_q.enable();
+      //pid_q.enable();
 
       if(goal_angle_atteint)
       {
         //i++;
-        delay(1000);
+        //delay(1000);
         pid_q.enable();
         choix = LACHE_SAPIN;
         pid_x.enable();
@@ -377,7 +377,7 @@ void loop() {
 
       AX_.setMotorPWM(MOTOR_ID,0);
       pinMode(MAGPIN, LOW);
-      delay(500);
+      delay(1000);
 
       choix = AVANCE_RETOUR;
       pid_x.enable();
@@ -388,6 +388,7 @@ void loop() {
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
+
       if(goal_position_atteint)
       {
         goal_position_atteint = false;

@@ -14,12 +14,14 @@ PenduleItem::PenduleItem(double angle,double currentpos):
     pendule->setPos(currentpos+5,360);
     //pendule->setRotation(angle);
 
-    QPointF c = pendule->boundingRect().topRight();
+    QPointF offset = pendule->boundingRect().topRight();
 
-    pendule->boundingRect().topRight();
-    pendule->setX(c.x());
-    pendule->setY(c.y());
-    pendule->setRotation(angle);
+    QTransform trans;
+
+    trans.translate(offset.x(), offset.y());
+    trans.rotate(-angle);
+    trans.translate(-offset.x(), -offset.y());
+    pendule->setTransform(trans);
 
     addToGroup(pendule);
 //    xAnimation = new QPropertyAnimation(this,"x",this);
