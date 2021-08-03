@@ -335,9 +335,10 @@ void loop() {
 
       //Serial.println(angle_pendule);
 
-      if(goal_position_atteint)
+      if(goal_angle_atteint)
       {
         i++;
+        pid_q.enable();
       }
       else
       {

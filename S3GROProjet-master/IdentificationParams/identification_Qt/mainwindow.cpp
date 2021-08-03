@@ -48,30 +48,30 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
         brushGreen.setColor(colorGreen);
 
         //Création background
-        pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
+//        pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
 
-        //Creation objets avec image
-        camion = new CarItem(positionVoiture);
-        pipe = new PipeItem(positionObstacle);
-        flag = new FlagItem(positionDepot);
-        pendule = new PenduleItem(anglePendule,positionVoiture);
+//        //Creation objets avec image
+//        camion = new CarItem(positionVoiture);
+//        pipe = new PipeItem(positionObstacle);
+//        flag = new FlagItem(positionDepot);
+//        pendule = new PenduleItem(anglePendule,positionVoiture);
 
-        //Creation objets sans images
-        rail = QRectF(5,350, 650, 7);
-        panierGauche = QRectF(positionDepot, 425, 5, 20);
-        panierMillieu = QRectF(positionDepot, 445, 40, 5);
-        panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+//        //Creation objets sans images
+//        rail = QRectF(5,350, 650, 7);
+//        panierGauche = QRectF(positionDepot, 425, 5, 20);
+//        panierMillieu = QRectF(positionDepot, 445, 40, 5);
+//        panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
-        //Faire apparaître objets dans la scène au début
-        scene->addItem(pixItem);
-        scene->addItem(pendule);
-        scene->addItem(camion);
-        scene->addItem(pipe);
-        scene->addItem(flag);
-        scene->addRect(rail, colorBlue, brushBlue);
-        scene->addRect(panierGauche, colorBlue, brushBlue);
-        scene->addRect(panierMillieu, colorBlue, brushBlue);
-        scene->addRect(panierDroite, colorBlue, brushBlue);
+//        //Faire apparaître objets dans la scène au début
+//        scene->addItem(pixItem);
+//        scene->addItem(pendule);
+//        scene->addItem(camion);
+//        scene->addItem(pipe);
+//        scene->addItem(flag);
+//        scene->addRect(rail, colorBlue, brushBlue);
+//        scene->addRect(panierGauche, colorBlue, brushBlue);
+//        scene->addRect(panierMillieu, colorBlue, brushBlue);
+//        scene->addRect(panierDroite, colorBlue, brushBlue);
 
 
 }
@@ -293,18 +293,40 @@ void MainWindow::addFormes()
     //Mettre la scene vide
     scene->clear();
 
+    pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
     scene->addItem(pixItem);
 
-    scene->addItem(pendule);
+    //Creation objets sans images
+    rail = QRectF(5,350, 650, 7);
+    panierGauche = QRectF(positionDepot, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+
+    //Faire apparaître objets dans la scène au début
+//    scene->addItem(pendule);
+//    scene->addItem(camion);
+//    scene->addItem(pipe);
+//    scene->addItem(flag);
+//    scene->addRect(rail, colorBlue, brushBlue);
+//    scene->addRect(panierGauche, colorBlue, brushBlue);
+//    scene->addRect(panierMillieu, colorBlue, brushBlue);
+//    scene->addRect(panierDroite, colorBlue, brushBlue);
+
+//    scene->addItem(pixItem);
+
+//    scene->addItem(pendule);
 
     //Voiture
     //QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
     //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
     //scene->addRect(rectVoiture1, colorRed, brushRed);
     //scene->addRect(rectVoiture2, colorRed, brushRed);
-    //CarItem * camion = new CarItem(positionVoiture);
+    PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
+    scene->addItem(pendule);
 
+    CarItem * camion = new CarItem(positionVoiture);
     scene->addItem(camion);
+
 
     //Rail qui donne le point initiale des autres formes
 
