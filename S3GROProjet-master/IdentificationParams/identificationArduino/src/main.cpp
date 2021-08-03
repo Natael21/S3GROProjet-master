@@ -236,7 +236,7 @@ void loop() {
         pid_x.setGoal(position_depot);
         pid_q.enable(); 
         pid_x.enable();
-        Serial.println("avance initial fini");
+        //Serial.println("avance initial fini");
       }
 
     break;
@@ -487,7 +487,7 @@ void sendMsg(){
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
-  Serial.println();
+  //Serial.println();
   shouldSend_ = false;
 }
 
@@ -502,8 +502,8 @@ void readMsg(){
 
   // Si erreur dans le message
   if (error) {
-    Serial.print("deserialize() failed: ");
-    Serial.println(error.c_str());
+    //Serial.print("deserialize() failed: ");
+    //Serial.println(error.c_str());
     return;
   }
   
