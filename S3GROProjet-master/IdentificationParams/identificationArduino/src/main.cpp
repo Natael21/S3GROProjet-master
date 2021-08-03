@@ -116,7 +116,7 @@ double PIDmeasurement_angle();
 void PIDcommand_angle(double cmd);
 void PIDgoalReached_angle();
 
-void Calculangle();
+double Calculangle();
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
