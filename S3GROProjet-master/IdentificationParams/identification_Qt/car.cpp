@@ -24,7 +24,7 @@ CarItem::CarItem(double currentpos):
 
 CarItem::~CarItem()//tester si efface
 {
-   // qDebug()<< "Mario est mort";
+    qDebug()<< "Mario est mort";
 
 }
 qreal CarItem::getX() {
