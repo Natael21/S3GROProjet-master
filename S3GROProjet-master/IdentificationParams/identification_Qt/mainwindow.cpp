@@ -127,7 +127,7 @@ void MainWindow::receiveFromSerial(QString msg){
             //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
-            anglePendule = jsonObj["cur_angle"].toDouble()-45;//necessaire?
+            anglePendule = -1*(jsonObj["cur_angle"].toDouble()-45);//necessaire?
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
 

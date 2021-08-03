@@ -19,7 +19,7 @@ PenduleItem::PenduleItem(double angle,double currentpos):
     QTransform trans;
 
     trans.translate(offset.x(), offset.y());
-    trans.rotate(-angle);
+    trans.rotate(angle);
     trans.translate(-offset.x(), -offset.y());
     pendule->setTransform(trans);
 
