@@ -328,6 +328,7 @@ void loop() {
 
     case ARRET_OSCILLATION: //Cas pour arreter le pendule vers 0 degree au dessus du panier
       //On fait un sinus qui tend vers 0 ???---------------------------------------------------------------
+      //problème avec le case 
       pid_q.setGains(5,0,0);
       pid_q.setGoal(0);
      
@@ -338,10 +339,14 @@ void loop() {
 
       if(goal_angle_atteint)
       {
-        i++;
+        //i++;
+        delay(1000);
         pid_q.enable();
+        choix = LACHE_SAPIN;
+        pid_x.enable();
+        goal_angle_atteint = false;
       }
-      else
+    /*  else
       {
         i = 0;
       }
@@ -360,10 +365,10 @@ void loop() {
         {
           choix = LACHE_SAPIN;
         }
-        */
+        
         goal_angle_atteint = false;
         
-      }
+      }*/
 
     break;
 
@@ -390,7 +395,7 @@ void loop() {
         pid_x.enable();
         choix = ARRET_OSCILLATION;
       }
-      Serial.println(choix);
+      
       
 
     break;
