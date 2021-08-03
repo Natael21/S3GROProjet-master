@@ -24,7 +24,7 @@ CarItem::CarItem(double currentpos):
 
 CarItem::~CarItem()//tester si efface
 {
-    qDebug()<< "Mario est mort";
+    //qDebug()<< "Mario est mort";
 
 }
 qreal CarItem::getX() {
@@ -33,7 +33,7 @@ qreal CarItem::getX() {
 
 void CarItem::setX(qreal x)
 {
-    qDebug() << "Mario position:"<< x;
+    //qDebug() << "Mario position:"<< x;
     moveBy(x,0);
     m_x = x;
 }

@@ -420,6 +420,8 @@ void loop() {
   pid_x.run();
   pid_q.run();
 
+  Calculangle();
+
 }
 
 /*---------------------------Definition de fonctions ------------------------*/
@@ -624,12 +626,21 @@ void PIDAngle()
 // Fonctions pour le PID d'angle
 double PIDmeasurement_angle(){
   
-  angle_pendule = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
+  //angle_pendule = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
 
-  cur_angle = angle_pendule;
+  //cur_angle = angle_pendule;
 
   //Serial.print("angle_pendule");
   //Serial.println(angle_pendule);
+
+  return Calculangle();
+}
+
+double Calculangle()
+{
+  angle_pendule = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
+
+  cur_angle = angle_pendule;
 
   return angle_pendule;
 }

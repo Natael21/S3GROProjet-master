@@ -289,64 +289,52 @@ void MainWindow::startSerialCom(QString portName){
 
 void MainWindow::addFormes()
 {
-    //Changer le ratio pour la longeur du pendule et l'angle et la position de la voiture/objets/etc.----------------------------------------
     //Mettre la scene vide
     scene->clear();
 
+    //Ajout du background
     pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
     scene->addItem(pixItem);
 
-    //Creation objets sans images
-    rail = QRectF(5,350, 650, 7);
+    //Creationdu panier
     panierGauche = QRectF(positionDepot, 425, 5, 20);
     panierMillieu = QRectF(positionDepot, 445, 40, 5);
     panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
-    //Faire apparaître objets dans la scène au début
-//    scene->addItem(pendule);
-//    scene->addItem(camion);
-//    scene->addItem(pipe);
-//    scene->addItem(flag);
-//    scene->addRect(rail, colorBlue, brushBlue);
-//    scene->addRect(panierGauche, colorBlue, brushBlue);
-//    scene->addRect(panierMillieu, colorBlue, brushBlue);
-//    scene->addRect(panierDroite, colorBlue, brushBlue);
-
-//    scene->addItem(pixItem);
-
-//    scene->addItem(pendule);
-
-    //Voiture
-    //QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
-    //QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
-    //scene->addRect(rectVoiture1, colorRed, brushRed);
-    //scene->addRect(rectVoiture2, colorRed, brushRed);
+    // Pendule
     PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
     scene->addItem(pendule);
 
-    CarItem * camion = new CarItem(positionVoiture);
-    scene->addItem(camion);
+    //Voiture
+//    CarItem * camion = new CarItem(positionVoiture);
+//    scene->addItem(camion);
 
 
-    //Rail qui donne le point initiale des autres formes
-
+    //Rail
+    rail = QRectF(5,350, 650, 7);
     scene->addRect(rail, colorBlue, brushBlue);
 
-    //Roue voiture
-    //QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
-    //QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
-    //scene->addEllipse(ellipseRoue1, colorBlack, brushBlack);
-    //scene->addEllipse(ellipseRoue2, colorBlack, brushBlack);
+    //Pipe
+    pipe = new PipeItem(positionObstacle);// a changer pour ne pas recréer d'objet
+    scene->addItem(pipe);
 
-    //Pendule
-    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-    double x1 = 40+positionVoiture;
-    double y1 = 346;
-    double y2 = 350+longeurPendule;
 
-   // QLine pendule = QLine(x1, y1, x2+x1, y2);
-   // scene->addLine(pendule, colorBlack);
+    //Panier
+    panierGauche = QRectF(positionDepot, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
+    scene->addRect(panierGauche, colorBlue, brushBlue);
+    scene->addRect(panierMillieu, colorBlue, brushBlue);
+    scene->addRect(panierDroite, colorBlue, brushBlue);
+
+    // Flag
+    flag = new FlagItem(positionDepot);// a changer pour ne pas recréer d'objet
+    scene->addItem(flag);
+
+
+
+/*
     //Sapin
     if(!sapinLacher)
     {
@@ -390,30 +378,33 @@ void MainWindow::addFormes()
         scene->addRect(sapin2, colorBlack, brushGreen);
         scene->addRect(sapin3, colorBlue, brushGreen);
         scene->addRect(sapin4, colorRed, brushGreen);
-
     }
+*/
+
+    //Voiture
+//    QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
+//    QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
+//    scene->addRect(rectVoiture1, colorRed, brushRed);
+//    scene->addRect(rectVoiture2, colorRed, brushRed);
+
+    //Roue voiture
+//    QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
+//    QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
+//    scene->addEllipse(ellipseRoue1, colorBlack, brushBlack);
+//    scene->addEllipse(ellipseRoue2, colorBlack, brushBlack);
+
+    //Pendule
+//    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
+//    double x1 = 40+positionVoiture;
+//    double y1 = 346;
+//    double y2 = 350+longeurPendule;
+
+//    QLine pendule = QLine(x1, y1, x2+x1, y2);
+//    scene->addLine(pendule, colorBlack);
 
     //Obstacle
-    //QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
-    //scene.addRect(obstacle, colorBlack, brushBlack);
-
-    pipe = new PipeItem(positionObstacle);// a changer pour ne pas recréer d'objet
-
-    scene->addItem(pipe);
-
-
-    //Panier
-    panierGauche = QRectF(positionDepot, 425, 5, 20);
-    panierMillieu = QRectF(positionDepot, 445, 40, 5);
-    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
-
-    scene->addRect(panierGauche, colorBlue, brushBlue);
-    scene->addRect(panierMillieu, colorBlue, brushBlue);
-    scene->addRect(panierDroite, colorBlue, brushBlue);
-
-    flag = new FlagItem(positionDepot);// a changer pour ne pas recréer d'objet
-    scene->addItem(flag);
-
+//    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
+//    scene.addRect(obstacle, colorBlack, brushBlack);
 }
 
 

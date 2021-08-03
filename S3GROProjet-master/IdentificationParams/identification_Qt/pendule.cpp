@@ -46,7 +46,7 @@ PenduleItem::PenduleItem(double angle,double currentpos):
 
 PenduleItem::~PenduleItem()//tester si efface
 {
-    qDebug()<< "Pendule est mort";
+    //qDebug()<< "Pendule est mort";
 
 }
 qreal PenduleItem::getQ() {
@@ -61,19 +61,19 @@ qreal PenduleItem::getX()
 void PenduleItem::setQ(qreal q)
 {
     m_q = q;
-    qDebug() << "Pendule angle:"<< q;
+    //qDebug() << "Pendule angle:"<< q;
 
     QPointF c = boundingRect().topRight();
     QTransform t;
-    t.translate(c.x(), c.y());
+    //t.translate(c.x(), c.y());
     t.rotate(q);
-    t.translate(-c.x(),-c.y());//maybe not?
+    //t.translate(-c.x(),-c.y());//maybe not?
     setTransform(t);
 }
 
 void PenduleItem::setX(qreal x)
 {
-    qDebug() << "Pendule position:"<< x;
+    //qDebug() << "Pendule position:"<< x;
     moveBy(x,0);
     m_x = x;
 }
