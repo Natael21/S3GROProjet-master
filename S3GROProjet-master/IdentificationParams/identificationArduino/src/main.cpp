@@ -78,8 +78,8 @@ bool oscillation_finis =                false;
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
 double position_depart =                0.0;      //Permet de savoir la position initial du robot
-double position_obstacle =              0.0;      //Permet de savoir la position de l'obstacle
-double position_depot =                 0.0;      //Permet de savoir la position du dépot du sapin
+double position_obstacle =              0.5;      //Permet de savoir la position de l'obstacle
+double position_depot =                 1.0;      //Permet de savoir la position du dépot du sapin
 double distance_ins =                   0.0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
 double distance_old =                   0.0;      //Permet de savoir la distance précédente pour le calcul de la vitesse
 double temps_ins =                      0.0;      //Permet de savoir le temps instantanné du véhicule pour calculer la vitesse
@@ -334,6 +334,7 @@ void loop() {
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
 
       //Serial.println(angle_pendule);
+      pid_q.enable();
 
       if(goal_angle_atteint)
       {
