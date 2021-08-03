@@ -24,7 +24,6 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     //addFormes();
-    //setUpMarioTimer(lastanglePendule,anglePendule,lastposvoiture,positionVoiture,updateRate);
     //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
@@ -46,34 +45,6 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
         brushBlack.setColor(colorBlack);
         brushBlue.setColor(colorBlue);
         brushGreen.setColor(colorGreen);
-
-        //Création background
-//        pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
-
-//        //Creation objets avec image
-//        camion = new CarItem(positionVoiture);
-//        pipe = new PipeItem(positionObstacle);
-//        flag = new FlagItem(positionDepot);
-//        pendule = new PenduleItem(anglePendule,positionVoiture);
-
-//        //Creation objets sans images
-//        rail = QRectF(5,350, 650, 7);
-//        panierGauche = QRectF(positionDepot, 425, 5, 20);
-//        panierMillieu = QRectF(positionDepot, 445, 40, 5);
-//        panierDroite = QRectF(positionDepot+35, 425, 5, 20);
-
-//        //Faire apparaître objets dans la scène au début
-//        scene->addItem(pixItem);
-//        scene->addItem(pendule);
-//        scene->addItem(camion);
-//        scene->addItem(pipe);
-//        scene->addItem(flag);
-//        scene->addRect(rail, colorBlue, brushBlue);
-//        scene->addRect(panierGauche, colorBlue, brushBlue);
-//        scene->addRect(panierMillieu, colorBlue, brushBlue);
-//        scene->addRect(panierDroite, colorBlue, brushBlue);
-
-
 }
 
 MainWindow::~MainWindow(){
@@ -154,7 +125,7 @@ void MainWindow::receiveFromSerial(QString msg){
            // pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
             //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
-            positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();//nécessaire?
+            positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
             anglePendule = jsonObj["cur_angle"].toDouble()-45;//necessaire?
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
@@ -282,7 +253,7 @@ void MainWindow::startSerialCom(QString portName){
     if(serialCom_!=nullptr){
         delete serialCom_;
     }
-    qDebug() << "allo";
+    //qDebug() << "allo";
     serialCom_ = new SerialProtocol(portName, BAUD_RATE);
     connectSerialPortRead();
 }
