@@ -10,6 +10,7 @@
 #include <ArduinoJson.h>
 #include <Tests.h> // Vos propres librairies
 /*------------------------------ Constantes ---------------------------------*/
+using namespace std;
 
 #define BAUD                            115200    // Frequence de transmission serielle
 #define UPDATE_PERIODE                  100       // Periode (ms) d'envoie d'etat general
@@ -389,6 +390,7 @@ void loop() {
         pid_x.enable();
         choix = ARRET_OSCILLATION;
       }
+      Serial.println(choix);
       
 
     break;
