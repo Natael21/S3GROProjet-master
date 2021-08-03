@@ -162,9 +162,6 @@ void setup() {
 
   //Initialise l'état initiale du pendule comme étant 0 degree
   Potentio_zero = analogRead(POTPIN);
-
-  readMsg();
-  sendMsg();
 }
 
 
@@ -401,8 +398,6 @@ void loop() {
         goal_angle_atteint = false;
         prendre_sapin = false;
         // AX_.resetEncoder(MOTOR_ID);
-        pid_x.enable();
-        pid_q.enable();
         pinMode(MAGPIN, HIGH);
 
     break;
@@ -464,8 +459,8 @@ void sendMsg(){
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
   doc["actualTime"] = pid_x.getActualDt();
-  //doc["position_obstacle"] = position_obstacle;
-  //doc["position_depot"] = position_depot;
+  doc["position_obstacle"] = position_obstacle;
+  doc["position_depot"] = position_depot;
   doc["sapin_lacher"] = sapinLacher;
   doc["casZero"] = casZero;
 
@@ -537,7 +532,6 @@ void readMsg(){
     pid_x.setGoal(doc["setGoal"][4]);
     pid_x.enable();
   }
-  //------------------------------------------------------------------------------------------------------------------------
 
   parse_msg = doc["Start"];
   if(!parse_msg.isNull())
@@ -619,10 +613,7 @@ void PIDgoalReached(){
 
 void PIDAngle()
 {
-  if(PIDmeasurement_angle > 0)
-  {
-
-  }
+  
 }
 
 // Fonctions pour le PID d'angle
