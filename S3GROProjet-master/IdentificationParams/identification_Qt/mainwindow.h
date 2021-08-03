@@ -131,7 +131,8 @@ private:
     double hauteurRobot =        10;
     double diametreRoue =        12;
     double afficher     =        0;
-    double covertisseurMagique = (602/2);
+    double distanceRouePendule = 0.217;
+    double covertisseurMagique = (602.0/1.56);
 
     bool casZero     =           false;
     bool sapinLacher =           false;

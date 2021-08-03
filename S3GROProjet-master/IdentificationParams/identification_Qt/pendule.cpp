@@ -11,8 +11,8 @@ PenduleItem::PenduleItem(double angle,double currentpos):
   pendule(new QGraphicsPixmapItem(QPixmap(":/image/pendule.png")))
 
 {
-    pendule->setPos(currentpos+5,360);
-    //pendule->setRotation(angle);
+//    pendule->setPos(currentpos+5,355);
+    pendule->setPos(currentpos-5,345);
 
     QPointF offset = pendule->boundingRect().topRight();
 
