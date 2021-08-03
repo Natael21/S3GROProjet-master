@@ -67,7 +67,7 @@ uint16_t pulseTime_ =                   0;        // temps dun pulse en ms
 int time =                              0;        //timer pour la loop
 int32_t compteur_encodeur =             0;        //Encodeur du moteur
 
-int choix =                             START;  //sert pour le switch case
+int choix =                             ATTENTE;  //sert pour le switch case
 
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
@@ -488,7 +488,7 @@ void sendMsg(){
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
-  //Serial.println();
+  Serial.println();
   shouldSend_ = false;
 }
 
@@ -503,8 +503,8 @@ void readMsg(){
 
   // Si erreur dans le message
   if (error) {
-    //Serial.print("deserialize() failed: ");
-    //Serial.println(error.c_str());
+    Serial.print("deserialize() failed: ");
+    Serial.println(error.c_str());
     return;
   }
   

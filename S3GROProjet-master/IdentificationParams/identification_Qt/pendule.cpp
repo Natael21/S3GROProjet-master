@@ -12,6 +12,13 @@ PenduleItem::PenduleItem(double angle,double currentpos):
 
 {
     pendule->setPos(currentpos+5,360);
+    //pendule->setRotation(angle);
+
+    QPointF c = pendule->boundingRect().topRight();
+
+    pendule->boundingRect().topRight();
+    pendule->setX(c.x());
+    pendule->setY(c.y());
     pendule->setRotation(angle);
 
     addToGroup(pendule);
@@ -65,7 +72,7 @@ void PenduleItem::setQ(qreal q)
 
     QPointF c = boundingRect().topRight();
     QTransform t;
-    //t.translate(c.x(), c.y());
+    t.translate(c.x(), c.y());
     t.rotate(q);
     //t.translate(-c.x(),-c.y());//maybe not?
     setTransform(t);

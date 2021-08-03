@@ -33,7 +33,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     // initialisation du timer
     updateTimer_.start();
 
-        // Création scène
+        // Création scene
         scene = new QGraphicsScene(this);
         scene->setSceneRect(225,190,200,200);
 
@@ -109,6 +109,7 @@ void MainWindow::receiveFromSerial(QString msg){
 
     //Si un message est termine
     if(msgBuffer_.endsWith('\n')){
+
         // Passage ASCII vers structure Json
         QJsonDocument jsonResponse = QJsonDocument::fromJson(msgBuffer_.toUtf8());
 
