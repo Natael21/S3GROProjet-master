@@ -19,13 +19,13 @@ using namespace std;
 #define POTPIN                          A5        // Port analogique pour le potentiometre
 
 #define PASPARTOUR                      64        // Nombre de pas par tour du moteur
-#define RAPPORTVITESSE                  50        // Rapport de vitesse du moteur
+#define RAPPORTVITESSE                  60        // Rapport de vitesse du moteur
 #define RAYON_ROUE                      0.06      // Diamètres des roues
 #define MOTOR_ID                        1         //Permet de choisir l'ID du moteur utiliser
 #define GEAR_RATIO                      2         //Permet de choisir un gearRatio en fonction des engrenage choisit
 #define FACTEUR_MAGIQUE                 1.1       //Ajoute 10% de distance pour compenser l'arondissement des ratio
-#define DISTANCE_AVANT_OBSTACLE         0.22   //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
-#define PID_KP_LENT                     1.5
+#define DISTANCE_AVANT_OBSTACLE         0.165   //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
+#define PID_KP_LENT                     1.8
 #define PID_KI_LENT                     0.25
 #define PID_KD_LENT                     0.2
 #define PID_KP_RAPIDE                   13
@@ -67,7 +67,7 @@ uint16_t pulseTime_ =                   0;        // temps dun pulse en ms
 int time =                              0;        //timer pour la loop
 int32_t compteur_encodeur =             0;        //Encodeur du moteur
 
-int choix =                             ARRET_TOTAL;  //sert pour le switch case
+int choix =                             ATTENTE;  //sert pour le switch case
 
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
@@ -82,10 +82,13 @@ double position_depart =                0.03;      //Permet de savoir la positio
 double position_obstacle =              0.5;      //Permet de savoir la position de l'obstacle
 double position_depot =                 1.0;      //Permet de savoir la position du dépot du sapin
 double distance_ins =                   0.0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
+double hauteur_obstacle =               0.0;      //Permet de savoir la hauteur de l'obstacle
 double distance_old =                   0.0;      //Permet de savoir la distance précédente pour le calcul de la vitesse
 double temps_ins =                      0.0;      //Permet de savoir le temps instantanné du véhicule pour calculer la vitesse
 double temps_old =                      0.0;      //Permet de savoir le temps précédente pour le calcul de la vitesse
 
+double temps1 =                         0.0;
+double temps2 =                         0.0;
 float pulsePWM_ =                       0.1;      // Amplitude de la tension au moteur pour la position[-1,1]
 float pulsePWM_angle =                  0.1;      //Amplitude de la tension au moteur pour l'angle [-1,1]
 float Axyz[3];                                    // tableau pour accelerometre
@@ -125,6 +128,7 @@ void PIDgoalReached_angle();
 
 double Calculangle();
 float reduce_angle();
+double vitesse();
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
@@ -150,7 +154,7 @@ void setup() {
   pid_x.setMeasurementFunc(PIDmeasurement);
   pid_x.setCommandFunc(PIDcommand);
   pid_x.setAtGoalFunc(PIDgoalReached);
-  pid_x.setEpsilon(0.01);
+  pid_x.setEpsilon(0.015);
   pid_x.setPeriod(100);
   //pid_x.enable();
 
@@ -167,6 +171,7 @@ void setup() {
 
   //Defenition du IO pour l'ÉLECTRO-AIMANT
   pinMode(MAGPIN, OUTPUT); 
+  //digitalWrite(MAGPIN, LOW);
 
   //Initialise l'état initiale du pendule comme étant 0 degree
   Potentio_zero = analogRead(POTPIN);
@@ -199,9 +204,9 @@ void loop() {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
     //Serial.println("Case 1");
       AX_.setMotorPWM(MOTOR_ID, 0);
-
+      digitalWrite(MAGPIN, HIGH);
       //Serial.println("attente");
-      choix = START;
+      //choix = START;
 
     break;
 
@@ -212,8 +217,9 @@ void loop() {
       goal_voulu_angle = 60;
       goal_position_atteint = false;
       goal_angle_atteint = false;
+      oscillation_finis = false;
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
-      digitalWrite(MAGPIN, HIGH);
+      //digitalWrite(MAGPIN, HIGH);
       
       sapinLacher = false;
       
@@ -241,9 +247,11 @@ void loop() {
       {
         choix = OSCILLATION_DEBUT;
         goal_position_atteint = false;
-        pid_x.setGoal(position_depot);                                // depot + distance
+        pid_x.setGoal(position_depot-0.2);                                // depot + distance
         pid_q.enable(); 
         pid_x.enable();
+        pid_q.setGoal(goal_voulu_angle);
+        temps2 = millis();
         //Serial.println("avance initial fini");
       }
 
@@ -252,18 +260,13 @@ void loop() {
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
     //Serial.println("Case 4");
       //Serial.println("oscillation_debut");
-      if(!oscillation_finis)
-      {
-      fonction = 0.9*sin(5.0*(millis()/1000.0));// donne un coup au début????
-      pid_q.setGoal(goal_voulu_angle);
-      AX_.setMotorPWM(MOTOR_ID,fonction);
-      }
+
 
       if(goal_angle_atteint)
       {
         oscillation_finis = true;
-        pid_x.setGains(PID_KP_RAPIDE,0,0);
-        AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+        //pid_x.setGains(PID_KP_RAPIDE,0,0);
+        AX_.setMotorPWM(MOTOR_ID, 1);
 
         if(goal_position_atteint)
         {
@@ -273,6 +276,17 @@ void loop() {
           goal_position_atteint = false;
           pid_x.enable();
         }
+      }
+      
+      if(!oscillation_finis)
+      {
+        temps1= millis()-temps2;
+  
+      fonction = -0.9*sin(5.0*(temps1/1000.0));
+      
+     
+      AX_.setMotorPWM(MOTOR_ID,fonction);
+
       }
 
     break;
@@ -314,7 +328,7 @@ void loop() {
 
       //Serial.println("arret_oscillation");
       reduce_angle();
-      Serial.println(vitesse_angle);
+     // Serial.println(vitesse_angle);
       //Serial.println(new_angle);
 
       //Serial.println(angle_pendule);
@@ -325,15 +339,15 @@ void loop() {
       {
         pid_x.enable();
         goal_angle_atteint = false;
-        if(prendre_sapin == true)
-        {
-          choix = PREND_SAPIN;
-        }
-        else
-        {
+        // if(prendre_sapin == true)
+        // {
+        //   choix = PREND_SAPIN;
+        // }
+        // else
+        // {
           choix = LACHE_SAPIN;
           i = 0;
-        }
+        // }
       }
     break;
 
@@ -342,13 +356,14 @@ void loop() {
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
-      digitalWrite(MAGPIN, LOW);
+      digitalWrite(MAGPIN, 0);
       i = i +1;
       
-      if( i == 1000 )
+      if( i >= 1000 )
       {
        choix = AVANCE_RETOUR;
         pid_x.enable();
+        goal_position_atteint = false;
       }
       break;
 
@@ -359,16 +374,17 @@ void loop() {
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
       if(goal_position_atteint)
       {
+        sapinLacher = false;
         goal_position_atteint = false;
         prendre_sapin = true;
         pid_x.enable();
-        choix = ARRET_OSCILLATION;
+        choix = START;
       }
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
       //Serial.println("prend sapin");
-        choix = ARRET_TOTAL;
+        choix = ATTENTE;
         goal_angle_atteint = false;
         prendre_sapin = false;
         // AX_.resetEncoder(MOTOR_ID);
@@ -380,6 +396,7 @@ void loop() {
       //Serial.println("arret_total");
       AX_.setMotorPWM(MOTOR_ID,0);
       digitalWrite(MAGPIN, LOW);
+      AX_.resetEncoder(MOTOR_ID);
     break;
 
 
@@ -392,6 +409,8 @@ void loop() {
   pid_q.run();
 
   Calculangle();
+  vitesse();
+  PIDmeasurement();
 
 }
 
@@ -434,6 +453,7 @@ void sendMsg(){
   doc["Etat"]      = choix;
   doc["actualTime"] = pid_x.getActualDt();
   doc["position_obstacle"] = position_obstacle;
+  doc["hauteur_obstacle"] = hauteur_obstacle;
   doc["position_depot"] = position_depot;
   doc["sapin_lacher"] = sapinLacher;
   doc["casZero"] = casZero;
@@ -511,7 +531,7 @@ void readMsg(){
   parse_msg = doc["Start"];
   if(!parse_msg.isNull())
   {
-    choix = ATTENTE;
+    choix = START;
   }
 
   parse_msg = doc["Stop"];

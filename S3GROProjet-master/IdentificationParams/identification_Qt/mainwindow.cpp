@@ -160,6 +160,7 @@ void MainWindow::receiveFromSerial(QString msg){
             anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);
             angleSapin = -1*(jsonObj["cur_angle"].toDouble());
             sapinLacher = jsonObj["sapin_lacher"].toBool();
+            etat = jsonObj["Etat"].toDouble();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
             etat = jsonObj["Etat"].toDouble();
@@ -243,6 +244,7 @@ void MainWindow::sendPosition()
     distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
     positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
     positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
+    hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
 
     QJsonArray array = { QString::number(-distance_obstacle, 'f', 2),//??
                          QString::number(-positionObstacle, 'f', 2),//?? negatif
@@ -325,7 +327,7 @@ void MainWindow::addFormesInitial()
     scene->addRect(rail, colorBlue, brushBlue);
 
     //Pipe
-    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    pipe = new PipeItem(positionObstacle+distanceRouePendule,hauteur_obstacle);// a changer pour ne pas recréer d'objet
     scene->addItem(pipe);
 
     // Flag
@@ -367,7 +369,7 @@ void MainWindow::moveMario()
     scene->addRect(rail, colorBlue, brushBlue);
 
     //Pipe
-    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    pipe = new PipeItem(positionObstacle+distanceRouePendule,hauteur_obstacle);// a changer pour ne pas recréer d'objet
     scene->addItem(pipe);
 
 
@@ -384,10 +386,13 @@ void MainWindow::moveMario()
     flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
+    if(sapinLacher == 0)
+    {
     //Sapin
 
     sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
     scene->addItem(sapin);
+    }
 /*
     //Sapin
     if(!sapinLacher)
@@ -459,28 +464,6 @@ void MainWindow::moveMario()
     //Obstacle
 //    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
 //    scene.addRect(obstacle, colorBlack, brushBlack);
-}
-void MainWindow::moveScene(){
-
-    scene->destroyItemGroup(pipe);
-    scene->destroyItemGroup(flag);
-
-    //Panier
-    panierGauche = QRectF(positionDepot+distanceRouePendule, 425, 5, 20);
-    panierMillieu = QRectF(positionDepot+distanceRouePendule, 445, 40, 5);
-    panierDroite = QRectF(positionDepot+distanceRouePendule+35, 425, 5, 20);
-
-    scene->addRect(panierGauche, colorBlue, brushBlue);
-    scene->addRect(panierMillieu, colorBlue, brushBlue);
-    scene->addRect(panierDroite, colorBlue, brushBlue);
-    //Pipe
-    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
-    scene->addItem(pipe);
-
-    // Flag
-    flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
-    scene->addItem(flag);
-
 }
 
 

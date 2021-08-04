@@ -78,7 +78,6 @@ private:
     void connectTextInputs();
     void connectComboBox();
     void moveMario();
-    void moveScene();
     void addFormesInitial();
     void portCensus();
     void showPopUp();
@@ -137,11 +136,14 @@ private:
 
     int sapin_dropped =          0;
 
+    double etat =                100;
+
     double distance_obstacle =   100;
     //double distance_depot =      500;
    // double lastposvoiture =      0;
     double positionVoiture =     0;//peut peut etre enlever et garder dans la classe max = 602
     double positionObstacle =    0;//same 350,-18 a 620
+    double hauteur_obstacle =    -0.01;
     double longeurPendule =      40;
     double positionDepot =       500;
     //double lastanglePendule =    0;

@@ -18,7 +18,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="4" column="0">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>1</number>
@@ -556,22 +556,22 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>10</y>
+          <y>20</y>
           <width>111</width>
-          <height>41</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="text">
-         <string>Distance Obstacle</string>
+         <string>Distance obstacle</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_27">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>80</y>
           <width>101</width>
-          <height>31</height>
+          <height>16</height>
          </rect>
         </property>
         <property name="text">
@@ -608,11 +608,11 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="distanceDepot">
+       <widget class="QLineEdit" name="hauteurObstacle">
         <property name="geometry">
          <rect>
           <x>140</x>
-          <y>60</y>
+          <y>50</y>
           <width>113</width>
           <height>22</height>
          </rect>
@@ -629,6 +629,29 @@
         </property>
         <property name="text">
          <string>Envoie distance</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="distanceDepot">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>80</y>
+          <width>113</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_29">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Hauteur obstacle</string>
         </property>
        </widget>
       </widget>

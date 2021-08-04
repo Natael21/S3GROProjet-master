@@ -5,7 +5,7 @@ SapinItem::SapinItem(double angle,double currentpos,bool sapinlacher):
 
 {
     //x1 = sin(angle)*longeurPendule;
-    //y1 = cos(angle)*longeurPendule;
+   // y1 = sin(angle)*longeurPendule;
     sapin->setPos(currentpos+15,365);
 
     QPointF offset = sapin->boundingRect().center();
@@ -33,13 +33,19 @@ SapinItem::SapinItem(double angle,double currentpos,bool sapinlacher):
     }
     if(sapinlacher == 0)
     {
-       yAnimation->stop();
+       //yAnimation->stop();
+          connect(yAnimation,&QPropertyAnimation::finished,[=](){
+               qDebug()<<"Animation Sapin Fini";
+               scene()->removeItem(this);
+               delete this;
+           });
     }
 
 }
 
 SapinItem::~SapinItem()
 {
+
 
 }
 

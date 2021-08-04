@@ -13,7 +13,7 @@ class PipeItem :public QObject, public QGraphicsItemGroup
     Q_OBJECT
 
 public:
-    explicit PipeItem(double position);
+    explicit PipeItem(double position,double hauteur);
     ~PipeItem();
 
 private:
