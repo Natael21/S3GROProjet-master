@@ -152,10 +152,6 @@ void MainWindow::receiveFromSerial(QString msg){
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
 
-            //camion->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());// marche peut etre
-           // pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
-            //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
-
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
             anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);
             angleSapin = -1*(jsonObj["cur_angle"].toDouble());
@@ -166,8 +162,6 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             son = jsonObj["son"].toDouble();
 
-            //positionObstacle = covertisseurMagique*jsonObj["position_obstacle"].toDouble();
-            //positionDepot = covertisseurMagique*jsonObj["position_depot"].toDouble();
             this->moveMario();
 
             // Affichage des donnees dans le graph
@@ -313,8 +307,8 @@ void MainWindow::addFormesInitial()
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
-    // Pendule
-    PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
+    // Pendule + Sapin
+    PenduleItem * pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
     scene->addItem(pendule);
 
     //Voiture
@@ -336,8 +330,8 @@ void MainWindow::addFormesInitial()
 
     //Sapin
 
-    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    scene->addItem(sapin);
+   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    //scene->addItem(sapin);
 }
 
 void MainWindow::moveMario()
@@ -356,7 +350,7 @@ void MainWindow::moveMario()
     panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
     // Pendule
-    pendule = new PenduleItem(anglePendule, positionVoiture);
+    pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
     scene->addItem(pendule);
 
     //Voiture
@@ -386,13 +380,13 @@ void MainWindow::moveMario()
     flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
-    if(sapinLacher == 0)
-    {
+    //if(sapinLacher == 0)
+    //{
     //Sapin
 
-    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    scene->addItem(sapin);
-    }
+   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    //scene->addItem(sapin);
+    //}
 /*
     //Sapin
     if(!sapinLacher)

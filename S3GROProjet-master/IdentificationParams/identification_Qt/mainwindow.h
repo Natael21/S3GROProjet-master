@@ -156,7 +156,6 @@ private:
     double distanceRouePendule = 0.217;
     double covertisseurMagique = (602.0/1.68);
     double vitesse_angulaire =   0;
-    //double etat  =               0;
     double son =                  0;
 
     bool casZero     =           false;

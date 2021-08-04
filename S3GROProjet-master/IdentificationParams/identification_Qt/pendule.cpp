@@ -2,86 +2,81 @@
 
 #include <QDebug>
 
-//double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-//double x1 = 40+lastposvoiture;
-//double y1 = 346;
-//double y2 = 350+longeurPendule;
-
-PenduleItem::PenduleItem(double angle,double currentpos):
-  pendule(new QGraphicsPixmapItem(QPixmap(":/image/pendule.png")))
+PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos,double sapinLacher,double etat):
+  pendule(new QGraphicsPixmapItem(QPixmap(":/image/pendule.png"))),
+  sapin(new QGraphicsPixmapItem(QPixmap(":/image/sapin.png")))
 
 {
     pendule->setPos(currentpos-5,345);
+    sapin->setPos(currentpos+15,365);
 
-    QPointF offset = pendule->boundingRect().topRight();
+    sapin->setTransformOriginPoint(pendule->boundingRect().topRight());
 
-    QTransform trans;
+    QPointF offsetPendule = pendule->boundingRect().topRight();
+    QPointF offsetSapin= sapin->boundingRect().center();
+    QTransform transPendule;
 
-    trans.translate(offset.x(), offset.y());
-    trans.rotate(angle);
-    trans.translate(-offset.x(), -offset.y());
-    pendule->setTransform(trans);
+    transPendule.translate(offsetPendule .x(), offsetPendule .y());
+    transPendule.rotate(anglePendule);
+    transPendule.translate(-offsetPendule .x(), -offsetPendule .y());
+
+    QTransform transSapin;
+
+    transSapin.translate(offsetSapin.x(), offsetSapin.y());
+    transSapin.rotate(angleSapin);
+    transSapin.translate(-offsetSapin.x(), -offsetSapin.y());
+
+
+    pendule->setTransform(transPendule);
+    sapin->setTransform(transSapin);
 
     addToGroup(pendule);
-//    xAnimation = new QPropertyAnimation(this,"x",this);
-//    xAnimation->setStartValue(currentpos);//a changer
-//    xAnimation->setEndValue(newpos);//a changer
-//    xAnimation->setEasingCurve(QEasingCurve::Linear);
-//    xAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
 
-//   connect(xAnimation,&QPropertyAnimation::finished,[=](){
-//        qDebug()<<"Animation position Pendule Fini";
-//        scene()->removeItem(this);
-//        delete this;
-//    });
+    if(etat != 8)
+    {
+        addToGroup(sapin);
+    }
 
- //   xAnimation->start();
+    groundposition = scenePos().y()+395;
 
-//    qAnimation = new QPropertyAnimation(this,"q",this);
-//    qAnimation->setStartValue(startanglePendule);//a changer
-//    qAnimation->setEndValue(newangle);//a changer
-//    qAnimation->setEasingCurve(QEasingCurve::InQuad);
-//    qAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
+   /* connect(sapin,&yAnimation,[=](){
 
-//    connect(qAnimation,&QPropertyAnimation::finished,[=](){
-//         qDebug()<<"Animation angle Pendule Fini";
-//         scene()->removeItem(this);
-//         delete this;
-//     });
+    groundposition = scenePos().y()+395;
+    yAnimation = new QPropertyAnimation(this,"y",this);
+    yAnimation->setStartValue(scenePos().y());
+    yAnimation->setEndValue(groundposition);
+    yAnimation->setEasingCurve(QEasingCurve::Linear);
+    yAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
+    });
+    if(sapinLacher == 1)
+    {
+            //yAnimation->start();
 
-//     qAnimation->start();
+    }
+    if(sapinLacher == 0)
+    {
+       yAnimation->stop();
+          connect(yAnimation,&QPropertyAnimation::finished,[=](){
+               qDebug()<<"Animation Sapin Fini";
+               scene()->removeItem(this);
+               delete this;
+          });
+    }*/
 }
 
-PenduleItem::~PenduleItem()//tester si efface
-{
-    //qDebug()<< "Pendule est mort";
+    PenduleItem::~PenduleItem()//tester si efface
+    {
+        //qDebug()<< "Pendule est mort";
+    }
 
-}
-qreal PenduleItem::getQ() {
-    return m_q;
-}
+    qreal PenduleItem::getY() {
+        return m_y;
+    }
 
-qreal PenduleItem::getX()
-{
-    return m_x;
-}
+    void PenduleItem::setY(qreal y)
+    {
+        //qDebug() << "Sapin position:"<< x;
+        moveBy(0,y-m_y);
+        m_y = y;
+    }
 
-void PenduleItem::setQ(qreal q)
-{
-    m_q = q;
-    //qDebug() << "Pendule angle:"<< q;
-
-    QPointF c = boundingRect().topRight();
-    QTransform t;
-    t.translate(c.x(), c.y());
-    t.rotate(q);
-    //t.translate(-c.x(),-c.y());//maybe not?
-    setTransform(t);
-}
-
-void PenduleItem::setX(qreal x)
-{
-    //qDebug() << "Pendule position:"<< x;
-    moveBy(x,0);
-    m_x = x;
-}

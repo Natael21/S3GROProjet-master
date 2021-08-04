@@ -7,34 +7,32 @@
 #include<QGraphicsPixmapItem>
 #include<QGraphicsScene>
 #include<QPropertyAnimation>
-
+#include<QtDebug>
 
 class PenduleItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal q READ getQ WRITE setQ)
-    Q_PROPERTY(qreal x READ getX WRITE setX)
+    Q_PROPERTY(qreal y READ getY WRITE setY)
 
 
 public:
-    explicit PenduleItem(double angle,double currentpos);
+    explicit PenduleItem(double anglePendule,double angleSapin,double currentpos,double sapinLacher,double etat);
     ~PenduleItem();
-    qreal getQ();
-    qreal getX();
+    qreal getY();
+
 
 signals:
 
 public slots:
-    void setQ(qreal q);
-    void setX(qreal x);
+     void setY(qreal y);
 
 private:
+    qreal m_y;
+    qreal groundposition;
 
-    qreal m_q;
-    qreal m_x;
     QGraphicsPixmapItem * pendule;
-//    QPropertyAnimation * xAnimation;
-//    QPropertyAnimation * qAnimation;
+    QGraphicsPixmapItem * sapin;
+    QPropertyAnimation * yAnimation;
 
 };
 
