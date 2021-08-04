@@ -8,7 +8,7 @@
 #include<QGraphicsScene>
 #include<QPropertyAnimation>
 #include<QtMath>
-
+#include<QtDebug>
 class SapinItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
