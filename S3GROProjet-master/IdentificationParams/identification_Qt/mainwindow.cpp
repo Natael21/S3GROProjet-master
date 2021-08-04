@@ -24,7 +24,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     //addFormes();
-    showGIF(); //a décommenter pour voir le GIF
+    //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
     portCensus();
@@ -510,7 +510,7 @@ void MainWindow::sendStart(){
         QString strJson(doc.toJson(QJsonDocument::Compact));
         sendMessage(strJson);
 
-        startIMfastAsF();
+        startItsMeMario();
     }
     else
     {

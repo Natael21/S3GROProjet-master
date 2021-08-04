@@ -27,6 +27,7 @@ private:
     qreal groundposition;
     qreal x1;
     qreal y1;
+    qreal postionSapin;
     double longeurPendule =      40;
     qreal m_y;
     QGraphicsPixmapItem * sapin;

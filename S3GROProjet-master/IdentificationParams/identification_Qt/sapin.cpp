@@ -8,13 +8,17 @@ SapinItem::SapinItem(double angle,double currentpos,bool sapinlacher):
    // y1 = sin(angle)*longeurPendule;
     sapin->setPos(currentpos+15,365);
 
-    QPointF offset = sapin->boundingRect().center();
+    postionSapin = 365-(longeurPendule/2);
+
+    sapin->boundingRect().setTop(postionSapin);
+    //    QPointF offset = sapin->boundingRect().setTop(postionSapin);
+
 
     QTransform trans;
 
-    trans.translate(offset.x(), offset.y());
+    //trans.translate(offset.x(), offset.y());
     trans.rotate(angle);
-    trans.translate(-offset.x(), -offset.y());
+    //trans.translate(-offset.x(), -offset.y());
     sapin->setTransform(trans);
 
     addToGroup(sapin);
