@@ -197,18 +197,16 @@ void loop() {
   switch(choix) 
   {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
-    //Serial.println("Case 1");
       digitalWrite(MAGPIN, HIGH);
       AX_.setMotorPWM(MOTOR_ID, 0);
 
-      Serial.println("attente");
+      //Serial.println("attente");
       choix = START;
 
     break;
 
     case START: //Cas pour l'initialisation des variables
-    //Serial.println("Case 2");
-      Serial.println("start");
+      //Serial.println("start");
       casZero = true;
       goal_voulu_angle = 60;
       goal_position_atteint = false;
@@ -226,8 +224,8 @@ void loop() {
     break;
 
     case AVANCE_INITIAL: //Cas pour aller  la position initiale avant d'osciller
-    //Serial.println("Case 3");
-      Serial.println("avance_initial");
+
+      //Serial.println("avance_initial");
       casZero = false;
       
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
@@ -252,8 +250,8 @@ void loop() {
     break;
 
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
-    //Serial.println("Case 4");
-      Serial.println("oscillation_debut");
+
+      //Serial.println("oscillation_debut");
       if(!oscillation_finis)
       {
       fonction = 0.9*sin(5.0*(millis()/1000.0));
@@ -305,8 +303,8 @@ void loop() {
     */
 
     case AVANCE_ALLER : //Cas pour se rendre au dessus du panier à sapin
-    //Serial.println("Case 5");
-      Serial.println("avance_aller");
+
+      //Serial.println("avance_aller");
     
         // Serial.println("pos depot");
         // Serial.println(position_depot);
@@ -347,7 +345,7 @@ void loop() {
                // pid_q.setGoal(0);
                 //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
 
-      Serial.println("arret_oscillation");
+     // Serial.println("arret_oscillation");
       reduce_angle();
 
       //Serial.println(angle_pendule);
@@ -360,7 +358,7 @@ void loop() {
         //delay(1000);
         //pid_q.enable();
         //choix = LACHE_SAPIN;
-        
+
         pid_x.enable();
         goal_angle_atteint = false;
         if(prendre_sapin == true)
@@ -400,7 +398,8 @@ void loop() {
     break;
 
     case LACHE_SAPIN: //Cas pour lacher le pendule dans le panier
-      Serial.println("lache_sapin");
+      
+      //Serial.println("lache_sapin");
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
@@ -416,7 +415,8 @@ void loop() {
     break;
 
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
-      Serial.println("avance retour");
+      
+      //Serial.println("avance retour");
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
@@ -434,7 +434,8 @@ void loop() {
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
-      Serial.println("prend sapin");
+      
+      //Serial.println("prend sapin");
         choix = ARRET_TOTAL;
         goal_angle_atteint = false;
         prendre_sapin = false;
@@ -444,9 +445,11 @@ void loop() {
     break;
 
     case ARRET_TOTAL: //Cas pour mettre les moteurs à 0. Donc, arret du moteur et de l'électroaimant
-      Serial.println("arret_total");
+      
+      //Serial.println("arret_total");
       AX_.setMotorPWM(MOTOR_ID,0);
       digitalWrite(MAGPIN, LOW);
+      AX_.resetEncoder(MOTOR_ID);
       
     break;
 
@@ -460,6 +463,8 @@ void loop() {
   pid_q.run();
 
   Calculangle();
+  vitesse();
+  PIDmeasurement();
 
 }
 
@@ -495,17 +500,17 @@ void sendMsg(){
 
   doc["time"]      = (millis()/1000.0);
   doc["goal"]      = pid_x.getGoal();
-  doc["pulsePWM"]  = pulsePWM_;
   doc["cur_vel"]   = cur_vel;
   doc["cur_pos"]   = cur_pos;
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
-  doc["actualTime"] = pid_x.getActualDt();
   doc["position_obstacle"] = position_obstacle;
   doc["position_depot"] = position_depot;
-  doc["sapin_lacher"] = sapinLacher;
-  doc["casZero"] = casZero;
 
+  //doc["actualTime"] = pid_x.getActualDt();
+  //doc["sapin_lacher"] = sapinLacher;
+  //doc["casZero"] = casZero;
+  //doc["pulsePWM"]  = pulsePWM_;
   //doc["potVex"] = analogRead(POTPIN);
   //doc["encVex"] = vexEncoder_.getCount();
   //doc["measurements"] = PIDmeasurement();
@@ -642,6 +647,8 @@ double PIDmeasurement(){
   return distance;
 }
 
+
+
 void PIDcommand(double cmd){
   pulsePWM_ = cmd;
 }
@@ -653,20 +660,9 @@ void PIDgoalReached(){
 
 /////////////////////////////////////////////////////////
 
-void PIDAngle()
-{
-  
-}
 
 // Fonctions pour le PID d'angle
 double PIDmeasurement_angle(){
-  
-  //angle_pendule = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
-
-  //cur_angle = angle_pendule;
-
-  //Serial.print("angle_pendule");
-  //Serial.println(angle_pendule);
 
   return Calculangle();
 }
@@ -683,8 +679,6 @@ double Calculangle()
 
 void PIDcommand_angle(double cmd_angle){
   pulsePWM_angle = cmd_angle;
-  //Serial.println("cmd_angle");
-  //Serial.println(cmd_angle);
 }
 
 
