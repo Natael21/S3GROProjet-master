@@ -28,6 +28,7 @@
 #include "pipe.h"
 #include "flag.h"
 #include "pendule.h"
+#include "sapin.h"
 
 // Classe definissant l'application
 namespace Ui {
@@ -74,7 +75,9 @@ private:
     void stopRecording();
     void connectTextInputs();
     void connectComboBox();
-    void addFormes();
+    void moveMario();
+    void moveScene();
+    void addFormesInitial();
     void portCensus();
     void showPopUp();
     void showGIF();
@@ -115,8 +118,9 @@ private:
     PipeItem * pipe;
     FlagItem * flag;
     PenduleItem * pendule;
+    SapinItem * sapin;
 
-    int sapin =                  0;
+    int sapin_dropped =                  0;
 
     double distance_obstacle =   100;
     //double distance_depot =      500;
@@ -127,16 +131,19 @@ private:
     double positionDepot =       500;
     //double lastanglePendule =    0;
     double anglePendule =        -45;
+    double angleSapin =        0;
     double largeurRobot =        50;
     double hauteurRobot =        10;
     double diametreRoue =        12;
     double afficher     =        0;
     double distanceRouePendule = 0.217;
-    double covertisseurMagique = (602.0/1.56);
+    double covertisseurMagique = (602.0/1.68);
+    double vitesse_angulaire = 0;
 
     bool casZero     =           false;
     bool sapinLacher =           false;
     bool distance_envoyer =      false;
+    bool scene_initialise = false;
 
 protected:
     Ui::MainWindow *ui;

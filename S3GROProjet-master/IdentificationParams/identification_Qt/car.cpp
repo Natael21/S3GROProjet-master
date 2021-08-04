@@ -34,6 +34,6 @@ qreal CarItem::getX() {
 void CarItem::setX(qreal x)
 {
     //qDebug() << "Mario position:"<< x;
-    moveBy(x,0);
+    //moveBy(x,0);
     m_x = x;
 }

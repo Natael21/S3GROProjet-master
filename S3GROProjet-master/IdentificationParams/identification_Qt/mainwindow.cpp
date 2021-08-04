@@ -39,6 +39,12 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
 
         ui->Graphique->setScene(scene);
 
+        if(scene_initialise == false)
+        {
+            this->addFormesInitial();
+            scene_initialise = true;
+        }
+
         //Couleurs
 
         brushRed.setColor(colorRed);
@@ -127,13 +133,15 @@ void MainWindow::receiveFromSerial(QString msg){
             //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
-            anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);//necessaire?
+            anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);
+            angleSapin = -1*(jsonObj["cur_angle"].toDouble());
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
+            vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
 
             //positionObstacle = covertisseurMagique*jsonObj["position_obstacle"].toDouble();
             //positionDepot = covertisseurMagique*jsonObj["position_depot"].toDouble();
-            this->addFormes();
+            this->moveMario();
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -166,7 +174,7 @@ void MainWindow::receiveFromSerial(QString msg){
 
     if(sapinLacher && afficher != 1)
     {
-       this->showGIF();
+       //this->showGIF();
        afficher = 1;
     }
 }
@@ -220,7 +228,7 @@ void MainWindow::sendPosition()
     sendMessage(strJson);
 
     distance_envoyer = true;
-    this->addFormes();
+    this->moveMario();
 }
 
 void MainWindow::connectSpinBoxes(){
@@ -254,15 +262,58 @@ void MainWindow::startSerialCom(QString portName){
     if(serialCom_!=nullptr){
         delete serialCom_;
     }
-    //qDebug() << "allo";
     serialCom_ = new SerialProtocol(portName, BAUD_RATE);
     connectSerialPortRead();
 }
+void MainWindow::addFormesInitial()
+{
+    //Ajout du background
+    pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
+    scene->addItem(pixItem);
 
-void MainWindow::addFormes()
+    //Creation du panier
+    panierGauche = QRectF(positionDepot, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+
+    scene->addRect(panierGauche, colorBlue, brushBlue);
+    scene->addRect(panierMillieu, colorBlue, brushBlue);
+    scene->addRect(panierDroite, colorBlue, brushBlue);
+
+    // Pendule
+    PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
+    scene->addItem(pendule);
+
+    //Voiture
+    CarItem * camion = new CarItem(positionVoiture);
+    scene->addItem(camion);
+
+
+    //Rail
+    rail = QRectF(5,350, 650, 7);
+    scene->addRect(rail, colorBlue, brushBlue);
+
+    //Pipe
+    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    scene->addItem(pipe);
+
+    // Flag
+    flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    scene->addItem(flag);
+
+    //Sapin
+
+    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    scene->addItem(sapin);
+
+
+}
+
+void MainWindow::moveMario()
 {
     //Mettre la scene vide
     scene->clear();
+
 
     //Ajout du background
     pixItem = new QGraphicsPixmapItem(QPixmap(":/image/sky.png"));
@@ -274,11 +325,11 @@ void MainWindow::addFormes()
     panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
     // Pendule
-    PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
+    pendule = new PenduleItem(anglePendule, positionVoiture);
     scene->addItem(pendule);
 
     //Voiture
-    CarItem * camion = new CarItem(positionVoiture);
+    camion = new CarItem(positionVoiture);
     scene->addItem(camion);
 
 
@@ -304,8 +355,10 @@ void MainWindow::addFormes()
     flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
+    //Sapin
 
-
+    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    scene->addItem(sapin);
 /*
     //Sapin
     if(!sapinLacher)
@@ -315,7 +368,7 @@ void MainWindow::addFormes()
     }
     else
     {
-        sapin++;
+        sapin_dropped++;
     }
 
     if(sapin == 1)
@@ -378,7 +431,28 @@ void MainWindow::addFormes()
 //    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
 //    scene.addRect(obstacle, colorBlack, brushBlack);
 }
+void MainWindow::moveScene(){
 
+    scene->destroyItemGroup(pipe);
+    scene->destroyItemGroup(flag);
+
+    //Panier
+    panierGauche = QRectF(positionDepot+distanceRouePendule, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot+distanceRouePendule, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+distanceRouePendule+35, 425, 5, 20);
+
+    scene->addRect(panierGauche, colorBlue, brushBlue);
+    scene->addRect(panierMillieu, colorBlue, brushBlue);
+    scene->addRect(panierDroite, colorBlue, brushBlue);
+    //Pipe
+    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    scene->addItem(pipe);
+
+    // Flag
+    flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    scene->addItem(flag);
+
+}
 
 
 void MainWindow::changeJsonKeyValue(){

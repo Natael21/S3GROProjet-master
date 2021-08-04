@@ -24,7 +24,7 @@ using namespace std;
 #define MOTOR_ID                        1         //Permet de choisir l'ID du moteur utiliser
 #define GEAR_RATIO                      2         //Permet de choisir un gearRatio en fonction des engrenage choisit
 #define FACTEUR_MAGIQUE                 1.1       //Ajoute 10% de distance pour compenser l'arondissement des ratio
-#define DISTANCE_AVANT_OBSTACLE         0.095     //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
+#define DISTANCE_AVANT_OBSTACLE         0.22   //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
 #define PID_KP_LENT                     1.5
 #define PID_KI_LENT                     0.25
 #define PID_KD_LENT                     0.2
@@ -67,7 +67,7 @@ uint16_t pulseTime_ =                   0;        // temps dun pulse en ms
 int time =                              0;        //timer pour la loop
 int32_t compteur_encodeur =             0;        //Encodeur du moteur
 
-int choix =                             ATTENTE;  //sert pour le switch case
+int choix =                             ARRET_TOTAL;  //sert pour le switch case
 
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
@@ -254,7 +254,7 @@ void loop() {
       //Serial.println("oscillation_debut");
       if(!oscillation_finis)
       {
-      fonction = 0.9*sin(5.0*(millis()/1000.0));
+      fonction = 0.9*sin(5.0*(millis()/1000.0));// donne un coup au début????
       pid_q.setGoal(goal_voulu_angle);
       AX_.setMotorPWM(MOTOR_ID,fonction);
       }
@@ -511,7 +511,7 @@ void readMsg(){
   parse_msg = doc["Start"];
   if(!parse_msg.isNull())
   {
-    choix = START;
+    choix = ATTENTE;
   }
 
   parse_msg = doc["Stop"];

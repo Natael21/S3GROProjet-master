@@ -24,6 +24,7 @@ void SerialProtocol::connectSignals(){
 void SerialProtocol::sendMessage(QString msg) {
     // Fonction d'ecriture sur le port serie
     if (serial_->isOpen()) {
+
         serial_->write(msg.toUtf8());
     }
 }
