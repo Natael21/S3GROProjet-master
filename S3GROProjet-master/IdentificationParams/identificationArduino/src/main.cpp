@@ -67,7 +67,7 @@ uint16_t pulseTime_ =                   0;        // temps dun pulse en ms
 int time =                              0;        //timer pour la loop
 int32_t compteur_encodeur =             0;        //Encodeur du moteur
 
-int choix =                             START;  //sert pour le switch case
+int choix =                             ATTENTE;  //sert pour le switch case
 
 bool goal_position_atteint =            false;    //Permet de savoir si la positon est atteinte
 bool goal_angle_atteint =               false;    //Permet de savoir si l'anlge du pendule est atteinte
@@ -78,7 +78,7 @@ bool oscillation_finis =                false;
 
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
-double position_depart =                0.0;      //Permet de savoir la position initial du robot
+double position_depart =                0.03;      //Permet de savoir la position initial du robot
 double position_obstacle =              0.5;      //Permet de savoir la position de l'obstacle
 double position_depot =                 1.0;      //Permet de savoir la position du dépot du sapin
 double distance_ins =                   0.0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
@@ -97,6 +97,12 @@ float cur_pos =                         0.0;      //Permet de savoir la position
 float cur_vel =                         0.0;      //Permet de savoir la vitesse en temps réelle du pendule
 float cur_angle =                       0.0;      //Permet de savoir l'angle en temps réelle du pendule
 int i = 0;
+
+float old_angle;
+float new_angle;
+float vitesse_angle;
+float old_temps;
+float new_temps;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -118,6 +124,7 @@ void PIDcommand_angle(double cmd);
 void PIDgoalReached_angle();
 
 double Calculangle();
+void reduce_angle();
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
@@ -191,21 +198,23 @@ void loop() {
   {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
     //Serial.println("Case 1");
-      pinMode(MAGPIN, HIGH);
+      digitalWrite(MAGPIN, HIGH);
       AX_.setMotorPWM(MOTOR_ID, 0);
-      //delay(3000);
-      //choix = START;
+
+      Serial.println("attente");
+      choix = START;
 
     break;
 
     case START: //Cas pour l'initialisation des variables
     //Serial.println("Case 2");
+      Serial.println("start");
       casZero = true;
       goal_voulu_angle = 60;
       goal_position_atteint = false;
       goal_angle_atteint = false;
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
-      pinMode(MAGPIN, HIGH);
+      digitalWrite(MAGPIN, HIGH);
       i = 0;
 
       sapinLacher = false;
@@ -218,6 +227,7 @@ void loop() {
 
     case AVANCE_INITIAL: //Cas pour aller  la position initiale avant d'osciller
     //Serial.println("Case 3");
+      Serial.println("avance_initial");
       casZero = false;
       
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
@@ -243,6 +253,7 @@ void loop() {
 
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
     //Serial.println("Case 4");
+      Serial.println("oscillation_debut");
       if(!oscillation_finis)
       {
       fonction = 0.9*sin(5.0*(millis()/1000.0));
@@ -295,13 +306,14 @@ void loop() {
 
     case AVANCE_ALLER : //Cas pour se rendre au dessus du panier à sapin
     //Serial.println("Case 5");
+      Serial.println("avance_aller");
     
         // Serial.println("pos depot");
         // Serial.println(position_depot);
         // Serial.println(" pos cur");
         // Serial.println(cur_pos);
 
-      pid_x.setGoal(position_depot);
+      pid_x.setGoal(position_depot + 0.1);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
 
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
@@ -322,6 +334,8 @@ void loop() {
         goal_position_atteint = false;
         pid_q.enable();
         pid_x.enable();
+        old_angle = Calculangle();
+        old_temps = millis();
       }
 
     break;
@@ -329,23 +343,35 @@ void loop() {
     case ARRET_OSCILLATION: //Cas pour arreter le pendule vers 0 degree au dessus du panier
       //On fait un sinus qui tend vers 0 ???---------------------------------------------------------------
       //problème avec le case 
-      pid_q.setGains(5,0,0);
-      pid_q.setGoal(0);
-     
-      AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
+               // pid_q.setGains(5,0,0);
+               // pid_q.setGoal(0);
+                //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
+
+      Serial.println("arret_oscillation");
+      reduce_angle();
 
       //Serial.println(angle_pendule);
-      pid_q.enable();
+      //pid_q.enable();
 
-      if(goal_angle_atteint)
+     // if(goal_angle_atteint)                          // mis en comentaire pour tester
+     if(vitesse_angle < 2 && new_angle <3 && new_angle > -3) 
       {
         //i++;
-        delay(1000);
-        pid_q.enable();
-        choix = LACHE_SAPIN;
+        //delay(1000);
+        //pid_q.enable();
+        //choix = LACHE_SAPIN;
         pid_x.enable();
         goal_angle_atteint = false;
+        if(prendre_sapin == true)
+        {
+          choix = PREND_SAPIN;
+        }
+        else
+        {
+          choix = LACHE_SAPIN;
+        }
       }
+
     /*  else
       {
         i = 0;
@@ -373,11 +399,12 @@ void loop() {
     break;
 
     case LACHE_SAPIN: //Cas pour lacher le pendule dans le panier
+      Serial.println("lache_sapin");
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
-      pinMode(MAGPIN, LOW);
-      delay(500);
+      digitalWrite(MAGPIN, LOW);
+      //delay(500);
 
       choix = AVANCE_RETOUR;
       pid_x.enable();
@@ -385,6 +412,7 @@ void loop() {
     break;
 
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
+      Serial.println("avance retour");
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
@@ -401,17 +429,19 @@ void loop() {
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
+      Serial.println("prend sapin");
         choix = ARRET_TOTAL;
         goal_angle_atteint = false;
         prendre_sapin = false;
         // AX_.resetEncoder(MOTOR_ID);
-        pinMode(MAGPIN, HIGH);
+        digitalWrite(MAGPIN, HIGH);
 
     break;
 
     case ARRET_TOTAL: //Cas pour mettre les moteurs à 0. Donc, arret du moteur et de l'électroaimant
+      Serial.println("arret_total");
       AX_.setMotorPWM(MOTOR_ID,0);
-      pinMode(MAGPIN, LOW);
+      digitalWrite(MAGPIN, LOW);
       
     break;
 
@@ -655,4 +685,36 @@ void PIDcommand_angle(double cmd_angle){
 
 void PIDgoalReached_angle(){
   goal_angle_atteint = true;
+}
+
+
+void reduce_angle(){
+  float new_angle = Calculangle();
+  float new_temps = millis();
+  float verif_temps = millis();
+  float vitesse_angle = (new_angle - old_angle) / (new_temps - old_temps);
+
+  if(vitesse_angle > 5 && new_angle <10 && new_angle > -10) 
+  {                     
+    while((millis() - verif_temps) < 800)
+    {
+      Serial.println("reducing");
+                      // a changer
+          AX_.setMotorPWM(MOTOR_ID, -1);                                //probleme avec qt a cause de while?
+    }        
+  }                                            // a changer
+      
+ else if(vitesse_angle < -5 && new_angle <10 && new_angle > -10) 
+  {                                       // a changer
+          while((millis() - verif_temps) < 800)
+    {
+                      // a changer
+          AX_.setMotorPWM(MOTOR_ID, 1);                                //probleme avec qt a cause de while?
+    }         
+  }                                            // a changer
+
+  if( new_angle > 10 && new_angle < -10) 
+  {                                       // a changer
+          AX_.setMotorPWM(MOTOR_ID, 0);        
+  }                                            // a changer
 }
