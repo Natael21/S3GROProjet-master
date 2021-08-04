@@ -1,6 +1,6 @@
 #include "sapin.h"
 
-SapinItem::SapinItem()
+sapin::sapin()
 {
 
 }

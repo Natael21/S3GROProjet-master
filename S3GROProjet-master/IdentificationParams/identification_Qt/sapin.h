@@ -2,10 +2,10 @@
 #define SAPIN_H
 
 
-class SapinItem
+class sapin
 {
 public:
-    SapinItem(double angle);
+    sapin();
 };
 
 #endif // SAPIN_H
