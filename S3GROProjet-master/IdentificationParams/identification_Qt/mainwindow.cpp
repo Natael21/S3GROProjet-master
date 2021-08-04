@@ -24,7 +24,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     //addFormes();
-    showGIF(); //a décommenter pour voir le GIF
+    //showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
     portCensus();
@@ -51,15 +51,6 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
         brushBlack.setColor(colorBlack);
         brushBlue.setColor(colorBlue);
         brushGreen.setColor(colorGreen);
-
-
-    //QSound ohYeah(":/sound/WeDidIt.wav");
-    QSound IMfastAsFuck(":/I'm_fast_as_F_boi.wav");
-
-    ohYeah.setSource(QUrl::fromLocalFile(":/sound/WeDidIt.wav"));
-    //effect.setLoopCount(QSoundEffect::Infinite);
-    ohYeah.setVolume(1.0f);
-
 }
 
 MainWindow::~MainWindow(){
@@ -78,10 +69,32 @@ void MainWindow::showPopUp()
     msg.exec();
 }
 
+void MainWindow::startMarioLetsGo()
+{
+    letsGoMario->play();
+}
+
+void MainWindow::startItsMeMario()
+{
+    ItsMeMario->play();
+}
+
+void MainWindow::startIMfastAsF()
+{
+    IMfastAsFuck->play();
+}
+
+void MainWindow::startMarioDeath()
+{
+    Mario_Death->play();
+}
+
+
 void MainWindow::showGIF()
 {
-    ohYeah.play();
-    //ohYeah.play();
+    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
+    SapinSound->play();
+//    startSapinSound(3);
 
     QMessageBox msg;
         //msg.setText("This closes in 10 seconds");
@@ -89,11 +102,13 @@ void MainWindow::showGIF()
         int cnt = 10;
 
         QTimer cntDown;
-        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&cnt, &cntDown]()->void{
+        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&SapinSound, &cnt, &cntDown]()->void{
                              if(--cnt < 0){
                                  cntDown.stop();
                                  msg.close();
-                             } else {
+                                SapinSound->stop();
+
+                             }  else {
                                  msg.setWindowTitle("AMAZING");
                                  msg.setStandardButtons(nullptr);
                              }
@@ -137,10 +152,6 @@ void MainWindow::receiveFromSerial(QString msg){
             ui->textBrowser->setText(buff.mid(2,buff.length()-4));
             //ui->Etat->setText(jsonObj["Etat"].toString());
 
-            //camion->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());// marche peut etre
-           // pendule->setX(covertisseurMagique*jsonObj["cur_pos"].toDouble());
-            //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
-
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
             anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);
             angleSapin = -1*(jsonObj["cur_angle"].toDouble());
@@ -148,9 +159,9 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
+            etat = jsonObj["Etat"].toDouble();
+            son = jsonObj["son"].toDouble();
 
-            //positionObstacle = covertisseurMagique*jsonObj["position_obstacle"].toDouble();
-            //positionDepot = covertisseurMagique*jsonObj["position_depot"].toDouble();
             this->moveMario();
 
             // Affichage des donnees dans le graph
@@ -184,8 +195,13 @@ void MainWindow::receiveFromSerial(QString msg){
 
     if(sapinLacher && afficher != 1)
     {
-       //this->showGIF();
+       this->showGIF();
        afficher = 1;
+    }
+
+    if(son == 1)
+    {
+        startIMfastAsF();
     }
 }
 
@@ -291,8 +307,8 @@ void MainWindow::addFormesInitial()
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
-    // Pendule
-    PenduleItem * pendule = new PenduleItem(anglePendule, positionVoiture);
+    // Pendule + Sapin
+    PenduleItem * pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
     scene->addItem(pendule);
 
     //Voiture
@@ -314,10 +330,8 @@ void MainWindow::addFormesInitial()
 
     //Sapin
 
-    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    scene->addItem(sapin);
-
-
+   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    //scene->addItem(sapin);
 }
 
 void MainWindow::moveMario()
@@ -336,7 +350,7 @@ void MainWindow::moveMario()
     panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
     // Pendule
-    pendule = new PenduleItem(anglePendule, positionVoiture);
+    pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
     scene->addItem(pendule);
 
     //Voiture
@@ -366,13 +380,13 @@ void MainWindow::moveMario()
     flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
-    if(sapinLacher == 0)
-    {
+    //if(sapinLacher == 0)
+    //{
     //Sapin
 
-    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    scene->addItem(sapin);
-    }
+   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
+    //scene->addItem(sapin);
+    //}
 /*
     //Sapin
     if(!sapinLacher)
@@ -489,15 +503,20 @@ void MainWindow::sendStart(){
         QJsonDocument doc(jsonObject);
         QString strJson(doc.toJson(QJsonDocument::Compact));
         sendMessage(strJson);
+
+        startItsMeMario();
     }
     else
     {
         showPopUp();
     }
+
 }
 
 void MainWindow::sendStop()
 {
+    startMarioDeath();
+
     QJsonObject jsonObject
     {
         {"Stop", 100}
