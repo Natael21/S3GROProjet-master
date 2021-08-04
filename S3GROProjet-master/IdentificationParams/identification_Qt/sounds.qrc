@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>sound/WeDidIt.wav</file>
+        <file>sound/I'm_fast_as_F_boi.wav</file>
     </qresource>
 </RCC>

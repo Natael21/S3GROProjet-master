@@ -19,6 +19,7 @@
 #include <QSound>
 #include <QGraphicsPixmapItem>
 #include <QPropertyAnimation>
+#include <QSoundEffect>
 
 // Propres librairies
 #include "csvwriter.h"
@@ -111,6 +112,12 @@ private:
     QRectF panierGauche;
     QRectF panierMillieu;
     QRectF panierDroite;
+
+
+
+
+    QSoundEffect ohYeah;
+
 
 
     CarItem * camion;

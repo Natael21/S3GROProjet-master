@@ -24,7 +24,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     connectTextInputs();
     connectComboBox();
     //addFormes();
-    //showGIF(); //a décommenter pour voir le GIF
+    showGIF(); //a décommenter pour voir le GIF
 
     // Recensement des ports
     portCensus();
@@ -51,6 +51,15 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
         brushBlack.setColor(colorBlack);
         brushBlue.setColor(colorBlue);
         brushGreen.setColor(colorGreen);
+
+
+    //QSound ohYeah(":/sound/WeDidIt.wav");
+    QSound IMfastAsFuck(":/I'm_fast_as_F_boi.wav");
+
+    ohYeah.setSource(QUrl::fromLocalFile(":/sound/WeDidIt.wav"));
+    //effect.setLoopCount(QSoundEffect::Infinite);
+    ohYeah.setVolume(1.0f);
+
 }
 
 MainWindow::~MainWindow(){
@@ -71,8 +80,8 @@ void MainWindow::showPopUp()
 
 void MainWindow::showGIF()
 {
-    QSound ohYeah(":/sound/WeDidIt.wav");
     ohYeah.play();
+    //ohYeah.play();
 
     QMessageBox msg;
         //msg.setText("This closes in 10 seconds");
