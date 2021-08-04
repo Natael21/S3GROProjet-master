@@ -8,7 +8,7 @@
 /*------------------------------ Librairies ---------------------------------*/
 #include <LibS3GRO.h>
 #include <ArduinoJson.h>
-#include <Tests.h> // Vos propres librairies
+//#include <Tests.h> // Vos propres librairies
 /*------------------------------ Constantes ---------------------------------*/
 using namespace std;
 
@@ -52,7 +52,7 @@ VexQuadEncoder vexEncoder_;                       // objet encodeur vex
 IMU9DOF imu_;                                     // objet imu
 PID pid_x;                                        // objet PID x
 PID pid_q;                                        // objet PID q
-Tests tests;
+//Tests tests;
 
 volatile bool shouldSend_ =             false;    // drapeau prêt à envoyer un message
 volatile bool shouldRead_ =             false;    // drapeau prêt à lire un message
@@ -124,7 +124,7 @@ void PIDcommand_angle(double cmd);
 void PIDgoalReached_angle();
 
 double Calculangle();
-void reduce_angle();
+float reduce_angle();
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
@@ -197,7 +197,7 @@ void loop() {
   switch(choix) 
   {
     case ATTENTE : //Cas pour l'activation de l'électroaimant et attente du commencement de la séquence
-      digitalWrite(MAGPIN, HIGH);
+    //Serial.println("Case 1");
       AX_.setMotorPWM(MOTOR_ID, 0);
 
       //Serial.println("attente");
@@ -206,6 +206,7 @@ void loop() {
     break;
 
     case START: //Cas pour l'initialisation des variables
+    //Serial.println("Case 2");
       //Serial.println("start");
       casZero = true;
       goal_voulu_angle = 60;
@@ -213,8 +214,7 @@ void loop() {
       goal_angle_atteint = false;
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
       digitalWrite(MAGPIN, HIGH);
-      i = 0;
-
+      
       sapinLacher = false;
       
       choix = AVANCE_INITIAL;
@@ -224,7 +224,7 @@ void loop() {
     break;
 
     case AVANCE_INITIAL: //Cas pour aller  la position initiale avant d'osciller
-
+    //Serial.println("Case 3");
       //Serial.println("avance_initial");
       casZero = false;
       
@@ -241,7 +241,7 @@ void loop() {
       {
         choix = OSCILLATION_DEBUT;
         goal_position_atteint = false;
-        pid_x.setGoal(position_depot);
+        pid_x.setGoal(position_depot);                                // depot + distance
         pid_q.enable(); 
         pid_x.enable();
         //Serial.println("avance initial fini");
@@ -250,7 +250,7 @@ void loop() {
     break;
 
     case OSCILLATION_DEBUT: //Cas pour osciller le pendule a environ 60 degree pour passer par dessus l'obstacle
-
+    //Serial.println("Case 4");
       //Serial.println("oscillation_debut");
       if(!oscillation_finis)
       {
@@ -273,37 +273,12 @@ void loop() {
           goal_position_atteint = false;
           pid_x.enable();
         }
-
-        /*
-          choix = PASSE_OBSTACLE;
-          goal_angle_atteint = false;
-          pid_q.disable();
-          pid_x.enable();
-          */
       }
 
     break;
-
-      /*
-    case PASSE_OBSTACLE: //Cas pour passer par dessus l'obstacle
-      pid_x.setGoal(position_obstacle);
-      pid_x.setGains(PID_KP_RAPIDE,0,0);
-      
-      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
-
-      if(goal_position_atteint)
-      {
-        choix = AVANCE_ALLER;
-        goal_position_atteint = false;
-        pid_x.enable();
-        
-      }
-
-    break;
-    */
 
     case AVANCE_ALLER : //Cas pour se rendre au dessus du panier à sapin
-
+    //Serial.println("Case 5");
       //Serial.println("avance_aller");
     
         // Serial.println("pos depot");
@@ -311,23 +286,15 @@ void loop() {
         // Serial.println(" pos cur");
         // Serial.println(cur_pos);
 
-      pid_x.setGoal(position_depot + 0.1);
+      pid_x.setGoal(position_depot);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
 
       AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
-      // if(millis()>25000)
-      // {
-      //   Serial.println(" Timeout");
-      //   choix = ARRET_TOTAL;
-      //   goal_position_atteint = false;
-      //   pid_q.enable();
-      //   pid_x.enable();
-      // } 
+      
 
       if(goal_position_atteint)
       {
-         
         choix = ARRET_OSCILLATION;
         goal_position_atteint = false;
         pid_q.enable();
@@ -345,20 +312,17 @@ void loop() {
                // pid_q.setGoal(0);
                 //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
 
-     // Serial.println("arret_oscillation");
+      //Serial.println("arret_oscillation");
       reduce_angle();
+      Serial.println(vitesse_angle);
+      //Serial.println(new_angle);
 
       //Serial.println(angle_pendule);
       //pid_q.enable();
 
      // if(goal_angle_atteint)                          // mis en comentaire pour tester
-     if(vitesse_angle < 2 && new_angle <3 && new_angle > -3) 
+     if(vitesse_angle < 0.5 && new_angle < 5 && new_angle > -5) 
       {
-        //i++;
-        //delay(1000);
-        //pid_q.enable();
-        //choix = LACHE_SAPIN;
-
         pid_x.enable();
         goal_angle_atteint = false;
         if(prendre_sapin == true)
@@ -368,59 +332,31 @@ void loop() {
         else
         {
           choix = LACHE_SAPIN;
+          i = 0;
         }
       }
-
-    /*  else
-      {
-        i = 0;
-      }
-
-      if(i == COMPTEUR)
-      {
-        //Serial.println(" allo");
-        choix = LACHE_SAPIN;
-        pid_x.enable();
-        /*
-        if(prendre_sapin == true)
-        {
-          choix = PREND_SAPIN;
-        }
-        else
-        {
-          choix = LACHE_SAPIN;
-        }
-        
-        goal_angle_atteint = false;
-        
-      }*/
-
     break;
 
     case LACHE_SAPIN: //Cas pour lacher le pendule dans le panier
-      
       //Serial.println("lache_sapin");
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
       digitalWrite(MAGPIN, LOW);
-      //delay(500);
-
-      // pinMode(MAGPIN, LOW);
-      // delay(1000);
-
-      choix = AVANCE_RETOUR;
-      pid_x.enable();
-
-    break;
+      i = i +1;
+      
+      if( i == 1000 )
+      {
+       choix = AVANCE_RETOUR;
+        pid_x.enable();
+      }
+      break;
 
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
-      
       //Serial.println("avance retour");
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
-
       if(goal_position_atteint)
       {
         goal_position_atteint = false;
@@ -428,13 +364,9 @@ void loop() {
         pid_x.enable();
         choix = ARRET_OSCILLATION;
       }
-      
-      
-
     break;
 
     case PREND_SAPIN: //Cas d'arret du pendule au dessus du sapin = 0 degree
-      
       //Serial.println("prend sapin");
         choix = ARRET_TOTAL;
         goal_angle_atteint = false;
@@ -445,12 +377,9 @@ void loop() {
     break;
 
     case ARRET_TOTAL: //Cas pour mettre les moteurs à 0. Donc, arret du moteur et de l'électroaimant
-      
       //Serial.println("arret_total");
       AX_.setMotorPWM(MOTOR_ID,0);
       digitalWrite(MAGPIN, LOW);
-      AX_.resetEncoder(MOTOR_ID);
-      
     break;
 
 
@@ -463,8 +392,6 @@ void loop() {
   pid_q.run();
 
   Calculangle();
-  vitesse();
-  PIDmeasurement();
 
 }
 
@@ -500,17 +427,18 @@ void sendMsg(){
 
   doc["time"]      = (millis()/1000.0);
   doc["goal"]      = pid_x.getGoal();
+  doc["pulsePWM"]  = pulsePWM_;
   doc["cur_vel"]   = cur_vel;
   doc["cur_pos"]   = cur_pos;
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
+  doc["actualTime"] = pid_x.getActualDt();
   doc["position_obstacle"] = position_obstacle;
   doc["position_depot"] = position_depot;
+  doc["sapin_lacher"] = sapinLacher;
+  doc["casZero"] = casZero;
+  doc["vitesse_angulaire"] = reduce_angle();
 
-  //doc["actualTime"] = pid_x.getActualDt();
-  //doc["sapin_lacher"] = sapinLacher;
-  //doc["casZero"] = casZero;
-  //doc["pulsePWM"]  = pulsePWM_;
   //doc["potVex"] = analogRead(POTPIN);
   //doc["encVex"] = vexEncoder_.getCount();
   //doc["measurements"] = PIDmeasurement();
@@ -548,8 +476,8 @@ void readMsg(){
 
   // Si erreur dans le message
   if (error) {
-    Serial.print("deserialize() failed: ");
-    Serial.println(error.c_str());
+    //Serial.print("deserialize() failed: ");
+    //Serial.println(error.c_str());
     return;
   }
   
@@ -647,8 +575,6 @@ double PIDmeasurement(){
   return distance;
 }
 
-
-
 void PIDcommand(double cmd){
   pulsePWM_ = cmd;
 }
@@ -660,9 +586,20 @@ void PIDgoalReached(){
 
 /////////////////////////////////////////////////////////
 
+void PIDAngle()
+{
+  
+}
 
 // Fonctions pour le PID d'angle
 double PIDmeasurement_angle(){
+  
+  //angle_pendule = (analogRead(POTPIN)-Potentio_zero)*(180.0/880.0);
+
+  //cur_angle = angle_pendule;
+
+  //Serial.print("angle_pendule");
+  //Serial.println(angle_pendule);
 
   return Calculangle();
 }
@@ -679,6 +616,8 @@ double Calculangle()
 
 void PIDcommand_angle(double cmd_angle){
   pulsePWM_angle = cmd_angle;
+  //Serial.println("cmd_angle");
+  //Serial.println(cmd_angle);
 }
 
 
@@ -687,33 +626,31 @@ void PIDgoalReached_angle(){
 }
 
 
-void reduce_angle(){
-  float new_angle = Calculangle();
-  float new_temps = millis();
-  float verif_temps = millis();
-  float vitesse_angle = (new_angle - old_angle) / (new_temps - old_temps);
+float reduce_angle(){
+  new_angle = Calculangle();
+  new_temps = millis();
+  vitesse_angle = (new_angle - old_angle) / (new_temps - old_temps);
+  old_angle = new_angle;
+  old_temps = new_temps;
+  return vitesse_angle;
 
-  if(vitesse_angle > 5 && new_angle <10 && new_angle > -10) 
-  {                     
-    while((millis() - verif_temps) < 800)
-    {
-      Serial.println("reducing");
-                      // a changer
-          AX_.setMotorPWM(MOTOR_ID, -1);                                //probleme avec qt a cause de while?
-    }        
-  }                                            // a changer
-      
- else if(vitesse_angle < -5 && new_angle <10 && new_angle > -10) 
-  {                                       // a changer
-          while((millis() - verif_temps) < 800)
-    {
-                      // a changer
-          AX_.setMotorPWM(MOTOR_ID, 1);                                //probleme avec qt a cause de while?
-    }         
-  }                                            // a changer
+//   float pwm_correction = vitesse_angle/;
 
-  if( new_angle > 10 && new_angle < -10) 
-  {                                       // a changer
-          AX_.setMotorPWM(MOTOR_ID, 0);        
-  }                                            // a changer
+
+//  AX_.setMotorPWM(MOTOR_ID, pwm_correction);
 }
+
+
+
+
+/*
+old angle = new angle
+comments message
+serial prints
+start seulment avec qt
+negative in pwm_correction
+
+
+fix temps pas assez grand dt
+tester vitesse angle dans attente
+*/
