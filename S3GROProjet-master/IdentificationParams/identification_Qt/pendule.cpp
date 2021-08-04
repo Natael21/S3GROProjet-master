@@ -10,25 +10,25 @@ PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos
     pendule->setPos(currentpos-5,345);
     sapin->setPos(currentpos+15,365);
 
-sapin->setTransformOriginPoint(pendule->boundingRect().topRight());
-
+    sapin->setTransformOriginPoint(pendule->boundingRect().topRight());
+    sapin->setRotation(angleSapin);
     QPointF offsetPendule = pendule->boundingRect().topRight();
-    QPointF offsetSapin= sapin->boundingRect().center();
+   // QPointF offsetSapin= sapin->boundingRect().center();
     QTransform transPendule;
 
     transPendule.translate(offsetPendule .x(), offsetPendule .y());
     transPendule.rotate(anglePendule);
     transPendule.translate(-offsetPendule .x(), -offsetPendule .y());
 
-    QTransform transSapin;
+    //QTransform transSapin;
 
-    transSapin.translate(offsetSapin.x(), offsetSapin.y());
-    transSapin.rotate(angleSapin);
-    transSapin.translate(-offsetSapin.x(), -offsetSapin.y());
+   // transSapin.translate(offsetSapin.x(), offsetSapin.y());
+    //transSapin.rotate(angleSapin);
+  //  transSapin.translate(-offsetSapin.x(), -offsetSapin.y());
 
 
     pendule->setTransform(transPendule);
-    sapin->setTransform(transSapin);
+    //sapin->setTransform(transSapin);
 
     addToGroup(pendule);
 
