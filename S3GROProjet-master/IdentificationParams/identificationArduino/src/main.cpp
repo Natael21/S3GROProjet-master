@@ -358,13 +358,9 @@ void loop() {
       {
         //i++;
         //delay(1000);
-<<<<<<< HEAD
         //pid_q.enable();
         //choix = LACHE_SAPIN;
-=======
-        pid_q.enable();
-        choix = LACHE_SAPIN;
->>>>>>> 011812a9d4b0fa99ea59e8821aedf3796451a6c3
+        
         pid_x.enable();
         goal_angle_atteint = false;
         if(prendre_sapin == true)
@@ -408,13 +404,11 @@ void loop() {
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
-<<<<<<< HEAD
       digitalWrite(MAGPIN, LOW);
       //delay(500);
-=======
-      pinMode(MAGPIN, LOW);
-      delay(1000);
->>>>>>> 011812a9d4b0fa99ea59e8821aedf3796451a6c3
+
+      // pinMode(MAGPIN, LOW);
+      // delay(1000);
 
       choix = AVANCE_RETOUR;
       pid_x.enable();
