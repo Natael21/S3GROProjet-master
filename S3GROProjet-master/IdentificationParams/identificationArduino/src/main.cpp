@@ -358,8 +358,13 @@ void loop() {
       {
         //i++;
         //delay(1000);
+<<<<<<< HEAD
         //pid_q.enable();
         //choix = LACHE_SAPIN;
+=======
+        pid_q.enable();
+        choix = LACHE_SAPIN;
+>>>>>>> 011812a9d4b0fa99ea59e8821aedf3796451a6c3
         pid_x.enable();
         goal_angle_atteint = false;
         if(prendre_sapin == true)
@@ -403,8 +408,13 @@ void loop() {
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
+<<<<<<< HEAD
       digitalWrite(MAGPIN, LOW);
       //delay(500);
+=======
+      pinMode(MAGPIN, LOW);
+      delay(1000);
+>>>>>>> 011812a9d4b0fa99ea59e8821aedf3796451a6c3
 
       choix = AVANCE_RETOUR;
       pid_x.enable();
@@ -416,6 +426,7 @@ void loop() {
       pid_x.setGoal(position_depart);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
+
       if(goal_position_atteint)
       {
         goal_position_atteint = false;
@@ -523,7 +534,7 @@ void sendMsg(){
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
-  //Serial.println();
+  Serial.println();
   shouldSend_ = false;
 }
 
@@ -538,8 +549,8 @@ void readMsg(){
 
   // Si erreur dans le message
   if (error) {
-    //Serial.print("deserialize() failed: ");
-    //Serial.println(error.c_str());
+    Serial.print("deserialize() failed: ");
+    Serial.println(error.c_str());
     return;
   }
   

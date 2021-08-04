@@ -11,8 +11,17 @@ PenduleItem::PenduleItem(double angle,double currentpos):
   pendule(new QGraphicsPixmapItem(QPixmap(":/image/pendule.png")))
 
 {
-    pendule->setPos(currentpos+5,360);
-    pendule->setRotation(angle);
+//    pendule->setPos(currentpos+5,355);
+    pendule->setPos(currentpos-5,345);
+
+    QPointF offset = pendule->boundingRect().topRight();
+
+    QTransform trans;
+
+    trans.translate(offset.x(), offset.y());
+    trans.rotate(angle);
+    trans.translate(-offset.x(), -offset.y());
+    pendule->setTransform(trans);
 
     addToGroup(pendule);
 //    xAnimation = new QPropertyAnimation(this,"x",this);
@@ -65,7 +74,7 @@ void PenduleItem::setQ(qreal q)
 
     QPointF c = boundingRect().topRight();
     QTransform t;
-    //t.translate(c.x(), c.y());
+    t.translate(c.x(), c.y());
     t.rotate(q);
     //t.translate(-c.x(),-c.y());//maybe not?
     setTransform(t);

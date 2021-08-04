@@ -33,7 +33,7 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     // initialisation du timer
     updateTimer_.start();
 
-        // Création scène
+        // Création scene
         scene = new QGraphicsScene(this);
         scene->setSceneRect(225,190,200,200);
 
@@ -109,6 +109,7 @@ void MainWindow::receiveFromSerial(QString msg){
 
     //Si un message est termine
     if(msgBuffer_.endsWith('\n')){
+
         // Passage ASCII vers structure Json
         QJsonDocument jsonResponse = QJsonDocument::fromJson(msgBuffer_.toUtf8());
 
@@ -126,7 +127,7 @@ void MainWindow::receiveFromSerial(QString msg){
             //pendule->setQ(-jsonObj["cur_angle"].toDouble()-45);//negatif, car la pic tourne négativement
 
             positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
-            anglePendule = jsonObj["cur_angle"].toDouble()-45;//necessaire?
+            anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);//necessaire?
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
 
@@ -277,8 +278,8 @@ void MainWindow::addFormes()
     scene->addItem(pendule);
 
     //Voiture
-//    CarItem * camion = new CarItem(positionVoiture);
-//    scene->addItem(camion);
+    CarItem * camion = new CarItem(positionVoiture);
+    scene->addItem(camion);
 
 
     //Rail
@@ -286,21 +287,21 @@ void MainWindow::addFormes()
     scene->addRect(rail, colorBlue, brushBlue);
 
     //Pipe
-    pipe = new PipeItem(positionObstacle);// a changer pour ne pas recréer d'objet
+    pipe = new PipeItem(positionObstacle+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(pipe);
 
 
     //Panier
-    panierGauche = QRectF(positionDepot, 425, 5, 20);
-    panierMillieu = QRectF(positionDepot, 445, 40, 5);
-    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+    panierGauche = QRectF(positionDepot+distanceRouePendule, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot+distanceRouePendule, 445, 40, 5);
+    panierDroite = QRectF(positionDepot+distanceRouePendule+35, 425, 5, 20);
 
     scene->addRect(panierGauche, colorBlue, brushBlue);
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
     // Flag
-    flag = new FlagItem(positionDepot);// a changer pour ne pas recréer d'objet
+    flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
 
