@@ -51,15 +51,6 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
         brushBlack.setColor(colorBlack);
         brushBlue.setColor(colorBlue);
         brushGreen.setColor(colorGreen);
-
-
-    //QSound ohYeah(":/sound/WeDidIt.wav");
-    QSound IMfastAsFuck(":/I'm_fast_as_F_boi.wav");
-
-    ohYeah.setSource(QUrl::fromLocalFile(":/sound/WeDidIt.wav"));
-    //effect.setLoopCount(QSoundEffect::Infinite);
-    ohYeah.setVolume(1.0f);
-
 }
 
 MainWindow::~MainWindow(){
@@ -78,10 +69,32 @@ void MainWindow::showPopUp()
     msg.exec();
 }
 
+void MainWindow::startMarioLetsGo()
+{
+    letsGoMario->play();
+}
+
+void MainWindow::startItsMeMario()
+{
+    ItsMeMario->play();
+}
+
+void MainWindow::startIMfastAsF()
+{
+    IMfastAsFuck->play();
+}
+
+void MainWindow::startMarioDeath()
+{
+    Mario_Death->play();
+}
+
+
 void MainWindow::showGIF()
 {
-    ohYeah.play();
-    //ohYeah.play();
+    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
+    SapinSound->play();
+//    startSapinSound(3);
 
     QMessageBox msg;
         //msg.setText("This closes in 10 seconds");
@@ -89,11 +102,13 @@ void MainWindow::showGIF()
         int cnt = 10;
 
         QTimer cntDown;
-        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&cnt, &cntDown]()->void{
+        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&SapinSound, &cnt, &cntDown]()->void{
                              if(--cnt < 0){
                                  cntDown.stop();
                                  msg.close();
-                             } else {
+                                SapinSound->stop();
+
+                             }  else {
                                  msg.setWindowTitle("AMAZING");
                                  msg.setStandardButtons(nullptr);
                              }
@@ -147,6 +162,8 @@ void MainWindow::receiveFromSerial(QString msg){
             sapinLacher = jsonObj["sapin_lacher"].toBool();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
+            etat = jsonObj["Etat"].toDouble();
+            son = jsonObj["son"].toDouble();
 
             //positionObstacle = covertisseurMagique*jsonObj["position_obstacle"].toDouble();
             //positionDepot = covertisseurMagique*jsonObj["position_depot"].toDouble();
@@ -183,8 +200,13 @@ void MainWindow::receiveFromSerial(QString msg){
 
     if(sapinLacher && afficher != 1)
     {
-       //this->showGIF();
+       this->showGIF();
        afficher = 1;
+    }
+
+    if(son == 1)
+    {
+        startIMfastAsF();
     }
 }
 
@@ -314,8 +336,6 @@ void MainWindow::addFormesInitial()
 
     sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
     scene->addItem(sapin);
-
-
 }
 
 void MainWindow::moveMario()
@@ -506,15 +526,20 @@ void MainWindow::sendStart(){
         QJsonDocument doc(jsonObject);
         QString strJson(doc.toJson(QJsonDocument::Compact));
         sendMessage(strJson);
+
+        startIMfastAsF();
     }
     else
     {
         showPopUp();
     }
+
 }
 
 void MainWindow::sendStop()
 {
+    startMarioDeath();
+
     QJsonObject jsonObject
     {
         {"Stop", 100}

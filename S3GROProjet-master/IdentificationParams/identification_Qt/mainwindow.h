@@ -20,6 +20,7 @@
 #include <QGraphicsPixmapItem>
 #include <QPropertyAnimation>
 #include <QSoundEffect>
+#include <QMediaPlayer>
 
 // Propres librairies
 #include "csvwriter.h"
@@ -82,6 +83,10 @@ private:
     void portCensus();
     void showPopUp();
     void showGIF();
+    void startMarioLetsGo();
+    void startItsMeMario();
+    void startIMfastAsF();
+    void startMarioDeath();
 
     bool record = false;
     CsvWriter* writer_;
@@ -114,11 +119,14 @@ private:
     QRectF panierMillieu;
     QRectF panierDroite;
 
+    QSound *ohYeah = new QSound(":/sound/WeDidIt.wav");
+    QSound *IMfastAsFuck = new QSound(":/sound/Im_fast_as_F_boi.wav");
+    QSound *letsGoMario = new QSound(":/sound/mario_lets_a_go.wav");
+    QSound *ItsMeMario = new QSound(":/sound/Its_a_me_Mario.wav");
+    QSound *Mario_Death = new QSound(":/sound/Mario_Death.wav");
+//    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
 
-
-
-    QSoundEffect ohYeah;
-
+    QTimer *timer = new QTimer();
 
 
     CarItem * camion;
@@ -127,7 +135,7 @@ private:
     PenduleItem * pendule;
     SapinItem * sapin;
 
-    int sapin_dropped =                  0;
+    int sapin_dropped =          0;
 
     double distance_obstacle =   100;
     //double distance_depot =      500;
@@ -138,14 +146,16 @@ private:
     double positionDepot =       500;
     //double lastanglePendule =    0;
     double anglePendule =        -45;
-    double angleSapin =        0;
+    double angleSapin =          0;
     double largeurRobot =        50;
     double hauteurRobot =        10;
     double diametreRoue =        12;
     double afficher     =        0;
     double distanceRouePendule = 0.217;
     double covertisseurMagique = (602.0/1.68);
-    double vitesse_angulaire = 0;
+    double vitesse_angulaire =   0;
+    double etat  =               0;
+    double son =                  0;
 
     bool casZero     =           false;
     bool sapinLacher =           false;
