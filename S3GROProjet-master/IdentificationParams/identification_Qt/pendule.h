@@ -29,6 +29,7 @@ public slots:
     void setX(qreal x);
 
 private:
+
     qreal m_q;
     qreal m_x;
     QGraphicsPixmapItem * pendule;
