@@ -303,6 +303,7 @@ void loop() {
           goal_angle_atteint = false;
           choix = AVANCE_ALLER;
           goal_position_atteint = false;
+          pid_x.setEpsilon(0.05);
           pid_x.enable();
         }
       }
@@ -332,6 +333,7 @@ void loop() {
         choix = ARRET_OSCILLATION;
         goal_position_atteint = false;
         pid_x.enable();
+        pid_x.setEpsilon(0.03);
         old_angle = Calculangle();
         old_temps = millis();
         goal_voulu_angle = 0;
@@ -347,10 +349,10 @@ void loop() {
                 //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
       reduce_angle();
       pwm_correction = vitesse_angle;
-      AX_.setMotorPWM(MOTOR_ID, pwm_correction);
+      AX_.setMotorPWM(MOTOR_ID, 5*pwm_correction);
 
                      // mis en comentaire pour tester
-     if(abs(vitesse_angle) < 0.05 && abs(new_angle) < 10 ) 
+     if(abs(vitesse_angle) < 0.5 && abs(new_angle) < 10 ) 
       {
         pid_x.enable();
         goal_angle_atteint = false;
@@ -366,6 +368,7 @@ void loop() {
           {
           goal_position_atteint = false;
           pid_x.enable();
+          pid_x.setEpsilon(0.02);
           choix = LACHE_SAPIN;
           i = 0;
           temps2 = millis();
