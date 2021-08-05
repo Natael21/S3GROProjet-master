@@ -329,7 +329,7 @@ void loop() {
 
       
 
-      if(goal_position_atteint-0.1)
+      if(goal_position_atteint-0.1)                                //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
       {
         choix = ARRET_OSCILLATION;
         goal_position_atteint = false;
@@ -348,16 +348,16 @@ void loop() {
     case ARRET_OSCILLATION: //Cas pour arreter le pendule vers 0 degree au dessus du panier
       //On fait un sinus qui tend vers 0 ???---------------------------------------------------------------
       //problème avec le case 
-                pid_q.setGains(5,0,0);
-                pid_q.setGoal(0);
-                AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
+                //pid_q.setGains(5,0,0);
+                //pid_q.setGoal(0);
+                //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);       //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
       if(!go3)
       {
       pwm_correction = reduce_angle();
-      AX_.setMotorPWM(MOTOR_ID, 2*pwm_correction);
+      AX_.setMotorPWM(MOTOR_ID, 1*pwm_correction);              //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
       }
                      // mis en comentaire pour tester
-     if((abs(vitesse_angle) < 0.4 && abs(new_angle) < 10))//||go3==true  
+     if((abs(vitesse_angle) < 0.2 && abs(new_angle) < 10))//||go3==true  
       {
         go3 = true;
        
@@ -365,13 +365,12 @@ void loop() {
         
         AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
-          if (goal_position_atteint&&(abs(vitesse_angle) < 0.2 && abs(new_angle+old_angle) < 10))
+          if (goal_position_atteint) //&&(abs(vitesse_angle) < 0.2 && abs(new_angle+old_angle) < 10)) //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
           {
           goal_position_atteint = false;
           pid_x.enable();
           pid_x.setEpsilon(0.02);
           choix = LACHE_SAPIN;
-          i = 0;
           temps2 = millis();
         }
       }
