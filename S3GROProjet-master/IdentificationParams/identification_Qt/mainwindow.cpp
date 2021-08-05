@@ -164,7 +164,7 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
-            son = jsonObj["Sonnons"].toBool();
+            son = jsonObj["son"].toBool();
 
             if(game_on == true)
             {

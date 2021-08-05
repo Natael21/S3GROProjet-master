@@ -481,20 +481,20 @@ void sendMsg(){
   // Elements du message
 
   doc["time"]      = (millis()/1000.0);
-  doc["goal"]      = pid_x.getGoal();
-  doc["pulsePWM"]  = pulsePWM_;
+  //doc["goal"]      = pid_x.getGoal();
+  //doc["pulsePWM"]  = pulsePWM_;
   doc["cur_vel"]   = cur_vel;
   doc["cur_pos"]   = cur_pos;
   doc["cur_angle"] = cur_angle;
   doc["Etat"]      = choix;
-  doc["actualTime"] = pid_x.getActualDt();
+  //doc["actualTime"] = pid_x.getActualDt();
   doc["position_obstacle"] = position_obstacle;
-  doc["hauteur_obstacle"] = hauteur_obstacle;
+  //doc["hauteur_obstacle"] = hauteur_obstacle;
   doc["position_depot"] = position_depot;
   doc["sapin_lacher"] = sapinLacher;
   doc["casZero"] = casZero;
-  doc["vitesse_angulaire"] = vitesse_angulaire;
-  doc["Sonnons"] = son;
+  //doc["vitesse_angulaire"] = vitesse_angulaire;
+  doc["son"] = son;
 
   // Serialisation
   serializeJson(doc, Serial);

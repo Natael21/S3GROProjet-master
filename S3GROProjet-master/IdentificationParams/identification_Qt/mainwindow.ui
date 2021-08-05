@@ -21,7 +21,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -46,8 +46,8 @@
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>567</x>
-          <y>63</y>
+          <x>560</x>
+          <y>26</y>
           <width>121</width>
           <height>22</height>
          </rect>
@@ -88,8 +88,8 @@
        <widget class="QLabel" name="label_9">
         <property name="geometry">
          <rect>
-          <x>567</x>
-          <y>121</y>
+          <x>560</x>
+          <y>84</y>
           <width>121</width>
           <height>22</height>
          </rect>
@@ -101,10 +101,10 @@
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>570</x>
-          <y>310</y>
-          <width>241</width>
-          <height>241</height>
+          <x>550</x>
+          <y>270</y>
+          <width>281</width>
+          <height>301</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -119,44 +119,72 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>État 1: Attente de réception du bouton start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_20">
            <property name="text">
-            <string>État 1 : Oscillation aller</string>
+            <string>État 2 : Avance avant l'obstacle pour osciller</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_21">
            <property name="text">
-            <string>État 2 : Passe par dessus l'obstacle</string>
+            <string>État 3 : Début de l'oscillation</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_22">
            <property name="text">
-            <string>État 3 : Arrêt de l'oscillation aller</string>
+            <string>État 4 : Arrêt de l'oscillation</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_23">
            <property name="text">
-            <string>État 4 : Lache le sapin</string>
+            <string>État 5 : Passer par dessus l'obstale</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_24">
            <property name="text">
-            <string>État 5 : Reviens au début</string>
+            <string>État 6 : Se déplace au desus de l'obstacle</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_25">
            <property name="text">
-            <string>État 6 : Arrêt oscillation retour</string>
+            <string>État 7 : Lache sapin</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>État 8 : Reviens au point initiale</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>État 9 : Prend sapin</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>État 100 : Arrêt totale</string>
            </property>
           </widget>
          </item>
@@ -165,8 +193,8 @@
        <widget class="QLineEdit" name="lineEdit_Kd">
         <property name="geometry">
          <rect>
-          <x>677</x>
-          <y>155</y>
+          <x>670</x>
+          <y>118</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -175,8 +203,8 @@
        <widget class="QLineEdit" name="lineEdit_DesVal">
         <property name="geometry">
          <rect>
-          <x>677</x>
-          <y>65</y>
+          <x>670</x>
+          <y>28</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -234,8 +262,8 @@
        <widget class="QLineEdit" name="lineEdit_Kp">
         <property name="geometry">
          <rect>
-          <x>677</x>
-          <y>94</y>
+          <x>670</x>
+          <y>57</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -244,8 +272,8 @@
        <widget class="QPushButton" name="pushButton_Params">
         <property name="geometry">
          <rect>
-          <x>580</x>
-          <y>230</y>
+          <x>560</x>
+          <y>190</y>
           <width>221</width>
           <height>28</height>
          </rect>
@@ -285,8 +313,8 @@
        <widget class="QLabel" name="label_8">
         <property name="geometry">
          <rect>
-          <x>567</x>
-          <y>92</y>
+          <x>560</x>
+          <y>55</y>
           <width>121</width>
           <height>22</height>
          </rect>
@@ -330,8 +358,8 @@
        <widget class="QLabel" name="label_11">
         <property name="geometry">
          <rect>
-          <x>567</x>
-          <y>185</y>
+          <x>560</x>
+          <y>148</y>
           <width>121</width>
           <height>22</height>
          </rect>
@@ -385,8 +413,8 @@
        <widget class="QPushButton" name="Stop">
         <property name="geometry">
          <rect>
-          <x>550</x>
-          <y>270</y>
+          <x>560</x>
+          <y>240</y>
           <width>150</width>
           <height>28</height>
          </rect>
@@ -447,8 +475,8 @@
        <widget class="QLineEdit" name="lineEdit_Ki">
         <property name="geometry">
          <rect>
-          <x>677</x>
-          <y>123</y>
+          <x>670</x>
+          <y>86</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -457,8 +485,8 @@
        <widget class="QLabel" name="label_10">
         <property name="geometry">
          <rect>
-          <x>567</x>
-          <y>150</y>
+          <x>560</x>
+          <y>113</y>
           <width>121</width>
           <height>28</height>
          </rect>
@@ -470,8 +498,8 @@
        <widget class="QLineEdit" name="lineEdit_Thresh">
         <property name="geometry">
          <rect>
-          <x>677</x>
-          <y>187</y>
+          <x>670</x>
+          <y>150</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -480,8 +508,8 @@
        <widget class="QPushButton" name="StartButton">
         <property name="geometry">
          <rect>
-          <x>730</x>
-          <y>270</y>
+          <x>740</x>
+          <y>240</y>
           <width>93</width>
           <height>28</height>
          </rect>
