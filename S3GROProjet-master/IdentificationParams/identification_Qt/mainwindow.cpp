@@ -235,14 +235,17 @@ void MainWindow::connectButtons(){
 
 void MainWindow::sendPosition()
 {
-    distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-    positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-    positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
-    hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
 
-    QJsonArray array = { QString::number(-distance_obstacle, 'f', 2),//??
-                         QString::number(-positionObstacle, 'f', 2),//?? negatif
-                         QString::number(-positionDepot, 'f', 2)
+    distance_obstacle = ui->distanceObstacle->text().toDouble();
+    positionObstacle = ui->distanceObstacle->text().toDouble();
+    positionDepot = ui->distanceDepot->text().toDouble();
+    hauteur_obstacle = ui->hauteurObstacle->text().toDouble();
+
+
+
+    QJsonArray array = { QString::number(distance_obstacle, 'f', 2),//??
+                         QString::number(positionObstacle, 'f', 2),//?? negatif
+                         QString::number(positionDepot, 'f', 2)
                        };
 
     QJsonObject jsonObject
@@ -256,6 +259,12 @@ void MainWindow::sendPosition()
 
     distance_envoyer = true;
     this->moveMario();
+
+    distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+    positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+    positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
+    hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
+
 }
 
 void MainWindow::connectSpinBoxes(){

@@ -10,7 +10,7 @@ PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos
     pendule->setPos(currentpos-5,345);
     sapin->setPos(currentpos+15,365);
 
-    sapin->setTransformOriginPoint(pendule->boundingRect().topRight());
+    sapin->setTransformOriginPoint(currentpos,-10);
     sapin->setRotation(angleSapin);
     QPointF offsetPendule = pendule->boundingRect().topRight();
    // QPointF offsetSapin= sapin->boundingRect().center();

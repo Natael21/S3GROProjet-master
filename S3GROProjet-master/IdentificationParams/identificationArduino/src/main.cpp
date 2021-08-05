@@ -76,7 +76,8 @@ bool sapinLacher =                      false;    //Permet de savoir si le sapin
 bool casZero =                          false;    //Permet de savoir si le cas START est actif
 bool oscillation_finis =                false;
 bool go =                               false;
-bool go2 =                               false;
+bool go2 =                              false;
+bool go3 =                              false;  
 
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
@@ -328,15 +329,18 @@ void loop() {
 
       
 
-      if(goal_position_atteint)
+      if(goal_position_atteint-0.1)
       {
         choix = ARRET_OSCILLATION;
         goal_position_atteint = false;
         pid_x.enable();
         pid_x.setEpsilon(0.03);
+        pid_x.setGains(3,PID_KI_LENT,PID_KD_LENT);
+        pid_x.setGoal(position_depot);
         old_angle = Calculangle();
         old_temps = millis();
         goal_voulu_angle = 0;
+        go3 = false;
       }
 
     break;
@@ -347,23 +351,20 @@ void loop() {
                // pid_q.setGains(5,0,0);
                // pid_q.setGoal(0);
                 //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
-      reduce_angle();
-      pwm_correction = vitesse_angle;
-      AX_.setMotorPWM(MOTOR_ID, 5*pwm_correction);
-
-                     // mis en comentaire pour tester
-     if(abs(vitesse_angle) < 0.5 && abs(new_angle) < 10 ) 
+      if(!go3)
       {
-        pid_x.enable();
-        goal_angle_atteint = false;
-        pid_x.setGoal(position_depot);
+      pwm_correction = reduce_angle();
+      AX_.setMotorPWM(MOTOR_ID, 2*pwm_correction);
+      }
+                     // mis en comentaire pour tester
+     if((abs(vitesse_angle) < 0.5 && abs(new_angle) < 10)||go3==true ) 
+      {
+        go3 = true;
+       
+        
+        
         AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
-        // if(prendre_sapin == true)
-        // {
-        //   choix = PREND_SAPIN;
-        // }
-        // else
-        // {
+
           if (goal_position_atteint)
           {
           goal_position_atteint = false;
@@ -385,7 +386,7 @@ void loop() {
       digitalWrite(MAGPIN, 0);
       temps1 = millis();
       
-      if( (temps1- temps2) >= 1000 )
+      if( (temps1- temps2) >= 3000 )
       {
        choix = AVANCE_RETOUR;
         pid_x.enable();
@@ -568,16 +569,16 @@ void readMsg(){
     choix = ARRET_TOTAL;
   }
 
-  parse_msg = doc["position_obstacle"];
+  parse_msg = doc["Distance"];
   if(!parse_msg.isNull())
   {
-    position_obstacle = (doc["Distance"][0]);
+    position_obstacle = (doc["Distance"][1]);
   }
 
-  parse_msg = doc["position_depot"];
+  parse_msg = doc["Distance"];
   if(!parse_msg.isNull())
   {
-    position_depot = (doc["Distance"][1]);
+    position_depot = (doc["Distance"][2]);
   }  
   //--------------------------------------------------------------------------------------------------------------
 }
