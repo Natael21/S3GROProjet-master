@@ -7,6 +7,7 @@
 #include<QPropertyAnimation>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include"sapin.h"
 
 class PipeItem :public QObject, public QGraphicsItemGroup
 {
@@ -15,8 +16,11 @@ class PipeItem :public QObject, public QGraphicsItemGroup
 public:
     explicit PipeItem(double position,double hauteur);
     ~PipeItem();
+signals:
+    void pipecollided();
 
 private:
+    bool collidesWithSapin();
     double positionObstacle;
     QGraphicsPixmapItem * pipe;
 };

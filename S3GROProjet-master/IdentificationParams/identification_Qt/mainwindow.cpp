@@ -33,33 +33,38 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     // initialisation du timer
     updateTimer_.start();
 
-        // Création scene
-        scene = new QGraphicsScene(this);
-        scene->setSceneRect(225,190,200,200);
+    // Création scene
+    scene = new QGraphicsScene(this);
+    scene->setSceneRect(225,190,200,200);
 
-        ui->Graphique->setScene(scene);
+    ui->Graphique->setScene(scene);
 
-        if(scene_initialise == false)
-        {
-            this->addFormesInitial();
-            scene_initialise = true;
-        }
+    if(scene_initialise == false)
+    {
+        this->addFormesInitial();
+        scene_initialise = true;
+    }
 
-        //Couleurs
+    //Couleurs
 
-        brushRed.setColor(colorRed);
-        brushBlack.setColor(colorBlack);
-        brushBlue.setColor(colorBlue);
-        brushGreen.setColor(colorGreen);
+    brushRed.setColor(colorRed);
+    brushBlack.setColor(colorBlack);
+    brushBlue.setColor(colorBlue);
+    brushGreen.setColor(colorGreen);
 }
 
 MainWindow::~MainWindow(){
     // Destructeur de la classe
     updateTimer_.stop();
     if(serialCom_!=nullptr){
-      delete serialCom_;
+        delete serialCom_;
     }
     delete ui;
+}
+
+void MainWindow::gameover()
+{
+
 }
 
 void MainWindow::showPopUp()
@@ -94,37 +99,37 @@ void MainWindow::showGIF()
 {
     QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
     SapinSound->play();
-//    startSapinSound(3);
+    //    startSapinSound(3);
 
     QMessageBox msg;
-        //msg.setText("This closes in 10 seconds");
+    //msg.setText("This closes in 10 seconds");
 
-        int cnt = 10;
+    int cnt = 10;
 
-        QTimer cntDown;
-        QObject::connect(&cntDown, &QTimer::timeout, [&msg,&SapinSound, &cnt, &cntDown]()->void{
-                             if(--cnt < 0){
-                                 cntDown.stop();
-                                 msg.close();
-                                SapinSound->stop();
+    QTimer cntDown;
+    QObject::connect(&cntDown, &QTimer::timeout, [&msg,&SapinSound, &cnt, &cntDown]()->void{
+        if(--cnt < 0){
+            cntDown.stop();
+            msg.close();
+            SapinSound->stop();
 
-                             }  else {
-                                 msg.setWindowTitle("AMAZING");
-                                 msg.setStandardButtons(nullptr);
-                             }
-                         });
+        }  else {
+            msg.setWindowTitle("AMAZING");
+            msg.setStandardButtons(nullptr);
+        }
+    });
 
-            // create Label
-            msg.setIconPixmap(QPixmap(":/image/WeDidIt.gif"));
-            QLabel *icon_label = msg.findChild<QLabel *>("qt_msgboxex_icon_label");
-            icon_label->setFixedWidth(1000);
-            icon_label->setFixedHeight(600);
-            icon_label->setMovie(movie);
-            movie->setScaledSize(QSize(1000, 600));
-            movie->start();
+    // create Label
+    msg.setIconPixmap(QPixmap(":/image/WeDidIt.gif"));
+    QLabel *icon_label = msg.findChild<QLabel *>("qt_msgboxex_icon_label");
+    icon_label->setFixedWidth(1000);
+    icon_label->setFixedHeight(600);
+    icon_label->setMovie(movie);
+    movie->setScaledSize(QSize(1000, 600));
+    movie->start();
 
-            cntDown.start(300);
-            msg.exec();
+    cntDown.start(300);
+    msg.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -162,7 +167,23 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             son = jsonObj["son"].toDouble();
 
-            this->moveMario();
+            connect(pipe,&PipeItem::pipecollided,[=](){
+
+                game_on = false;
+            });
+
+            if(game_on == true)
+            {
+                this->moveMario();
+                startMarioDeath();
+                GameOver = new QGraphicsPixmapItem(QPixmap(":/image/gameover.png"));
+                scene->addItem(GameOver);
+            }
+
+            if(etat == 100)
+            {
+                game_on = true;
+            }
 
             // Affichage des donnees dans le graph
             if(jsonObj.contains(JsonKey_)){
@@ -195,8 +216,8 @@ void MainWindow::receiveFromSerial(QString msg){
 
     if(sapinLacher && afficher != 1)
     {
-       this->showGIF();
-       afficher = 1;
+        this->showGIF();
+        afficher = 1;
     }
 
     if(son == 1)
@@ -227,10 +248,10 @@ void MainWindow::connectButtons(){
 
     //Permet de mettre de la couleur sur les boutons
     ui->Stop->setStyleSheet("QPushButton { background-color: red; }\n"
-                          "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
+                            "QPushButton:enabled { background-color: rgb(200,0,0); }\n");
 
     ui->StartButton->setStyleSheet("QPushButton { background-color: green; }\n"
-                          "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
+                                   "QPushButton:enabled { background-color: rgb(0,255,0); }\n");
 }
 
 void MainWindow::sendPosition()
@@ -316,8 +337,8 @@ void MainWindow::addFormesInitial()
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
-    // Pendule + Sapin
-    PenduleItem * pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
+    // Pendule
+    PenduleItem * pendule = new PenduleItem(anglePendule,positionVoiture);
     scene->addItem(pendule);
 
     //Voiture
@@ -339,8 +360,8 @@ void MainWindow::addFormesInitial()
 
     //Sapin
 
-   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    //scene->addItem(sapin);
+    sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher,etat);
+    scene->addItem(sapin);
 }
 
 void MainWindow::moveMario()
@@ -359,7 +380,7 @@ void MainWindow::moveMario()
     panierDroite = QRectF(positionDepot+35, 425, 5, 20);
 
     // Pendule
-    pendule = new PenduleItem(anglePendule,angleSapin,positionVoiture,sapinLacher,etat);
+    pendule = new PenduleItem(anglePendule,positionVoiture);
     scene->addItem(pendule);
 
     //Voiture
@@ -391,12 +412,12 @@ void MainWindow::moveMario()
 
     //if(sapinLacher == 0)
     //{
-    //Sapin
+        //Sapin
 
-   // sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher);
-    //scene->addItem(sapin);
-    //}
-/*
+        sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher,etat);
+        scene->addItem(sapin);
+        //}
+        /*
     //Sapin
     if(!sapinLacher)
     {
@@ -443,168 +464,168 @@ void MainWindow::moveMario()
     }
 */
 
-    //Voiture
-//    QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
-//    QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
-//    scene->addRect(rectVoiture1, colorRed, brushRed);
-//    scene->addRect(rectVoiture2, colorRed, brushRed);
+        //Voiture
+        //    QRectF rectVoiture1 = QRectF(positionVoiture+15, 250, largeurRobot, hauteurRobot);
+        //    QRectF rectVoiture2 = QRectF(positionVoiture+15, 250, largeurRobot/2, hauteurRobot+10);
+        //    scene->addRect(rectVoiture1, colorRed, brushRed);
+        //    scene->addRect(rectVoiture2, colorRed, brushRed);
 
-    //Roue voiture
-//    QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
-//    QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
-//    scene->addEllipse(ellipseRoue1, colorBlack, brushBlack);
-//    scene->addEllipse(ellipseRoue2, colorBlack, brushBlack);
+        //Roue voiture
+        //    QRectF ellipseRoue1 = QRectF(positionVoiture, -12, diametreRoue, diametreRoue);
+        //    QRectF ellipseRoue2 = QRectF(positionVoiture+largeurRobot, -12, diametreRoue, diametreRoue);
+        //    scene->addEllipse(ellipseRoue1, colorBlack, brushBlack);
+        //    scene->addEllipse(ellipseRoue2, colorBlack, brushBlack);
 
-    //Pendule
-//    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
-//    double x1 = 40+positionVoiture;
-//    double y1 = 346;
-//    double y2 = 350+longeurPendule;
+        //Pendule
+        //    double x2 = (tan(anglePendule*(3.1416/180)))*longeurPendule;
+        //    double x1 = 40+positionVoiture;
+        //    double y1 = 346;
+        //    double y2 = 350+longeurPendule;
 
-//    QLine pendule = QLine(x1, y1, x2+x1, y2);
-//    scene->addLine(pendule, colorBlack);
+        //    QLine pendule = QLine(x1, y1, x2+x1, y2);
+        //    scene->addLine(pendule, colorBlack);
 
-    //Obstacle
-//    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
-//    scene.addRect(obstacle, colorBlack, brushBlack);
-}
-
-
-void MainWindow::changeJsonKeyValue(){
-    // Fonction SLOT pour changer la valeur de la cle Json
-    series_.clear();
-    JsonKey_ = ui->JsonKey->text();
-}
-
-void MainWindow::sendPID(){
-    // Fonction SLOT pour envoyer les paramettres de pulse
-    double goal = ui->lineEdit_DesVal->text().toDouble();
-    double Kp = ui->lineEdit_Kp->text().toDouble();
-    double Ki = ui->lineEdit_Ki->text().toDouble();
-    double Kd = ui->lineEdit_Kd->text().toDouble();
-    double thresh = ui->lineEdit_Thresh->text().toDouble();
-    // pour minimiser le nombre de decimales( QString::number)
-
-    QJsonArray array = { QString::number(Kp, 'f', 2),
-                         QString::number(Ki, 'f', 2),
-                         QString::number(Kd, 'f', 2),
-                         QString::number(thresh, 'f', 2),
-                         QString::number(goal, 'f', 2)
-                       };
-    QJsonObject jsonObject
-    {
-        {"setGoal", array}
-    };
-    QJsonDocument doc(jsonObject);
-    QString strJson(doc.toJson(QJsonDocument::Compact));
-    sendMessage(strJson);
-}
+        //Obstacle
+        //    QRectF obstacle = QRectF(positionObstacle, 50, 10, 40);
+        //    scene.addRect(obstacle, colorBlack, brushBlack);
+    }
 
 
-void MainWindow::sendStart(){
-    if(distance_envoyer)
-    {
+    void MainWindow::changeJsonKeyValue(){
+        // Fonction SLOT pour changer la valeur de la cle Json
+        series_.clear();
+        JsonKey_ = ui->JsonKey->text();
+    }
+
+    void MainWindow::sendPID(){
+        // Fonction SLOT pour envoyer les paramettres de pulse
+        double goal = ui->lineEdit_DesVal->text().toDouble();
+        double Kp = ui->lineEdit_Kp->text().toDouble();
+        double Ki = ui->lineEdit_Ki->text().toDouble();
+        double Kd = ui->lineEdit_Kd->text().toDouble();
+        double thresh = ui->lineEdit_Thresh->text().toDouble();
+        // pour minimiser le nombre de decimales( QString::number)
+
+        QJsonArray array = { QString::number(Kp, 'f', 2),
+                             QString::number(Ki, 'f', 2),
+                             QString::number(Kd, 'f', 2),
+                             QString::number(thresh, 'f', 2),
+                             QString::number(goal, 'f', 2)
+                           };
         QJsonObject jsonObject
         {
-             {"Start", 1}
+            {"setGoal", array}
+        };
+        QJsonDocument doc(jsonObject);
+        QString strJson(doc.toJson(QJsonDocument::Compact));
+        sendMessage(strJson);
+    }
+
+
+    void MainWindow::sendStart(){
+        if(distance_envoyer)
+        {
+            QJsonObject jsonObject
+            {
+                {"Start", 1}
+            };
+
+            QJsonDocument doc(jsonObject);
+            QString strJson(doc.toJson(QJsonDocument::Compact));
+            sendMessage(strJson);
+
+            startItsMeMario();
+        }
+        else
+        {
+            showPopUp();
+        }
+
+    }
+
+    void MainWindow::sendStop()
+    {
+        startMarioDeath();
+
+        QJsonObject jsonObject
+        {
+            {"Stop", 100}
         };
 
         QJsonDocument doc(jsonObject);
         QString strJson(doc.toJson(QJsonDocument::Compact));
         sendMessage(strJson);
-
-        startItsMeMario();
-    }
-    else
-    {
-        showPopUp();
     }
 
-}
-
-void MainWindow::sendStop()
-{
-    startMarioDeath();
-
-    QJsonObject jsonObject
-    {
-        {"Stop", 100}
-    };
-
-    QJsonDocument doc(jsonObject);
-    QString strJson(doc.toJson(QJsonDocument::Compact));
-    sendMessage(strJson);
-}
-
-void MainWindow::sendPulseSetting(){
-    // Fonction SLOT pour envoyer les paramettres de pulse
-    double PWM_val = ui->PWMBox->value();
-    int duration_val = ui->DurationBox->value();
-    QJsonObject jsonObject
-    {// pour minimiser le nombre de decimales( QString::number)
-        {"pulsePWM", QString::number(PWM_val)},
-        {"pulseTime", duration_val}
-    };
-    QJsonDocument doc(jsonObject);
-    QString strJson(doc.toJson(QJsonDocument::Compact));
-    sendMessage(strJson);
-}
-
-void MainWindow::sendPulseStart(){
-    // Fonction SLOT pour envoyer la commande de pulse
-    QJsonObject jsonObject
-    {
-        {"pulse", 1}
-    };
-    QJsonDocument doc(jsonObject);
-    QString strJson(doc.toJson(QJsonDocument::Compact));
-    sendMessage(strJson);
-}
-
-void MainWindow::sendMessage(QString msg){
-    // Fonction SLOT d'ecriture sur le port serie
-    if(serialCom_==nullptr){
-        qDebug().noquote() <<"Erreur aucun port serie !!!";
-        return;
+    void MainWindow::sendPulseSetting(){
+        // Fonction SLOT pour envoyer les paramettres de pulse
+        double PWM_val = ui->PWMBox->value();
+        int duration_val = ui->DurationBox->value();
+        QJsonObject jsonObject
+        {// pour minimiser le nombre de decimales( QString::number)
+            {"pulsePWM", QString::number(PWM_val)},
+            {"pulseTime", duration_val}
+        };
+        QJsonDocument doc(jsonObject);
+        QString strJson(doc.toJson(QJsonDocument::Compact));
+        sendMessage(strJson);
     }
-    serialCom_->sendMessage(msg);
-    qDebug().noquote() <<"Message du RPI: "  <<msg;
-}
 
-void MainWindow::setUpdateRate(int rateMs){
-    // Fonction d'initialisation du chronometre
-    updateTimer_.start(rateMs);
-}
-
-void MainWindow::manageRecording(int stateButton){
-    // Fonction SLOT pour determiner l'etat du bouton d'enregistrement
-    if(stateButton == 2){
-        startRecording();
+    void MainWindow::sendPulseStart(){
+        // Fonction SLOT pour envoyer la commande de pulse
+        QJsonObject jsonObject
+        {
+            {"pulse", 1}
+        };
+        QJsonDocument doc(jsonObject);
+        QString strJson(doc.toJson(QJsonDocument::Compact));
+        sendMessage(strJson);
     }
-    if(stateButton == 0){
-        stopRecording();
+
+    void MainWindow::sendMessage(QString msg){
+        // Fonction SLOT d'ecriture sur le port serie
+        if(serialCom_==nullptr){
+            qDebug().noquote() <<"Erreur aucun port serie !!!";
+            return;
+        }
+        serialCom_->sendMessage(msg);
+        qDebug().noquote() <<"Message du RPI: "  <<msg;
     }
-}
 
-void MainWindow::startRecording(){
-    // Fonction SLOT pour creation d'un nouveau fichier csv
-    record = true;
-    writer_ = new CsvWriter("/home/pi/Desktop/");
-    ui->label_pathCSV->setText(writer_->folder+writer_->filename);
-}
+    void MainWindow::setUpdateRate(int rateMs){
+        // Fonction d'initialisation du chronometre
+        updateTimer_.start(rateMs);
+    }
 
-void MainWindow::stopRecording(){
-    // Fonction permettant d'arreter l'ecriture du CSV
-    record = false;
-    delete writer_;
-}
-void MainWindow::onMessageReceived(QString msg){
-    // Fonction appelee lors de reception de message
-    // Decommenter la ligne suivante pour deverminage
-    // qDebug().noquote() << "Message du Arduino: " << msg;
-}
+    void MainWindow::manageRecording(int stateButton){
+        // Fonction SLOT pour determiner l'etat du bouton d'enregistrement
+        if(stateButton == 2){
+            startRecording();
+        }
+        if(stateButton == 0){
+            stopRecording();
+        }
+    }
 
-void MainWindow::onPeriodicUpdate(){
-    // Fonction SLOT appelee a intervalle definie dans le constructeur
-    qDebug().noquote() << "*";
-}
+    void MainWindow::startRecording(){
+        // Fonction SLOT pour creation d'un nouveau fichier csv
+        record = true;
+        writer_ = new CsvWriter("/home/pi/Desktop/");
+        ui->label_pathCSV->setText(writer_->folder+writer_->filename);
+    }
+
+    void MainWindow::stopRecording(){
+        // Fonction permettant d'arreter l'ecriture du CSV
+        record = false;
+        delete writer_;
+    }
+    void MainWindow::onMessageReceived(QString msg){
+        // Fonction appelee lors de reception de message
+        // Decommenter la ligne suivante pour deverminage
+        // qDebug().noquote() << "Message du Arduino: " << msg;
+    }
+
+    void MainWindow::onPeriodicUpdate(){
+        // Fonction SLOT appelee a intervalle definie dans le constructeur
+        qDebug().noquote() << "*";
+    }

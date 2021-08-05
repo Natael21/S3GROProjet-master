@@ -13,27 +13,19 @@
 class PenduleItem :public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(qreal y READ getY WRITE setY)
 
 
 public:
-    explicit PenduleItem(double anglePendule,double angleSapin,double currentpos,double sapinLacher,double etat);
+    explicit PenduleItem(double anglePendule,double currentpos);
     ~PenduleItem();
-    qreal getY();
 
 
 signals:
 
 public slots:
-     void setY(qreal y);
 
 private:
-    qreal m_y;
-    qreal groundposition;
-
     QGraphicsPixmapItem * pendule;
-    QGraphicsPixmapItem * sapin;
-    QPropertyAnimation * yAnimation;
 
 };
 

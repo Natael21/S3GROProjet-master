@@ -30,6 +30,7 @@
 #include "pipe.h"
 #include "flag.h"
 #include "pendule.h"
+#include "sapin.h"
 
 // Classe definissant l'application
 namespace Ui {
@@ -85,6 +86,7 @@ private:
     void startItsMeMario();
     void startIMfastAsF();
     void startMarioDeath();
+    void gameover();
 
     bool record = false;
     CsvWriter* writer_;
@@ -111,6 +113,7 @@ private:
     QBrush brushGreen = Qt::SolidPattern;
 
     QGraphicsPixmapItem * pixItem;
+    QGraphicsPixmapItem * GameOver;
 
     QRectF rail;
     QRectF panierGauche;
@@ -122,7 +125,7 @@ private:
     QSound *letsGoMario = new QSound(":/sound/mario_lets_a_go.wav");
     QSound *ItsMeMario = new QSound(":/sound/Its_a_me_Mario.wav");
     QSound *Mario_Death = new QSound(":/sound/Mario_Death.wav");
-//    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
+    //    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
 
     QTimer *timer = new QTimer();
 
@@ -131,6 +134,7 @@ private:
     PipeItem * pipe;
     FlagItem * flag;
     PenduleItem * pendule;
+    SapinItem * sapin;
 
     int sapin_dropped =          0;
 
@@ -138,7 +142,7 @@ private:
 
     double distance_obstacle =   100;
     //double distance_depot =      500;
-   // double lastposvoiture =      0;
+    // double lastposvoiture =      0;
     double positionVoiture =     0;//peut peut etre enlever et garder dans la classe max = 602
     double positionObstacle =    300;//same 350,-18 a 620
     double hauteur_obstacle =    -0.01;
@@ -160,6 +164,7 @@ private:
     bool sapinLacher =           false;
     bool distance_envoyer =      false;
     bool scene_initialise = false;
+    bool game_on = false;
 
 protected:
     Ui::MainWindow *ui;
