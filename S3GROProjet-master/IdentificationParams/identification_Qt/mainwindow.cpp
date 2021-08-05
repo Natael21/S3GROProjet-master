@@ -51,6 +51,8 @@ MainWindow::MainWindow(int updateRate, QWidget *parent):
     brushBlack.setColor(colorBlack);
     brushBlue.setColor(colorBlue);
     brushGreen.setColor(colorGreen);
+
+    startItsMeMario();
 }
 
 MainWindow::~MainWindow(){
@@ -99,10 +101,8 @@ void MainWindow::showGIF()
 {
     QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
     SapinSound->play();
-    //    startSapinSound(3);
 
     QMessageBox msg;
-    //msg.setText("This closes in 10 seconds");
 
     int cnt = 10;
 
@@ -164,7 +164,7 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
-            son = jsonObj["son"].toDouble();
+            son = jsonObj["Sonnons"].toBool();
 
             if(game_on == true)
             {
@@ -174,6 +174,12 @@ void MainWindow::receiveFromSerial(QString msg){
             if(etat == 100.0)
             {
                 game_on = true;
+            }
+
+            if(son == true && !compte)
+            {
+                startIMfastAsF();
+                compte = true;
             }
 
             // Affichage des donnees dans le graph
@@ -203,18 +209,14 @@ void MainWindow::receiveFromSerial(QString msg){
     if(casZero)
     {
         afficher = 0;
+        compte = false;
+        temp = 0;
     }
 
-
-    if(sapin_dropped == 2 && afficher != 1)
+    if(sapinLacher == true && afficher != 1)
     {
-       // this->showGIF();
+        this->showGIF();
         afficher = 1;
-    }
-
-    if(son == 1)
-    {
-        startIMfastAsF();
     }
 }
 
@@ -277,12 +279,6 @@ void MainWindow::sendPosition()
 
     distance_envoyer = true;
     this->moveMario();
-
-    //distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-    //positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-   // positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
-   // hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
-
 }
 
 void MainWindow::connectSpinBoxes(){
@@ -555,7 +551,7 @@ void MainWindow::moveMario()
             QString strJson(doc.toJson(QJsonDocument::Compact));
             sendMessage(strJson);
 
-            startItsMeMario();
+            startMarioLetsGo();
         }
         else
         {
