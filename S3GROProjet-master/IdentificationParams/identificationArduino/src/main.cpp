@@ -15,7 +15,7 @@ using namespace std;
 #define BAUD                            115200    // Frequence de transmission serielle
 #define UPDATE_PERIODE                  100       // Periode (ms) d'envoie d'etat general
 
-#define MAGPIN                          32        // Port numerique pour electroaimant J-16
+#define MAGPIN                          32        // Port numerique pour electroaimant J-18
 #define POTPIN                          A5        // Port analogique pour le potentiometre
 
 #define PASPARTOUR                      64        // Nombre de pas par tour du moteur
@@ -30,6 +30,7 @@ using namespace std;
 #define PID_KD_LENT                     0.2
 #define PID_KP_RAPIDE                   13
 #define COMPTEUR                        4
+#define BOUTON_PIN                      38         // Le id du bouton de demarage
 
 //Différent cas pour la séquence du projet du sapin
 #define START                           0
@@ -82,8 +83,8 @@ bool go3 =                              false;
 double fonction =                       0.0;      //fonction de tests dans la loop
 double goal_voulu_angle =               0.0;      //Permet de dire l'angle voulue
 double position_depart =                0.03;      //Permet de savoir la position initial du robot
-double position_obstacle =              0.5;      //Permet de savoir la position de l'obstacle
-double position_depot =                 1.0;      //Permet de savoir la position du dépot du sapin
+double position_obstacle =              0.75;      //Permet de savoir la position de l'obstacle
+double position_depot =                 1.2;      //Permet de savoir la position du dépot du sapin
 double distance_ins =                   0.0;      //Permet de savoir la distance instantanné du véhicule pour calculer la vitesse
 double hauteur_obstacle =               0.0;      //Permet de savoir la hauteur de l'obstacle
 double distance_old =                   0.0;      //Permet de savoir la distance précédente pour le calcul de la vitesse
@@ -135,6 +136,8 @@ double Calculangle();
 float reduce_angle();
 double vitesse();
 
+
+
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
@@ -178,6 +181,9 @@ void setup() {
   pinMode(MAGPIN, OUTPUT); 
   //digitalWrite(MAGPIN, LOW);
 
+//definition du IO du bouton
+  pinMode(BOUTON_PIN,INPUT);                                        // JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  Pinmode pour le bouton de demarrage
+
   //Initialise l'état initiale du pendule comme étant 0 degree
   Potentio_zero = analogRead(POTPIN);
 }
@@ -211,7 +217,10 @@ void loop() {
       AX_.setMotorPWM(MOTOR_ID, 0);
       digitalWrite(MAGPIN, HIGH);
       //Serial.println("attente");
-      //choix = START;
+      if(digitalRead(38))
+      {
+          choix = START;                                        //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   ajout d'un bouton pour faciliter les testage
+      }                                                  //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
 
     break;
 
@@ -278,10 +287,7 @@ void loop() {
               AX_.setMotorPWM(MOTOR_ID,fonction);
               pid_x.enable();
               oscillation_finis = false;
-              
-
             }
-
       
       if(cur_angle<goal_voulu_angle&&!go2)
       {
@@ -325,13 +331,13 @@ void loop() {
       pid_x.setGoal(position_depot);
       pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
 
-      AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
+      AX_.setMotorPWM(MOTOR_ID, 1);
 
       
 
-      if(goal_position_atteint-0.1)                                //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
-      {
-        choix = ARRET_OSCILLATION;
+      if(cur_pos > (position_depot-0.1))                                //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj  condition changer parce que celle davant avait pas de sens
+      {                                                                 
+        choix = ARRET_OSCILLATION;         
         goal_position_atteint = false;
         pid_x.enable();
         pid_x.setEpsilon(0.03);
@@ -354,15 +360,19 @@ void loop() {
       if(!go3)
       {
       pwm_correction = reduce_angle();
-      AX_.setMotorPWM(MOTOR_ID, 1*pwm_correction);              //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+      AX_.setMotorPWM(MOTOR_ID,(pwm_correction/abs(pwm_correction)));             // 50*pwm_correction);              //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+     
+      
+        if((abs(vitesse_angle) < 45.0 && abs(new_angle) < 2.0))//||go3==true //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+        {
+            choix = ATTENTE;
+        } 
       }
+      
                      // mis en comentaire pour tester
-     if((abs(vitesse_angle) < 0.2 && abs(new_angle) < 10))//||go3==true  
+     if((abs(vitesse_angle) < 0.2 && abs(new_angle) < 10.0))//||go3==true  
       {
         go3 = true;
-       
-        
-        
         AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
           if (goal_position_atteint) //&&(abs(vitesse_angle) < 0.2 && abs(new_angle+old_angle) < 10)) //jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
@@ -382,11 +392,12 @@ void loop() {
       sapinLacher = true;
 
       AX_.setMotorPWM(MOTOR_ID,0);
-      digitalWrite(MAGPIN, 0);
+      digitalWrite(MAGPIN, LOW);
       temps1 = millis();
       
       if( (temps1- temps2) >= 3000 )
       {
+       sapinLacher = false;
        choix = AVANCE_RETOUR;
         pid_x.enable();
         goal_position_atteint = false;
@@ -400,7 +411,6 @@ void loop() {
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
       if(goal_position_atteint)
       {
-        sapinLacher = false;
         goal_position_atteint = false;
         prendre_sapin = true;
         pid_x.enable();
@@ -675,23 +685,10 @@ void PIDgoalReached_angle(){
 float reduce_angle(){
   new_angle = Calculangle();
   new_temps = millis();
-  vitesse_angle = (new_angle - old_angle) / (new_temps - old_temps);
+  vitesse_angle = 1000.0 * (new_angle - old_angle) / (new_temps - old_temps);                      //JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ
   old_angle = new_angle;
   old_temps = new_temps;
   return vitesse_angle;
 }
 
 
-
-
-/*
-old angle = new angle
-comments message
-serial prints
-start seulment avec qt
-negative in pwm_correction
-
-
-fix temps pas assez grand dt
-tester vitesse angle dans attente
-*/

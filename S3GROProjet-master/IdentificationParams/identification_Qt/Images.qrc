@@ -7,5 +7,6 @@
         <file>image/WeDidIt.gif</file>
         <file>image/sapin.png</file>
         <file>image/pendule.png</file>
+        <file>image/gameover.png</file>
     </qresource>
 </RCC>

@@ -128,6 +128,7 @@ private:
     //    QSound *SapinSound = new QSound(":/sound/Never Gonna Give You Up.wav");
 
     QTimer *timer = new QTimer();
+    QTimer *sapintimer;
 
 
     CarItem * camion;
@@ -160,11 +161,17 @@ private:
     double vitesse_angulaire =   0;
     double son =                  0;
 
+    double distance_obstacle_anim = 0;
+    double positionObstacle_anim = 0;
+    double positionDepot_anim = 0;
+    double hauteur_obstacle_anim = 0;
+
     bool casZero     =           false;
     bool sapinLacher =           false;
     bool distance_envoyer =      false;
     bool scene_initialise = false;
-    bool game_on = false;
+    bool game_on = true;
+    bool go_anim = false;
 
 protected:
     Ui::MainWindow *ui;

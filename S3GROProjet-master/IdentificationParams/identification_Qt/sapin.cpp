@@ -9,36 +9,36 @@ SapinItem::SapinItem(double angleSapin,double currentpos,double sapinLacher,doub
     sapin->setTransformOriginPoint(16.5,-28);
     sapin->setRotation(angleSapin);
 
+    groundposition = scenePos().y()+50;
+    if(sapinLacher == 0)
+    {
+        go_anim = 0;
+
+    }
+
+    if(sapinLacher == 1&& go_anim == 0)
+    {
+    yAnimation = new QPropertyAnimation(this,"y",this);
+    yAnimation->setStartValue(scenePos().y());
+    yAnimation->setEndValue(400);
+    yAnimation->setEasingCurve(QEasingCurve::Linear);
+    yAnimation->setDuration(100);//compter cmb de temps prend d'aller a une position à l'autre 1100
+    connect(yAnimation,&QPropertyAnimation::finished,[=](){
+
+        scene()->removeItem(this);
+
+    });
+    yAnimation->start();
+    go_anim = 1;
+    }
+
     if(etat != 8)
     {
         addToGroup(sapin);
     }
 
-    groundposition = scenePos().y()+395;
 
-    /*connect(sapin,&yAnimation,[=](){
 
-    groundposition = scenePos().y()+395;
-    yAnimation = new QPropertyAnimation(this,"y",this);
-    yAnimation->setStartValue(scenePos().y());
-    yAnimation->setEndValue(groundposition);
-    yAnimation->setEasingCurve(QEasingCurve::Linear);
-    yAnimation->setDuration(1100);//compter cmb de temps prend d'aller a une position à l'autre 1100
-    });
-    if(sapinLacher == 1)
-    {
-            yAnimation->start();
-
-    }
-    if(sapinLacher == 0)
-    {
-       yAnimation->stop();
-          connect(yAnimation,&QPropertyAnimation::finished,[=](){
-               qDebug()<<"Animation Sapin Fini";
-               scene()->removeItem(this);
-               delete this;
-          });
-    }*/
 }
 
     SapinItem::~SapinItem()//tester si efface

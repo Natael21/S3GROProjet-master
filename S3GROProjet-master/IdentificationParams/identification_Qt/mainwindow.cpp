@@ -164,23 +164,14 @@ void MainWindow::receiveFromSerial(QString msg){
             etat = jsonObj["Etat"].toDouble();
             casZero     = jsonObj["casZero"].toBool();
             vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
-            etat = jsonObj["Etat"].toDouble();
             son = jsonObj["son"].toDouble();
-
-            connect(pipe,&PipeItem::pipecollided,[=](){
-
-                game_on = false;
-            });
 
             if(game_on == true)
             {
                 this->moveMario();
-                startMarioDeath();
-                GameOver = new QGraphicsPixmapItem(QPixmap(":/image/gameover.png"));
-                scene->addItem(GameOver);
             }
 
-            if(etat == 100)
+            if(etat == 100.0)
             {
                 game_on = true;
             }
@@ -214,9 +205,10 @@ void MainWindow::receiveFromSerial(QString msg){
         afficher = 0;
     }
 
-    if(sapinLacher && afficher != 1)
+
+    if(sapin_dropped == 2 && afficher != 1)
     {
-        this->showGIF();
+       // this->showGIF();
         afficher = 1;
     }
 
@@ -261,6 +253,11 @@ void MainWindow::sendPosition()
     positionObstacle = ui->distanceObstacle->text().toDouble();
     positionDepot = ui->distanceDepot->text().toDouble();
     hauteur_obstacle = ui->hauteurObstacle->text().toDouble();
+    distance_obstacle_anim = covertisseurMagique * distance_obstacle;
+    positionObstacle_anim = covertisseurMagique * positionObstacle;
+    positionDepot_anim = covertisseurMagique* positionDepot;
+    hauteur_obstacle_anim = covertisseurMagique * hauteur_obstacle;
+
 
 
 
@@ -281,10 +278,10 @@ void MainWindow::sendPosition()
     distance_envoyer = true;
     this->moveMario();
 
-    distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-    positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
-    positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
-    hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
+    //distance_obstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+    //positionObstacle = covertisseurMagique*ui->distanceObstacle->text().toDouble();
+   // positionDepot = covertisseurMagique*ui->distanceDepot->text().toDouble();
+   // hauteur_obstacle = covertisseurMagique*ui->hauteurObstacle->text().toDouble();
 
 }
 
@@ -375,9 +372,9 @@ void MainWindow::moveMario()
     scene->addItem(pixItem);
 
     //Creationdu panier
-    panierGauche = QRectF(positionDepot, 425, 5, 20);
-    panierMillieu = QRectF(positionDepot, 445, 40, 5);
-    panierDroite = QRectF(positionDepot+35, 425, 5, 20);
+    panierGauche = QRectF(positionDepot_anim, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot_anim, 445, 40, 5);
+    panierDroite = QRectF(positionDepot_anim+35, 425, 5, 20);
 
     // Pendule
     pendule = new PenduleItem(anglePendule,positionVoiture);
@@ -393,30 +390,54 @@ void MainWindow::moveMario()
     scene->addRect(rail, colorBlue, brushBlue);
 
     //Pipe
-    pipe = new PipeItem(positionObstacle+distanceRouePendule,hauteur_obstacle);// a changer pour ne pas recréer d'objet
+    pipe = new PipeItem(positionObstacle_anim+distanceRouePendule,hauteur_obstacle_anim);// a changer pour ne pas recréer d'objet
     scene->addItem(pipe);
+//    connect(pipe,&PipeItem::pipecollided,[=](){
+
+//        game_on = false;
+//        startMarioDeath();
+//        GameOver = new QGraphicsPixmapItem(QPixmap(":/image/gameover.png"));
+//        scene->addItem(GameOver);
+//    });
 
 
     //Panier
-    panierGauche = QRectF(positionDepot+distanceRouePendule, 425, 5, 20);
-    panierMillieu = QRectF(positionDepot+distanceRouePendule, 445, 40, 5);
-    panierDroite = QRectF(positionDepot+distanceRouePendule+35, 425, 5, 20);
+    panierGauche = QRectF(positionDepot_anim+distanceRouePendule, 425, 5, 20);
+    panierMillieu = QRectF(positionDepot_anim+distanceRouePendule, 445, 40, 5);
+    panierDroite = QRectF(positionDepot_anim+distanceRouePendule+35, 425, 5, 20);
 
     scene->addRect(panierGauche, colorBlue, brushBlue);
     scene->addRect(panierMillieu, colorBlue, brushBlue);
     scene->addRect(panierDroite, colorBlue, brushBlue);
 
     // Flag
-    flag = new FlagItem(positionDepot+distanceRouePendule);// a changer pour ne pas recréer d'objet
+    flag = new FlagItem(positionDepot_anim+distanceRouePendule);// a changer pour ne pas recréer d'objet
     scene->addItem(flag);
 
-    //if(sapinLacher == 0)
-    //{
+    if(sapinLacher == 0)
+    {
         //Sapin
+
+        go_anim = false;
 
         sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher,etat);
         scene->addItem(sapin);
-        //}
+    }
+//    if(sapinLacher == 1 && go_anim == false)
+//    {
+//        sapintimer = new QTimer(this);
+//        connect(sapintimer,&QTimer::timeout,[=](){
+
+//            sapin = new SapinItem(angleSapin, positionVoiture,sapinLacher,etat);
+//            scene->addItem(sapin);
+
+//        });
+
+//        sapintimer->start(120);
+//        sapin_dropped += 1;
+//        go_anim = true;
+//    }
+
         /*
     //Sapin
     if(!sapinLacher)

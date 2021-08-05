@@ -24,12 +24,14 @@ public:
 
 signals:
 
+
 public slots:
      void setY(qreal y);
 
 private:
     qreal m_y;
     qreal groundposition;
+    qreal go_anim;
 
     QGraphicsPixmapItem * pendule;
     QGraphicsPixmapItem * sapin;
