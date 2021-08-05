@@ -23,7 +23,7 @@ using namespace std;
 #define MOTOR_ID                        1         //Permet de choisir l'ID du moteur utiliser
 #define GEAR_RATIO                      2         //Permet de choisir un gearRatio en fonction des engrenage choisit
 #define FACTEUR_MAGIQUE                 1.1       //Ajoute 10% de distance pour compenser l'arondissement des ratio
-#define DISTANCE_AVANT_OBSTACLE         0.22   //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
+#define DISTANCE_AVANT_OBSTACLE         0.20   //Permet de savoir la position que le robot doit prendre pour commencer son oscillation
 #define PID_KP_LENT                     2.0
 #define PID_KI_LENT                     0.25
 #define PID_KD_LENT                     0.2
@@ -230,6 +230,8 @@ void loop() {
       oscillation_finis = false;
       go = false;
       go2 = false;
+      go3 = false;
+      trigger = false;
       
       pid_x.setGoal(position_obstacle-DISTANCE_AVANT_OBSTACLE);
       
@@ -359,7 +361,7 @@ void loop() {
               temps2 = millis();
             }
 
-            if(temps1-temps2 >= 1000)
+            if(temps1-temps2 >= 500)
             {
               AX_.setMotorPWM(MOTOR_ID, 0);
               go3 = true;
@@ -400,7 +402,7 @@ void loop() {
 
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
 
-      pid_x.setGoal(position_depart);
+      pid_x.setGoal(position_depart-0.01);
       pid_x.setGains(1.6, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
 
@@ -608,6 +610,10 @@ double PIDmeasurement(){
 }
 
 void PIDcommand(double cmd){
+  if (cmd<0.14&&cmd>0)
+  { cmd = 0.14;}
+  if (cmd>-0.14&&cmd<0)
+  { cmd = -0.14;}
   pulsePWM_ = cmd;
 }
 
@@ -642,6 +648,7 @@ double Calculangle()
 
 void PIDcommand_angle(double cmd_angle)
 {
+
   pulsePWM_angle = cmd_angle;
 }
 

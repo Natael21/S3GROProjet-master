@@ -110,8 +110,8 @@ void MainWindow::showGIF()
     QObject::connect(&cntDown, &QTimer::timeout, [&msg,&SapinSound, &cnt, &cntDown]()->void{
         if(--cnt < 0){
             cntDown.stop();
+             SapinSound->stop();
             msg.close();
-            SapinSound->stop();
 
         }  else {
             msg.setWindowTitle("AMAZING");
