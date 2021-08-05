@@ -28,6 +28,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         pendule.cpp \
+        sapin.cpp \
         serialprotocol.cpp \
         csvwriter.cpp \
         car.cpp \
@@ -37,6 +38,7 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
         pendule.h \
+        sapin.h \
         serialprotocol.h \
         csvwriter.h \
         car.h \
