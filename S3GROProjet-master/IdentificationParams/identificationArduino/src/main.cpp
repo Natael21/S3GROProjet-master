@@ -298,7 +298,7 @@ void loop() {
         pid_x.setGains(PID_KP_RAPIDE,0,0);
         AX_.setMotorPWM(MOTOR_ID, 1);
 
-        if(cur_pos > (position_obstacle+0.3))
+        if(cur_pos > (position_obstacle+0.35))
         {
           oscillation_finis = false;
           goal_angle_atteint = false;
@@ -348,16 +348,16 @@ void loop() {
     case ARRET_OSCILLATION: //Cas pour arreter le pendule vers 0 degree au dessus du panier
       //On fait un sinus qui tend vers 0 ???---------------------------------------------------------------
       //problème avec le case 
-               // pid_q.setGains(5,0,0);
-               // pid_q.setGoal(0);
-                //AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
+                pid_q.setGains(5,0,0);
+                pid_q.setGoal(0);
+                AX_.setMotorPWM(MOTOR_ID,pulsePWM_angle);
       if(!go3)
       {
       pwm_correction = reduce_angle();
       AX_.setMotorPWM(MOTOR_ID, 2*pwm_correction);
       }
                      // mis en comentaire pour tester
-     if((abs(vitesse_angle) < 0.5 && abs(new_angle) < 10)||go3==true ) 
+     if((abs(vitesse_angle) < 0.4 && abs(new_angle) < 10))//||go3==true  
       {
         go3 = true;
        
@@ -365,7 +365,7 @@ void loop() {
         
         AX_.setMotorPWM(MOTOR_ID, pulsePWM_);
 
-          if (goal_position_atteint)
+          if (goal_position_atteint&&(abs(vitesse_angle) < 0.2 && abs(new_angle+old_angle) < 10))
           {
           goal_position_atteint = false;
           pid_x.enable();
@@ -397,7 +397,7 @@ void loop() {
     case AVANCE_RETOUR: //Cas de passer par dessus l'obstacle pour le retour
       //Serial.println("avance retour");
       pid_x.setGoal(position_depart);
-      pid_x.setGains(PID_KP_LENT, PID_KI_LENT ,PID_KD_LENT);
+      pid_x.setGains(1.6, PID_KI_LENT ,PID_KD_LENT);
       AX_.setMotorPWM(MOTOR_ID,pulsePWM_);
       if(goal_position_atteint)
       {
@@ -405,7 +405,7 @@ void loop() {
         goal_position_atteint = false;
         prendre_sapin = true;
         pid_x.enable();
-        choix = START;
+        choix = ATTENTE;
       }
     break;
 

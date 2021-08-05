@@ -10,31 +10,18 @@ PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos
     pendule->setPos(currentpos-5,345);
     sapin->setPos(currentpos+15,365);
 
-<<<<<<< HEAD
-    sapin->setTransformOriginPoint(currentpos,-10);
-=======
->>>>>>> 3d67d1aeca77aa7b2b20339bd24add7828350090
+    sapin->setTransformOriginPoint(16.5,-28);
     sapin->setRotation(angleSapin);
-    sapin->setTransform(QTransform().translate(pendule->x(),pendule->y()).rotate(angleSapin).translate(-pendule->x(), -pendule->y()));
+
 
     QPointF offsetPendule = pendule->boundingRect().topRight();
-   // QPointF offsetSapin= sapin->boundingRect().center();
     QTransform transPendule;
 
     transPendule.translate(offsetPendule .x(), offsetPendule .y());
     transPendule.rotate(anglePendule);
     transPendule.translate(-offsetPendule .x(), -offsetPendule .y());
 
-    //QTransform transSapin;
-
-   // transSapin.translate(offsetSapin.x(), offsetSapin.y());
-    //transSapin.rotate(angleSapin);
-  //  transSapin.translate(-offsetSapin.x(), -offsetSapin.y());
-
-
-
     pendule->setTransform(transPendule);
-    //sapin->setTransform(transSapin);
 
     addToGroup(pendule);
 
@@ -45,7 +32,7 @@ PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos
 
     groundposition = scenePos().y()+395;
 
-   /* connect(sapin,&yAnimation,[=](){
+    /*connect(sapin,&yAnimation,[=](){
 
     groundposition = scenePos().y()+395;
     yAnimation = new QPropertyAnimation(this,"y",this);
@@ -56,7 +43,7 @@ PenduleItem::PenduleItem(double anglePendule,double angleSapin,double currentpos
     });
     if(sapinLacher == 1)
     {
-            //yAnimation->start();
+            yAnimation->start();
 
     }
     if(sapinLacher == 0)

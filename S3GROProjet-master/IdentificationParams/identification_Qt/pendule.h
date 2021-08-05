@@ -9,7 +9,6 @@
 #include<QPropertyAnimation>
 #include<QtDebug>
 #include<QtMath>
-#include<QTransform>
 
 class PenduleItem :public QObject, public QGraphicsItemGroup
 {

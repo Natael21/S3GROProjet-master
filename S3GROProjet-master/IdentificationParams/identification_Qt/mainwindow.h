@@ -30,7 +30,6 @@
 #include "pipe.h"
 #include "flag.h"
 #include "pendule.h"
-#include "sapin.h"
 
 // Classe definissant l'application
 namespace Ui {
@@ -132,7 +131,6 @@ private:
     PipeItem * pipe;
     FlagItem * flag;
     PenduleItem * pendule;
-    SapinItem * sapin;
 
     int sapin_dropped =          0;
 
@@ -142,7 +140,7 @@ private:
     //double distance_depot =      500;
    // double lastposvoiture =      0;
     double positionVoiture =     0;//peut peut etre enlever et garder dans la classe max = 602
-    double positionObstacle =    0;//same 350,-18 a 620
+    double positionObstacle =    300;//same 350,-18 a 620
     double hauteur_obstacle =    -0.01;
     double longeurPendule =      40;
     double positionDepot =       500;

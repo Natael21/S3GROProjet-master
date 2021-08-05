@@ -32,8 +32,7 @@ SOURCES += \
         csvwriter.cpp \
         car.cpp \
         pipe.cpp \
-        flag.cpp \
-    sapin.cpp
+        flag.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,8 +41,7 @@ HEADERS += \
         csvwriter.h \
         car.h \
         pipe.h \
-        flag.h \
-    sapin.h
+        flag.h
 
 FORMS += \
         mainwindow.ui
